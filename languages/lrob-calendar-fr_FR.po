@@ -1,5 +1,5 @@
 # French translation of LRob - Calendar
-# Copyright (C) 2026 Robin Labadie - LRob
+# Copyright (C) 2026 LRob
 # This file is distributed under the same license as the LRob - Calendar plugin.
 msgid ""
 msgstr ""
