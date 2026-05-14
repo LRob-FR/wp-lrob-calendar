@@ -36,7 +36,10 @@ $base_args = [
 ];
 
 if (!$attributes['showPast']) {
-    $base_args['start'] = time();
+    // "Today's events" — events that have already ended today should still
+    // count as upcoming. Cutoff is midnight at the start of the site's local
+    // day, not the precise current second.
+    $base_args['start'] = (new DateTimeImmutable('today', wp_timezone()))->getTimestamp();
 }
 if ($attributes['category']) {
     $base_args['category'] = (int) $attributes['category'];

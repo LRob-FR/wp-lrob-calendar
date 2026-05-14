@@ -268,6 +268,18 @@
     width: var(--lrob-popup-width, 360px);
     max-width: calc(100% - 20px);
     display: none;
+    /* Fade in/out — JS toggles `is-shown` on the next frame after display:block,
+       and removes it ~200ms before display:none on hide. */
+    opacity: 0;
+    transition: opacity 0.18s ease-out;
+}
+
+.lrob-cal-popup.is-shown {
+    opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .lrob-cal-popup { transition: none; }
 }
 
 /* Popup-size presets (set CSS var on the calendar container) */

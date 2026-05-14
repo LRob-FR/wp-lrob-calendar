@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: LRob Calendar 1.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/lrob-calendar\n"
-"POT-Creation-Date: 2026-05-14T13:57:24+00:00\n"
+"POT-Creation-Date: 2026-05-14T14:08:18+00:00\n"
 "PO-Revision-Date: 2026-05-12 18:00+0200\n"
 "Last-Translator: Robin Labadie <claude@lrob.fr>\n"
 "Language-Team: French <claude@lrob.fr>\n"
@@ -41,32 +41,32 @@ msgstr "Robin Labadie - LRob"
 msgid "View event"
 msgstr "Voir l'événement"
 
-#: blocks/events-list/render.php:68
+#: blocks/events-list/render.php:71
 msgid "No events found."
 msgstr "Aucun événement trouvé."
 
-#: blocks/events-list/render.php:86
+#: blocks/events-list/render.php:89
 msgid "Events list pagination"
 msgstr "Pagination de la liste d'événements"
 
-#: blocks/events-list/render.php:91
+#: blocks/events-list/render.php:94
 msgid "Previous page"
 msgstr "Page précédente"
 
 #. translators: 1: current page number, 2: total pages
-#: blocks/events-list/render.php:99
+#: blocks/events-list/render.php:102
 msgid "Page %1$d / %2$d"
 msgstr "Page %1$d / %2$d"
 
-#: blocks/events-list/render.php:105
+#: blocks/events-list/render.php:108
 msgid "Next page"
 msgstr "Page suivante"
 
-#: blocks/events-list/render.php:116
+#: blocks/events-list/render.php:119
 msgid "Previous"
 msgstr "Précédent"
 
-#: blocks/events-list/render.php:117
+#: blocks/events-list/render.php:120
 msgid "Next"
 msgstr "Suivant"
 
@@ -319,7 +319,7 @@ msgid "Location"
 msgstr "Lieu"
 
 #: includes/class-lrob-calendar-admin.php:599
-#: includes/class-lrob-calendar-block-helpers.php:216
+#: includes/class-lrob-calendar-block-helpers.php:222
 #: includes/class-lrob-calendar-blocks.php:193
 msgid "Recurring"
 msgstr "Récurrent"

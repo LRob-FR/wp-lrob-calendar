@@ -22,10 +22,13 @@ class LRob_Calendar_Block_Helpers {
         // For recurring events, prefer the next upcoming instance over the base.
         // Otherwise an event whose base happened years ago but recurs forever
         // would display its original 2018 date in the popup — confusing.
+        // Cutoff is start-of-today (site timezone) so today's instance still
+        // counts as "next upcoming" even after its time has passed.
         $start_dt = $event->get_start_datetime();
         $end_dt   = $event->get_end_datetime();
         if ($event->is_recurring()) {
-            $next = $event->get_next_instance_after(time());
+            $today_start = (new DateTimeImmutable('today', wp_timezone()))->getTimestamp();
+            $next = $event->get_next_instance_after($today_start);
             if ($next) {
                 $tz = new DateTimeZone($event->get('timezone') ?: 'UTC');
                 $start_dt = (new DateTime('@' . (int) $next['start']))->setTimezone($tz);
@@ -168,8 +171,11 @@ class LRob_Calendar_Block_Helpers {
         <article class="<?php echo esc_attr(implode(' ', $card_classes)); ?>">
             <?php if ($show_images && has_post_thumbnail($post->ID) && $template !== 'minimal'):
                 $thumb_attrs = ['alt' => esc_attr($post->post_title), 'loading' => 'lazy'];
+                // "Natural" image height shows the image at full visual fidelity
+                // inline — no need to enlarge via lightbox.
+                $allow_lightbox = ($image_height !== 'auto');
                 ?>
-                <?php if ($full_url): ?>
+                <?php if ($full_url && $allow_lightbox): ?>
                     <button class="lrob-event-thumbnail lrob-event-thumbnail--clickable"
                             type="button"
                             data-full-url="<?php echo esc_url($full_url); ?>">

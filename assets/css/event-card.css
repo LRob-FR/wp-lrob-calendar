@@ -54,7 +54,18 @@
 .lrob-event-card--image-height-small  .lrob-event-thumbnail img { height: 110px; }
 .lrob-event-card--image-height-medium .lrob-event-thumbnail img { height: 180px; }
 .lrob-event-card--image-height-large  .lrob-event-thumbnail img { height: 280px; }
-.lrob-event-card--image-height-auto   .lrob-event-thumbnail img { height: auto; max-height: 400px; }
+
+/* Natural: width fills the card, height follows the image's own aspect ratio.
+   object-fit is irrelevant here — the image renders at its natural box.
+   render_event_card() also drops the lightbox button in this mode since the
+   image is already shown at full visual fidelity. */
+.lrob-event-card--image-height-auto .lrob-event-thumbnail,
+.lrob-event-card--image-height-auto .lrob-event-thumbnail img {
+    height: auto;
+}
+.lrob-event-card--image-height-auto .lrob-event-thumbnail img {
+    object-fit: initial;
+}
 
 .lrob-event-content {
     padding: 15px;

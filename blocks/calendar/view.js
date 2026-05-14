@@ -561,6 +561,10 @@
         
         var $popup = this.$container.find('.lrob-cal-popup');
         $popup.html(html).show();
+        // Fade-in: force a reflow so the browser applies opacity:0 before we
+        // add the .is-shown class (otherwise the transition wouldn't trigger).
+        $popup[0].offsetHeight; // eslint-disable-line no-unused-expressions
+        $popup.addClass('is-shown');
 
         // Lightbox-on-click for the thumbnail
         var self = this;
@@ -637,7 +641,19 @@
 
     LRobCalendar.prototype.hidePopup = function() {
         this.currentPopupEventId = null;
-        this.$container.find('.lrob-cal-popup').hide();
+        var $popup = this.$container.find('.lrob-cal-popup');
+        if (!$popup.hasClass('is-shown')) {
+            $popup.hide();
+            return;
+        }
+        $popup.removeClass('is-shown');
+        // Match the CSS transition duration before fully hiding.
+        setTimeout(function () {
+            // Skip hide() if a new popup opened in the meantime (re-added .is-shown).
+            if (!$popup.hasClass('is-shown')) {
+                $popup.hide();
+            }
+        }, 200);
     };
 
     /**

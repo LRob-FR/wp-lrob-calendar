@@ -2,14 +2,14 @@
 # This file is distributed under the same license as the LRob - Calendar plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: LRob Calendar 1.0.0\n"
+"Project-Id-Version: LRob Calendar 1.0.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/lrob-calendar\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-05-14T13:57:24+00:00\n"
+"POT-Creation-Date: 2026-05-14T14:08:18+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: lrob-calendar\n"
@@ -36,32 +36,32 @@ msgstr ""
 msgid "View event"
 msgstr ""
 
-#: blocks/events-list/render.php:68
+#: blocks/events-list/render.php:71
 msgid "No events found."
 msgstr ""
 
-#: blocks/events-list/render.php:86
+#: blocks/events-list/render.php:89
 msgid "Events list pagination"
 msgstr ""
 
-#: blocks/events-list/render.php:91
+#: blocks/events-list/render.php:94
 msgid "Previous page"
 msgstr ""
 
 #. translators: 1: current page number, 2: total pages
-#: blocks/events-list/render.php:99
+#: blocks/events-list/render.php:102
 msgid "Page %1$d / %2$d"
 msgstr ""
 
-#: blocks/events-list/render.php:105
+#: blocks/events-list/render.php:108
 msgid "Next page"
 msgstr ""
 
-#: blocks/events-list/render.php:116
+#: blocks/events-list/render.php:119
 msgid "Previous"
 msgstr ""
 
-#: blocks/events-list/render.php:117
+#: blocks/events-list/render.php:120
 msgid "Next"
 msgstr ""
 
@@ -288,7 +288,7 @@ msgid "Location"
 msgstr ""
 
 #: includes/class-lrob-calendar-admin.php:599
-#: includes/class-lrob-calendar-block-helpers.php:216
+#: includes/class-lrob-calendar-block-helpers.php:222
 #: includes/class-lrob-calendar-blocks.php:193
 msgid "Recurring"
 msgstr ""
