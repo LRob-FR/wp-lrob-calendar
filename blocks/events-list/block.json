@@ -20,7 +20,8 @@
         "showExcerpt":    { "type": "boolean", "default": true },
         "showCategories": { "type": "boolean", "default": true },
         "imageDisplay":   { "type": "string",  "default": "contain" },
-        "imageHeight":    { "type": "string",  "default": "medium" }
+        "imageHeight":    { "type": "string",  "default": "medium" },
+        "imageLightbox":  { "type": "boolean", "default": true }
     },
     "editorScript": "lrob-calendar-block-events-list-edit",
     "editorStyle":  "lrob-calendar-blocks-editor",

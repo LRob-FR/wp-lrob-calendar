@@ -10,8 +10,9 @@
     "attributes": {
         "eventId":      { "type": "number", "default": 0 },
         "template":     { "type": "string", "default": "full" },
-        "imageDisplay": { "type": "string", "default": "contain" },
-        "imageHeight":  { "type": "string", "default": "medium" }
+        "imageDisplay":  { "type": "string",  "default": "contain" },
+        "imageHeight":   { "type": "string",  "default": "medium" },
+        "imageLightbox": { "type": "boolean", "default": true }
     },
     "editorScript": "lrob-calendar-block-single-event-edit",
     "editorStyle":  "lrob-calendar-blocks-editor",

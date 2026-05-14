@@ -88,6 +88,11 @@
                                 { value: 'large',  label: __('Large',  'lrob-calendar') }
                             ],
                             onChange: (value) => setAttributes({ popupImageHeight: value })
+                        }),
+                        attributes.popupShowImage && el(ToggleControl, {
+                            label: __('Click image to enlarge', 'lrob-calendar'),
+                            checked: attributes.popupImageLightbox,
+                            onChange: (value) => setAttributes({ popupImageLightbox: value })
                         })
                     )
                 ),

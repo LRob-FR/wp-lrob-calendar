@@ -150,6 +150,10 @@ class LRob_Calendar_Block_Helpers {
         $show_categories = $atts['showCategories']  ?? true;
         $image_display   = in_array($atts['imageDisplay'] ?? 'contain', ['cover', 'contain'], true) ? $atts['imageDisplay'] : 'contain';
         $image_height    = in_array($atts['imageHeight'] ?? 'medium', ['small', 'medium', 'large', 'auto'], true) ? $atts['imageHeight'] : 'medium';
+        // Whether thumbnail is clickable to open the fullscreen lightbox.
+        // Always disabled in "natural" image-height mode — the full image is
+        // already shown in the card so there's nothing to enlarge.
+        $allow_lightbox  = ($atts['imageLightbox'] ?? true) && $image_height !== 'auto';
 
         $date_format   = get_option('date_format');
         $time_format   = get_option('time_format');
@@ -171,9 +175,7 @@ class LRob_Calendar_Block_Helpers {
         <article class="<?php echo esc_attr(implode(' ', $card_classes)); ?>">
             <?php if ($show_images && has_post_thumbnail($post->ID) && $template !== 'minimal'):
                 $thumb_attrs = ['alt' => esc_attr($post->post_title), 'loading' => 'lazy'];
-                // "Natural" image height shows the image at full visual fidelity
-                // inline — no need to enlarge via lightbox.
-                $allow_lightbox = ($image_height !== 'auto');
+                // $allow_lightbox computed above from attrs + image_height.
                 ?>
                 <?php if ($full_url && $allow_lightbox): ?>
                     <button class="lrob-event-thumbnail lrob-event-thumbnail--clickable"

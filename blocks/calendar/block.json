@@ -16,10 +16,11 @@
         "tag":               { "type": "number",  "default": 0 },
         "linkText":          { "type": "string",  "default": "" },
         "align":             { "type": "string",  "default": "" },
-        "popupSize":         { "type": "string",  "default": "standard" },
-        "popupImageDisplay": { "type": "string",  "default": "contain" },
-        "popupImageHeight":  { "type": "string",  "default": "medium" },
-        "popupShowImage":    { "type": "boolean", "default": true }
+        "popupSize":          { "type": "string",  "default": "standard" },
+        "popupImageDisplay":  { "type": "string",  "default": "contain" },
+        "popupImageHeight":   { "type": "string",  "default": "medium" },
+        "popupShowImage":     { "type": "boolean", "default": true },
+        "popupImageLightbox": { "type": "boolean", "default": true }
     },
     "editorScript": "lrob-calendar-block-calendar-edit",
     "editorStyle":  "lrob-calendar-blocks-editor",

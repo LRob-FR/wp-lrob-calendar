@@ -32,6 +32,10 @@
             requestAnimationFrame(function () {
                 if (el.scrollHeight - el.clientHeight > 2) {
                     addToggle(el);
+                } else {
+                    // Content fits the clamp — strip the class so we don't
+                    // render the fade-out gradient over text that isn't truncated.
+                    el.classList.remove('lrob-cal-clampable');
                 }
             });
         });

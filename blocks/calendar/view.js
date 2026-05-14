@@ -32,6 +32,7 @@
         this.popupImageDisplay = config.popupImageDisplay || 'contain';
         this.popupImageHeight = config.popupImageHeight || 'medium';
         this.popupShowImage = config.popupShowImage !== false;
+        this.popupImageLightbox = config.popupImageLightbox !== false;
 
         // Mirror as CSS classes on the container so styles can react.
         this.$container.addClass('lrob-cal-popup-size-' + this.popupSize);
@@ -494,13 +495,19 @@
         html += '<div class="lrob-cal-popup-content">';
         html += '<button class="lrob-cal-popup-close" type="button" aria-label="' + this.escapeHtml(closeLabel) + '">&times;</button>';
 
-        // Thumbnail is always a click-to-zoom button (lightbox), independent of
-        // whether single-event pages exist. The title/CTA below handle navigation
-        // when public pages are enabled.
+        // Thumbnail click-behavior depends on popupImageLightbox: when on (default)
+        // it's a button that opens the fullscreen lightbox; when off it's a plain
+        // <div> with the same look but no click handler.
         if (event.thumbnail && this.popupShowImage) {
-            html += '<button class="lrob-cal-popup-thumb" type="button" aria-label="' + this.escapeHtml(viewImageLabel) + '">';
-            html += '<img src="' + event.thumbnail + '" alt="" loading="lazy">';
-            html += '</button>';
+            if (this.popupImageLightbox) {
+                html += '<button class="lrob-cal-popup-thumb" type="button" aria-label="' + this.escapeHtml(viewImageLabel) + '">';
+                html += '<img src="' + event.thumbnail + '" alt="" loading="lazy">';
+                html += '</button>';
+            } else {
+                html += '<div class="lrob-cal-popup-thumb lrob-cal-popup-thumb--static">';
+                html += '<img src="' + event.thumbnail + '" alt="" loading="lazy">';
+                html += '</div>';
+            }
         }
 
         html += '<div class="lrob-cal-popup-body">';

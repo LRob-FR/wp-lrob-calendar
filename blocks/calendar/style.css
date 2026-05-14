@@ -411,6 +411,15 @@
     opacity: 0.92;
 }
 
+/* Non-clickable variant — when popupImageLightbox is off. */
+.lrob-cal-popup-thumb--static {
+    cursor: default;
+}
+
+.lrob-cal-popup-thumb--static:hover img {
+    opacity: 1;
+}
+
 .lrob-cal-popup-body {
     padding: 14px 16px 16px;
 }
@@ -503,9 +512,15 @@
        min-width: calc(N * 100% + ...px) can exceed the table width by a few
        pixels (the +Npx accounts for cell padding/border), and on a narrow
        viewport that becomes a visible horizontal scrollbar. Popup arrows on
-       mobile are inside the fixed modal so they aren't affected by this clip. */
-    .lrob-calendar {
+       mobile sit just outside the popup (visible because popup is 84vw, not
+       90vw — see below). */
+    .lrob-calendar,
+    .lrob-cal-grid {
         overflow-x: hidden;
+    }
+    /* Extra safety: cap the bar's visual width to viewport-minus-padding. */
+    .lrob-cal-event-multiday {
+        max-inline-size: calc(100vw - 30px);
     }
 
     .lrob-cal-table td {
@@ -519,20 +534,48 @@
         font-size: 0.6em;
     }
 
-    /* Popup becomes a fixed centered modal — the relative-positioned 360px
-       box is unusable on phone screens. !important overrides the inline
-       top/left/width JS sets for desktop positioning. z-index sits below the
-       lightbox (200000) so a lightbox opened from the popup wins on iOS. */
+    /* Popup becomes a fixed CENTERED modal with a fullscreen backdrop.
+       Width 84vw (not 90vw) leaves room for nav arrows to sit just outside.
+       !important overrides the inline top/left/width that JS sets for desktop. */
     .lrob-cal-popup {
         position: fixed !important;
-        top: 5vh !important;
-        left: 5vw !important;
-        right: 5vw !important;
+        top: 50% !important;
+        left: 50% !important;
+        right: auto !important;
         bottom: auto !important;
-        width: 90vw !important;
+        width: 84vw !important;
         max-width: none !important;
-        max-height: 90vh;
+        max-height: 86vh;
         overflow-y: auto;
         z-index: 100001;
+        /* translate works alongside the existing opacity transition. */
+        transform: translate(-50%, -50%);
     }
+
+    /* Darkened backdrop behind the centered popup. The ::before is a child of
+       the popup's stacking context (z-index: -1) so it sits below the popup's
+       own content but above all other page elements with z-index < 100001. */
+    .lrob-cal-popup.is-shown::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.55);
+        z-index: -1;
+        animation: lrob-cal-backdrop-fade 0.18s ease-out;
+    }
+
+    @keyframes lrob-cal-backdrop-fade {
+        from { opacity: 0; }
+        to   { opacity: 1; }
+    }
+
+    /* Nav arrows: smaller, just outside the popup edge. With popup at 84vw
+       centered, each side has 8vw of room — enough for a 30px arrow at -34px. */
+    .lrob-cal-popup-nav {
+        width: 30px;
+        height: 30px;
+        font-size: 20px;
+    }
+    .lrob-cal-popup-nav--prev { left: -34px; right: auto; }
+    .lrob-cal-popup-nav--next { right: -34px; left: auto; }
 }

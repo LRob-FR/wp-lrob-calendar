@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: LRob Calendar 1.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/lrob-calendar\n"
-"POT-Creation-Date: 2026-05-14T14:08:18+00:00\n"
+"POT-Creation-Date: 2026-05-14T14:28:37+00:00\n"
 "PO-Revision-Date: 2026-05-12 18:00+0200\n"
 "Last-Translator: Robin Labadie <claude@lrob.fr>\n"
 "Language-Team: French <claude@lrob.fr>\n"
@@ -319,7 +319,7 @@ msgid "Location"
 msgstr "Lieu"
 
 #: includes/class-lrob-calendar-admin.php:599
-#: includes/class-lrob-calendar-block-helpers.php:222
+#: includes/class-lrob-calendar-block-helpers.php:224
 #: includes/class-lrob-calendar-blocks.php:193
 msgid "Recurring"
 msgstr "Récurrent"
@@ -780,11 +780,11 @@ msgstr "Voir la carte en grand"
 msgid "Layout"
 msgstr "Mise en page"
 
-#: blocks/calendar/edit.js:28 blocks/calendar/edit.js:103
+#: blocks/calendar/edit.js:28 blocks/calendar/edit.js:108
 msgid "Month grid"
 msgstr "Grille mensuelle"
 
-#: blocks/calendar/edit.js:29 blocks/calendar/edit.js:102
+#: blocks/calendar/edit.js:29 blocks/calendar/edit.js:107
 msgid "Agenda list"
 msgstr "Liste agenda"
 
@@ -863,11 +863,16 @@ msgstr "Moyenne"
 msgid "Large"
 msgstr "Grande"
 
-#: blocks/calendar/edit.js:98
+#: blocks/calendar/edit.js:93 blocks/events-list/edit.js:115
+#: blocks/single-event/edit.js:139
+msgid "Click image to enlarge"
+msgstr "Cliquer sur l'image pour l'agrandir"
+
+#: blocks/calendar/edit.js:103
 msgid "Event Calendar"
 msgstr "Calendrier des événements"
 
-#: blocks/calendar/edit.js:100
+#: blocks/calendar/edit.js:105
 msgid "Layout:"
 msgstr "Mise en page :"
 
@@ -952,35 +957,43 @@ msgstr "Options d'affichage"
 msgid "Natural"
 msgstr "Naturelle"
 
-#: blocks/events-list/edit.js:114
+#: blocks/events-list/edit.js:111 blocks/single-event/edit.js:135
+msgid ""
+"Natural fills the card width at the image's own aspect ratio and disables "
+"click-to-enlarge."
+msgstr ""
+"« Naturelle » remplit la largeur de la carte selon le ratio d'origine de "
+"l'image et désactive l'agrandissement au clic."
+
+#: blocks/events-list/edit.js:120
 msgid "Show Excerpt"
 msgstr "Afficher l'extrait"
 
-#: blocks/events-list/edit.js:119
+#: blocks/events-list/edit.js:125
 msgid "Show Categories"
 msgstr "Afficher les catégories"
 
-#: blocks/events-list/edit.js:124
+#: blocks/events-list/edit.js:130
 msgid "Filters"
 msgstr "Filtres"
 
-#: blocks/events-list/edit.js:126
+#: blocks/events-list/edit.js:132
 msgid "Category"
 msgstr "Catégorie"
 
-#: blocks/events-list/edit.js:132
+#: blocks/events-list/edit.js:138
 msgid "Tag"
 msgstr "Étiquette"
 
-#: blocks/events-list/edit.js:142
+#: blocks/events-list/edit.js:148
 msgid "Events List"
 msgstr "Liste d'événements"
 
-#: blocks/events-list/edit.js:142
+#: blocks/events-list/edit.js:148
 msgid "events"
 msgstr "événements"
 
-#: blocks/events-list/edit.js:153
+#: blocks/events-list/edit.js:159
 msgid "more events"
 msgstr "événements supplémentaires"
 
@@ -1004,7 +1017,7 @@ msgstr "Sélectionné :"
 msgid "Full"
 msgstr "Complet"
 
-#: blocks/single-event/edit.js:153
+#: blocks/single-event/edit.js:159
 msgid "Select an event in the sidebar."
 msgstr "Sélectionnez un événement dans la barre latérale."
 

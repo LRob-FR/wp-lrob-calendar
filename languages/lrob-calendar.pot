@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-05-14T14:08:18+00:00\n"
+"POT-Creation-Date: 2026-05-14T14:29:52+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: lrob-calendar\n"
@@ -288,7 +288,7 @@ msgid "Location"
 msgstr ""
 
 #: includes/class-lrob-calendar-admin.php:599
-#: includes/class-lrob-calendar-block-helpers.php:222
+#: includes/class-lrob-calendar-block-helpers.php:224
 #: includes/class-lrob-calendar-blocks.php:193
 msgid "Recurring"
 msgstr ""
@@ -740,12 +740,12 @@ msgid "Layout"
 msgstr ""
 
 #: blocks/calendar/edit.js:28
-#: blocks/calendar/edit.js:103
+#: blocks/calendar/edit.js:108
 msgid "Month grid"
 msgstr ""
 
 #: blocks/calendar/edit.js:29
-#: blocks/calendar/edit.js:102
+#: blocks/calendar/edit.js:107
 msgid "Agenda list"
 msgstr ""
 
@@ -833,11 +833,17 @@ msgstr ""
 msgid "Large"
 msgstr ""
 
-#: blocks/calendar/edit.js:98
+#: blocks/calendar/edit.js:93
+#: blocks/events-list/edit.js:115
+#: blocks/single-event/edit.js:139
+msgid "Click image to enlarge"
+msgstr ""
+
+#: blocks/calendar/edit.js:103
 msgid "Event Calendar"
 msgstr ""
 
-#: blocks/calendar/edit.js:100
+#: blocks/calendar/edit.js:105
 msgid "Layout:"
 msgstr ""
 
@@ -920,35 +926,40 @@ msgstr ""
 msgid "Natural"
 msgstr ""
 
-#: blocks/events-list/edit.js:114
+#: blocks/events-list/edit.js:111
+#: blocks/single-event/edit.js:135
+msgid "Natural fills the card width at the image's own aspect ratio and disables click-to-enlarge."
+msgstr ""
+
+#: blocks/events-list/edit.js:120
 msgid "Show Excerpt"
 msgstr ""
 
-#: blocks/events-list/edit.js:119
+#: blocks/events-list/edit.js:125
 msgid "Show Categories"
 msgstr ""
 
-#: blocks/events-list/edit.js:124
+#: blocks/events-list/edit.js:130
 msgid "Filters"
 msgstr ""
 
-#: blocks/events-list/edit.js:126
+#: blocks/events-list/edit.js:132
 msgid "Category"
 msgstr ""
 
-#: blocks/events-list/edit.js:132
+#: blocks/events-list/edit.js:138
 msgid "Tag"
 msgstr ""
 
-#: blocks/events-list/edit.js:142
+#: blocks/events-list/edit.js:148
 msgid "Events List"
 msgstr ""
 
-#: blocks/events-list/edit.js:142
+#: blocks/events-list/edit.js:148
 msgid "events"
 msgstr ""
 
-#: blocks/events-list/edit.js:153
+#: blocks/events-list/edit.js:159
 msgid "more events"
 msgstr ""
 
@@ -972,6 +983,6 @@ msgstr ""
 msgid "Full"
 msgstr ""
 
-#: blocks/single-event/edit.js:153
+#: blocks/single-event/edit.js:159
 msgid "Select an event in the sidebar."
 msgstr ""
