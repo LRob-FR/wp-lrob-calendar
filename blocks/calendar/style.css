@@ -305,23 +305,50 @@
     overflow: hidden;
     /* Animation fires every time the popup content is (re)rendered — including
        when navigatePopupTo() swaps to the next event. innerHTML replacement
-       creates a fresh DOM node, which triggers the keyframe from scratch. */
-    animation: lrob-cal-popup-slide-in 0.22s ease-out;
+       creates a fresh DOM node, which triggers the keyframe from scratch.
+       Default: slide in from the right (matches the typical "next" swipe). */
+    animation: lrob-cal-popup-slide-in-right 0.22s ease-out;
 }
 
-@keyframes lrob-cal-popup-slide-in {
-    from {
-        opacity: 0;
-        transform: translateX(16px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+/* Direction override: when navigatePopupTo() sets data-slide-in-from="left"
+   on the popup parent (i.e. user swiped right / pressed prev), the new card
+   slides in from the LEFT to match the gesture. */
+.lrob-cal-popup[data-slide-in-from="left"] .lrob-cal-popup-content {
+    animation: lrob-cal-popup-slide-in-left 0.22s ease-out;
+}
+
+/* Slide-out: the CURRENT card slides off in the swipe direction before the
+   content is replaced. JS adds .is-slide-out-{left,right} on the popup
+   parent, waits ~120ms, then calls showPopup() which swaps the inner HTML. */
+.lrob-cal-popup.is-slide-out-left .lrob-cal-popup-content {
+    animation: lrob-cal-popup-slide-out-left 0.12s ease-in forwards;
+}
+.lrob-cal-popup.is-slide-out-right .lrob-cal-popup-content {
+    animation: lrob-cal-popup-slide-out-right 0.12s ease-in forwards;
+}
+
+@keyframes lrob-cal-popup-slide-in-right {
+    from { opacity: 0; transform: translateX(16px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes lrob-cal-popup-slide-in-left {
+    from { opacity: 0; transform: translateX(-16px); }
+    to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes lrob-cal-popup-slide-out-left {
+    from { opacity: 1; transform: translateX(0); }
+    to   { opacity: 0; transform: translateX(-30px); }
+}
+@keyframes lrob-cal-popup-slide-out-right {
+    from { opacity: 1; transform: translateX(0); }
+    to   { opacity: 0; transform: translateX(30px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .lrob-cal-popup-content {
+    .lrob-cal-popup-content,
+    .lrob-cal-popup[data-slide-in-from="left"] .lrob-cal-popup-content,
+    .lrob-cal-popup.is-slide-out-left .lrob-cal-popup-content,
+    .lrob-cal-popup.is-slide-out-right .lrob-cal-popup-content {
         animation: none;
     }
 }
@@ -511,9 +538,7 @@
     /* Clip horizontal overflow at mobile widths. Multi-day bars with inline
        min-width: calc(N * 100% + ...px) can exceed the table width by a few
        pixels (the +Npx accounts for cell padding/border), and on a narrow
-       viewport that becomes a visible horizontal scrollbar. Popup arrows on
-       mobile sit just outside the popup (visible because popup is 84vw, not
-       90vw — see below). */
+       viewport that becomes a visible horizontal scrollbar. */
     .lrob-calendar,
     .lrob-cal-grid {
         overflow-x: hidden;
@@ -569,13 +594,20 @@
         to   { opacity: 1; }
     }
 
-    /* Nav arrows: smaller, just outside the popup edge. With popup at 84vw
-       centered, each side has 8vw of room — enough for a 30px arrow at -34px. */
+    /* Nav arrows: pinned to viewport edges, vertically centered, ALWAYS visible.
+       Previously the arrows sat at -34px relative to the popup, but with popup
+       at 84vw centered (8vw per side ≈ 28px on a 360px phone), -34px landed
+       just off-screen — so the arrows were effectively invisible on mobile. */
     .lrob-cal-popup-nav {
-        width: 30px;
-        height: 30px;
-        font-size: 20px;
+        position: fixed;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 38px;
+        height: 38px;
+        font-size: 24px;
+        z-index: 100002;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     }
-    .lrob-cal-popup-nav--prev { left: -34px; right: auto; }
-    .lrob-cal-popup-nav--next { right: -34px; left: auto; }
+    .lrob-cal-popup-nav--prev { left: 4px; right: auto; }
+    .lrob-cal-popup-nav--next { right: 4px; left: auto; }
 }

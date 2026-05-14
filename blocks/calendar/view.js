@@ -229,6 +229,10 @@
                 '<div class="lrob-cal-grid"></div>' +
                 '<div class="lrob-cal-popup"></div>'
             );
+            // Bind swipe + ESC handlers ONCE on the persistent popup element.
+            // (Re-binding on every showPopup would stack handlers — swipes
+            // would fire navigation multiple times after a few opens.)
+            this.bindPopupHandlers();
         }
     };
 
@@ -573,13 +577,20 @@
         $popup[0].offsetHeight; // eslint-disable-line no-unused-expressions
         $popup.addClass('is-shown');
 
-        // Lightbox-on-click for the thumbnail
+        // Lightbox-on-click for the thumbnail. Bind ONLY to the <button>
+        // variant — the static <div> uses the same class but should not be
+        // clickable.
         var self = this;
         var fullUrl = event.thumbnailFull || event.thumbnail;
-        $popup.find('.lrob-cal-popup-thumb').on('click', function(e) {
+        $popup.find('button.lrob-cal-popup-thumb').on('click', function(e) {
             e.preventDefault();
             self.openLightbox(fullUrl, event.title);
         });
+
+        // Preload prev/next thumbnails so navigation feels instant — the next
+        // popup doesn't have to wait on the image to render.
+        if (siblings.prev && siblings.prev.thumbnail) { (new Image()).src = siblings.prev.thumbnail; }
+        if (siblings.next && siblings.next.thumbnail) { (new Image()).src = siblings.next.thumbnail; }
 
         // Position popup relative to the clicked element within the container
         var containerOffset = this.$container.offset();
@@ -621,27 +632,48 @@
         $popup.find('.lrob-cal-popup-nav').on('click', function (e) {
             e.preventDefault();
             e.stopPropagation();
-            var targetId = parseInt($(this).attr('data-target-id'), 10);
-            self.navigatePopupTo(targetId);
+            var $btn = $(this);
+            var targetId = parseInt($btn.attr('data-target-id'), 10);
+            var dir = $btn.hasClass('lrob-cal-popup-nav--next') ? 'left' : 'right';
+            self.navigatePopupTo(targetId, dir);
         });
 
-        // Swipe gestures (mobile): left = next, right = prev.
+    };
+
+    /**
+     * One-time popup-level handlers (swipe nav, ESC, etc.). Bound on the
+     * persistent .lrob-cal-popup element — $popup.html() replaces children
+     * but keeps these listeners alive, so we must NOT re-bind in showPopup
+     * (which would stack handlers and fire navigation multiple times).
+     */
+    LRobCalendar.prototype.bindPopupHandlers = function() {
+        var self = this;
+        var $popup = this.$container.find('.lrob-cal-popup');
         var swipeStartX = 0;
         var swipeStartY = 0;
-        $popup.on('touchstart', function (e) {
+        var swipeTracking = false;
+
+        $popup.on('touchstart.lrobSwipe', function (e) {
+            if (!e.originalEvent.touches || e.originalEvent.touches.length !== 1) {
+                swipeTracking = false;
+                return;
+            }
             var t = e.originalEvent.touches[0];
             swipeStartX = t.clientX;
             swipeStartY = t.clientY;
+            swipeTracking = true;
         });
-        $popup.on('touchend', function (e) {
+        $popup.on('touchend.lrobSwipe', function (e) {
+            if (!swipeTracking) return;
+            swipeTracking = false;
             var t = e.originalEvent.changedTouches[0];
             var dx = t.clientX - swipeStartX;
             var dy = t.clientY - swipeStartY;
-            // Horizontal swipe threshold; ignore if it's mostly vertical.
-            if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
+            // Lower threshold (40px) + reject mostly-vertical motion.
+            if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.3) {
                 var siblings = self.getSortedEventsAroundId(self.currentPopupEventId);
                 var target = dx < 0 ? siblings.next : siblings.prev;
-                if (target) self.navigatePopupTo(target.id);
+                if (target) self.navigatePopupTo(target.id, dx < 0 ? 'left' : 'right');
             }
         });
     };
@@ -690,27 +722,58 @@
      * after an async loadEvents fetch. The popup element itself persists across
      * renders thanks to ensureShell(), so the existing popup just gets new content.
      */
-    LRobCalendar.prototype.navigatePopupTo = function(targetId) {
+    LRobCalendar.prototype.navigatePopupTo = function(targetId, direction) {
         var ev = this.events.find(function (e) { return e.id === targetId; });
         if (!ev) return;
+
+        var self = this;
+        var $popup = this.$container.find('.lrob-cal-popup');
+
+        // direction: 'left' → user moved to NEXT (current card slides off left,
+        //                     new card enters from the right).
+        //            'right' → user moved to PREV (current slides off right,
+        //                      new enters from the left).
+        // Fallback when callers don't pass a direction (programmatic nav, etc.):
+        // derive from index order.
+        if (!direction) {
+            var sorted = this.events.slice().sort(function (a, b) {
+                return new Date(a.start) - new Date(b.start);
+            });
+            var currIdx = -1, targetIdx = -1;
+            for (var i = 0; i < sorted.length; i++) {
+                if (sorted[i].id === this.currentPopupEventId) currIdx = i;
+                if (sorted[i].id === targetId) targetIdx = i;
+            }
+            direction = targetIdx > currIdx ? 'left' : 'right';
+        }
+        var outClass    = direction === 'left' ? 'is-slide-out-left' : 'is-slide-out-right';
+        var inFromAttr  = direction === 'left' ? 'right' : 'left';
 
         var d = new Date(ev.start);
         var sameMonth = d.getMonth() === this.currentMonth && d.getFullYear() === this.currentYear;
 
-        if (sameMonth) {
-            var $cell = this.$container.find('.lrob-cal-event-item[data-event-id="' + targetId + '"]').first();
-            this.showPopup(targetId, $cell.length ? $cell : this.$container, null);
-            return;
-        }
+        $popup.addClass(outClass);
+        setTimeout(function () {
+            $popup.removeClass('is-slide-out-left is-slide-out-right');
+            // CSS rule .lrob-cal-popup[data-slide-in-from="..."] picks the
+            // matching slide-in keyframe so the new card enters from the
+            // correct side.
+            $popup.attr('data-slide-in-from', inFromAttr);
 
-        this.currentMonth = d.getMonth();
-        this.currentYear = d.getFullYear();
-        this.pendingPopupId = targetId;
-        // Update popup content immediately so the user doesn't see stale data
-        // during any async events fetch (positioning stays as-is for now;
-        // consumePendingPopup() will reposition once the new month's grid renders).
-        this.showPopup(targetId, this.$container, null);
-        this.checkAndLoadEvents();
+            if (sameMonth) {
+                var $cell = self.$container.find('.lrob-cal-event-item[data-event-id="' + targetId + '"]').first();
+                self.showPopup(targetId, $cell.length ? $cell : self.$container, null);
+            } else {
+                self.currentMonth = d.getMonth();
+                self.currentYear = d.getFullYear();
+                self.pendingPopupId = targetId;
+                self.showPopup(targetId, self.$container, null);
+                self.checkAndLoadEvents();
+            }
+            // Drop the direction attr after the in-animation finishes — the
+            // next regular open will use the default right-to-left direction.
+            setTimeout(function () { $popup.removeAttr('data-slide-in-from'); }, 250);
+        }, 120);
     };
 
     /**

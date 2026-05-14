@@ -29,6 +29,7 @@ echo LRob_Calendar_Block_Helpers::render_event_card($event, [
     'showImages'     => true,
     'showExcerpt'    => true,
     'showCategories' => true,
-    'imageDisplay'   => $attributes['imageDisplay'] ?? 'contain',
-    'imageHeight'    => $attributes['imageHeight']  ?? 'medium',
+    'imageDisplay'   => $attributes['imageDisplay']  ?? 'contain',
+    'imageHeight'    => $attributes['imageHeight']   ?? 'medium',
+    'imageLightbox'  => $attributes['imageLightbox'] ?? true,
 ]);
