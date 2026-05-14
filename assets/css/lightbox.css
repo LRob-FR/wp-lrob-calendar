@@ -1,0 +1,54 @@
+/**
+ * Fullscreen image lightbox — shared by the calendar block (popup thumb)
+ * and the event-card blocks (events-list, single-event).
+ * Registered as `lrob-calendar-lightbox`.
+ */
+
+.lrob-cal-lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.88);
+    z-index: 100000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    box-sizing: border-box;
+    animation: lrob-lightbox-fade 0.18s ease-out;
+}
+
+@keyframes lrob-lightbox-fade {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.lrob-cal-lightbox-image {
+    max-width: 90vw;
+    max-height: 90vh;
+    width: auto;
+    height: auto;
+    display: block;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+    cursor: zoom-out;
+}
+
+.lrob-cal-lightbox-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.92);
+    border: none;
+    border-radius: 50%;
+    font-size: 28px;
+    line-height: 1;
+    color: #111;
+    cursor: pointer;
+    padding: 0;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
+
+.lrob-cal-lightbox-close:hover {
+    background: #fff;
+}

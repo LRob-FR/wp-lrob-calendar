@@ -1,0 +1,179 @@
+/**
+ * Event-card styles, shared by the `events-list` and `single-event` blocks.
+ * Registered as `lrob-calendar-event-card` (deps: lrob-calendar-tokens).
+ */
+
+.lrob-event-card {
+    background: var(--lrob-white);
+    border: 1px solid var(--lrob-border);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.lrob-event-card.lrob-event-list {
+    display: flex;
+}
+
+.lrob-event-card.lrob-event-list .lrob-event-thumbnail {
+    flex: 0 0 180px;
+}
+
+.lrob-event-card .lrob-event-thumbnail img {
+    width: 100%;
+    height: 180px; /* overridden by .lrob-event-card--image-height-* */
+    object-fit: contain; /* overridden by .lrob-event-card--image-cover */
+    background: #f3f4f6;
+    display: block;
+}
+
+/* Clickable thumbnail (renders a <button>) — opens the shared lightbox.
+   Reset the browser's default button chrome so it matches the previous <a>. */
+.lrob-event-thumbnail--clickable {
+    background: #f3f4f6;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    cursor: zoom-in;
+    display: block;
+}
+
+.lrob-event-thumbnail--clickable img {
+    transition: opacity 0.2s ease;
+}
+
+.lrob-event-thumbnail--clickable:hover img {
+    opacity: 0.92;
+}
+
+/* Per-block image-display setting */
+.lrob-event-card--image-cover   .lrob-event-thumbnail img { object-fit: cover; }
+.lrob-event-card--image-contain .lrob-event-thumbnail img { object-fit: contain; }
+
+/* Per-block image-height setting */
+.lrob-event-card--image-height-small  .lrob-event-thumbnail img { height: 110px; }
+.lrob-event-card--image-height-medium .lrob-event-thumbnail img { height: 180px; }
+.lrob-event-card--image-height-large  .lrob-event-thumbnail img { height: 280px; }
+.lrob-event-card--image-height-auto   .lrob-event-thumbnail img { height: auto; max-height: 400px; }
+
+.lrob-event-content {
+    padding: 15px;
+    flex: 1;
+}
+
+.lrob-event-title {
+    margin: 0 0 10px;
+    font-size: 1.1em;
+}
+
+.lrob-event-title a {
+    color: var(--lrob-text);
+    text-decoration: none;
+}
+
+.lrob-event-title a:hover {
+    color: var(--lrob-primary);
+}
+
+.lrob-event-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 0.85em;
+    color: var(--lrob-text-light);
+    margin-bottom: 10px;
+}
+
+.lrob-event-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.lrob-event-categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 10px;
+}
+
+.lrob-category-badge {
+    padding: 2px 8px;
+    font-size: 0.75em;
+    color: var(--lrob-white);
+    background: var(--lrob-primary);
+    border-radius: 12px;
+    text-decoration: none;
+}
+
+.lrob-event-excerpt {
+    margin-top: 10px;
+    color: var(--lrob-text-light);
+    line-height: 1.5;
+}
+
+/* When excerpt is "clampable", limit height with a gradient fade-out at the
+   bottom. JS measures overflow and adds the toggle button if needed; cards
+   with short content stay un-clamped visually (no button shown either). */
+.lrob-event-excerpt.lrob-cal-clampable {
+    position: relative;
+    max-height: 7.5em;
+    overflow: hidden;
+}
+
+.lrob-event-excerpt.lrob-cal-clampable::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2.5em;
+    background: linear-gradient(to bottom, rgba(255,255,255,0), var(--lrob-white) 80%);
+    pointer-events: none;
+}
+
+.lrob-event-excerpt.lrob-cal-expanded {
+    max-height: none;
+    overflow: visible;
+}
+
+.lrob-event-excerpt.lrob-cal-expanded::after {
+    display: none;
+}
+
+.lrob-event-excerpt > :first-child { margin-top: 0; }
+.lrob-event-excerpt > :last-child  { margin-bottom: 0; }
+
+.lrob-cal-expand-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 8px;
+    padding: 4px 0;
+    background: transparent;
+    border: 0;
+    color: var(--lrob-primary);
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.9em;
+    font-weight: 500;
+}
+
+.lrob-cal-expand-toggle:hover {
+    text-decoration: underline;
+}
+
+.lrob-cal-expand-icon {
+    display: inline-block;
+    transition: transform 0.15s ease;
+    line-height: 1;
+}
+
+@media (max-width: 600px) {
+    .lrob-event-card.lrob-event-list {
+        flex-direction: column;
+    }
+    .lrob-event-card.lrob-event-list .lrob-event-thumbnail {
+        flex: none;
+    }
+}

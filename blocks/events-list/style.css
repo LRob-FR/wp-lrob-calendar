@@ -1,0 +1,110 @@
+/**
+ * Events-list block — list/grid layouts. Card visuals live in event-card.css.
+ * Registered as `lrob-calendar-block-events-list` (deps: lrob-calendar-event-card).
+ */
+
+.lrob-cal-events-list-wrapper {
+    position: relative;
+    transition: opacity 0.15s ease;
+}
+
+/* Subtle fade during AJAX page swap */
+.lrob-cal-events-list-wrapper.lrob-cal-loading {
+    opacity: 0.55;
+    pointer-events: none;
+}
+
+.lrob-events-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.lrob-template-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.lrob-template-grid .lrob-event-card {
+    flex-direction: column;
+}
+
+/* Pagination — two styles share the same container; the modifier class on
+   the <nav> picks which gets shown. */
+.lrob-cal-events-pagination {
+    margin: 1.5em 0 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Arrows + "Page X / Y" indicator */
+.lrob-cal-page-arrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--lrob-border);
+    border-radius: 50%;
+    background: var(--lrob-white);
+    color: var(--lrob-text);
+    text-decoration: none;
+    font-size: 1.4em;
+    line-height: 1;
+}
+
+.lrob-cal-page-arrow:hover {
+    background: var(--lrob-bg);
+    border-color: var(--lrob-primary);
+    color: var(--lrob-primary);
+}
+
+.lrob-cal-page-arrow--disabled {
+    opacity: 0.35;
+    pointer-events: none;
+}
+
+.lrob-cal-page-indicator {
+    font-size: 0.9em;
+    color: var(--lrob-text-light);
+    min-width: 80px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Numbered style — wraps paginate_links() output */
+.lrob-cal-events-pagination--numbered {
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.lrob-cal-events-pagination--numbered .page-numbers {
+    display: inline-block;
+    padding: 6px 12px;
+    border: 1px solid var(--lrob-border);
+    border-radius: 4px;
+    background: var(--lrob-white);
+    color: var(--lrob-text);
+    text-decoration: none;
+    font-size: 0.9em;
+    line-height: 1;
+}
+
+.lrob-cal-events-pagination--numbered a.page-numbers:hover {
+    background: var(--lrob-bg);
+}
+
+.lrob-cal-events-pagination--numbered .page-numbers.current {
+    background: var(--lrob-primary);
+    border-color: var(--lrob-primary);
+    color: var(--lrob-white);
+    font-weight: 500;
+}
+
+.lrob-cal-events-pagination--numbered .page-numbers.dots {
+    border-color: transparent;
+    background: transparent;
+}

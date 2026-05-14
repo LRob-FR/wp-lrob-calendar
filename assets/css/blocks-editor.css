@@ -1,0 +1,101 @@
+/**
+ * LRob Calendar - Block Editor Styles
+ */
+
+.lrob-block-preview {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 20px;
+    text-align: center;
+}
+
+.lrob-block-icon {
+    margin-bottom: 10px;
+}
+
+.lrob-block-icon .dashicons {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+    color: #3788d8;
+}
+
+.lrob-block-label {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.lrob-block-info {
+    font-size: 12px;
+    color: #666;
+}
+
+.lrob-preview-list {
+    list-style: none;
+    margin: 10px 0 0;
+    padding: 0;
+    text-align: left;
+}
+
+.lrob-preview-list li {
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+    font-size: 13px;
+}
+
+.lrob-preview-list li:last-child {
+    border-bottom: none;
+}
+
+.lrob-preview-list strong {
+    display: block;
+    color: #333;
+}
+
+.lrob-preview-list span {
+    color: #666;
+    font-size: 12px;
+}
+
+.lrob-preview-more {
+    margin-top: 10px;
+    font-size: 12px;
+    color: #666;
+    font-style: italic;
+}
+
+.lrob-preview-placeholder {
+    color: #999;
+    font-style: italic;
+}
+
+.lrob-single-event-preview {
+    text-align: left;
+}
+
+.lrob-preview-thumb {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.lrob-preview-content strong {
+    display: block;
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.lrob-preview-content span {
+    display: block;
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 3px;
+}
+
+.lrob-block-preview .components-spinner {
+    margin: 20px auto;
+}

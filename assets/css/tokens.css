@@ -1,0 +1,27 @@
+/**
+ * Design tokens shared across every block + page rendering.
+ * Registered as `lrob-calendar-tokens`; all block stylesheets list it as a dep.
+ */
+
+:root {
+    --lrob-primary: #3788d8;
+    --lrob-primary-dark: #2c6cb5;
+    --lrob-text: #333;
+    --lrob-text-light: #666;
+    --lrob-border: #ddd;
+    --lrob-bg: #f9f9f9;
+    --lrob-white: #fff;
+}
+
+.lrob-icon {
+    flex-shrink: 0;
+}
+
+/* Empty-state copy reused by every block */
+.lrob-no-events {
+    text-align: center;
+    padding: 30px;
+    color: var(--lrob-text-light);
+    background: var(--lrob-bg);
+    border-radius: 4px;
+}

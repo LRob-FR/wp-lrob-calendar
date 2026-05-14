@@ -1,0 +1,963 @@
+# Copyright (C) 2026 Robin Labadie - LRob
+# This file is distributed under the same license as the LRob - Calendar plugin.
+msgid ""
+msgstr ""
+"Project-Id-Version: LRob Calendar 1.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/lrob-calendar\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-05-14T12:04:53+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.4.0\n"
+"X-Domain: lrob-calendar\n"
+
+#. Plugin Name of the plugin
+msgid "LRob - Calendar"
+msgstr ""
+
+#. Plugin URI of the plugin
+#. Author URI of the plugin
+msgid "https://www.lrob.fr"
+msgstr ""
+
+#. Description of the plugin
+msgid "A powerful and clean event calendar for WordPress with recurring events, categories, locations, import/export and more."
+msgstr ""
+
+#. Author of the plugin
+msgid "Robin Labadie - LRob"
+msgstr ""
+
+#: blocks/calendar/render.php:20
+#: blocks/calendar/edit.js:51
+msgid "View event"
+msgstr ""
+
+#: blocks/events-list/render.php:68
+msgid "No events found."
+msgstr ""
+
+#: blocks/events-list/render.php:86
+msgid "Events list pagination"
+msgstr ""
+
+#: blocks/events-list/render.php:91
+msgid "Previous page"
+msgstr ""
+
+#. translators: 1: current page number, 2: total pages
+#: blocks/events-list/render.php:99
+msgid "Page %1$d / %2$d"
+msgstr ""
+
+#: blocks/events-list/render.php:105
+msgid "Next page"
+msgstr ""
+
+#: blocks/events-list/render.php:116
+msgid "Previous"
+msgstr ""
+
+#: blocks/events-list/render.php:117
+msgid "Next"
+msgstr ""
+
+#: blocks/single-event/render.php:17
+msgid "No event selected."
+msgstr ""
+
+#: blocks/single-event/render.php:23
+msgid "Event not found."
+msgstr ""
+
+#: includes/class-lrob-calendar-admin.php:40
+#: includes/class-lrob-calendar-admin.php:41
+msgid "Import / Export"
+msgstr ""
+
+#: includes/class-lrob-calendar-admin.php:49
+#: includes/class-lrob-calendar-admin.php:50
+msgid "Settings"
+msgstr ""
+
+#: includes/class-lrob-calendar-admin.php:96
+#: includes/class-lrob-calendar-admin.php:470
+#: includes/class-lrob-calendar-admin.php:509
+msgid "Select Image"
+msgstr ""
+
+#: includes/class-lrob-calendar-admin.php:97
+msgid "Use this image"
+msgstr ""
+
+#: includes/class-lrob-calendar-admin.php:112
+msgid "Export completed successfully."
+msgstr ""
+
+#. translators: %d: number of events imported
+#: includes/class-lrob-calendar-admin.php:117
+msgid "%d events imported successfully."
+msgstr ""
+
+#: includes/class-lrob-calendar-admin.php:120
+msgid "Import failed. Please check your file format."
+msgstr ""
+
+#: includes/class-lrob-calendar-admin.php:135
+msgid "Import / Export Events"
+msgstr ""
+
+#: includes/class-lrob-calendar-admin.php:141
+msgid "Export"
+msgstr ""
+
+#: includes/class-lrob-calendar-admin.php:142
+msgid "Export all events, categories and tags to a JSON file."
+msgstr ""
+
+#: includes/class-lrob-calendar-admin.php:148
+msgid "Include recurring event instances"
+msgstr ""
+
+#: includes/class-lrob-calendar-admin.php:153
+msgid "Export to JSON"
+msgstr ""
+
+#: includes/class-lrob-calendar-admin.php:160
+msgid "Import"
+msgstr ""
+
+#: includes/class-lrob-calendar-admin.php:161
+msgid "Import events from a JSON file (LRob Calendar or All-in-One Event Calendar format)."
+msgstr ""
+
+#: includes/class-lrob-calendar-admin.php:170
+msgid "Skip existing events (match by title)"
+msgstr ""
+
+#: includes/class-lrob-calendar-admin.php:175
+msgid "Import from JSON"
+msgstr ""
+
+#. translators: 1: plugin name with link to author, 2: version number
+#: includes/class-lrob-calendar-admin.php:203
+msgid "%1$s — version %2$s"
+msgstr ""
+
+#: includes/class-lrob-calendar-admin.php:243
+msgid "Settings saved."
+msgstr ""
+
+#: includes/class-lrob-calendar-admin.php:254
+msgid "Sunday"
+msgstr ""
+
+#: includes/class-lrob-calendar-admin.php:255
+msgid "Monday"
+msgstr ""
+
+#: includes/class-lrob-calendar-admin.php:256
+msgid "Saturday"
+msgstr ""
+
+#: includes/class-lrob-calendar-admin.php:261
+#: blocks/calendar/edit.js:23
+msgid "Calendar Settings"
+msgstr ""
+
+#: includes/class-lrob-calendar-admin.php:268
+msgid "Default Timezone"
+msgstr ""
+
+#: includes/class-lrob-calendar-admin.php:273
+msgid "Default timezone for new events."
+msgstr ""
+
+#: includes/class-lrob-calendar-admin.php:277
+msgid "First day of the week"
+msgstr ""
+
+#. translators: %s: the auto-detected first day of the week (e.g. Sunday or Monday)
+#: includes/class-lrob-calendar-admin.php:284
+msgid "Auto — follow site language (currently %s)"
+msgstr ""
+
+#: includes/class-lrob-calendar-admin.php:293
+msgid "Day shown in the first column of the calendar grid."
+msgstr ""
+
+#: includes/class-lrob-calendar-admin.php:297
+msgid "Public event pages"
+msgstr ""
+
+#: includes/class-lrob-calendar-admin.php:301
+msgid "Disable dedicated pages for events and categories"
+msgstr ""
+
+#: includes/class-lrob-calendar-admin.php:304
+msgid "When disabled, events and their taxonomies are only accessible through the calendar. Direct URLs return 404, and frontend links are stripped from blocks and the calendar popup."
+msgstr ""
+
+#: includes/class-lrob-calendar-admin.php:310
+msgid "Maximum event age"
+msgstr ""
+
+#: includes/class-lrob-calendar-admin.php:315
+msgid "months"
+msgstr ""
+
+#: includes/class-lrob-calendar-admin.php:317
+msgid "Queries that don't set their own date range will ignore events older than this. Use 0 for no limit. Helps performance on sites with thousands of historical events."
+msgstr ""
+
+#: includes/class-lrob-calendar-admin.php:323
+msgid "Recurrence limits"
+msgstr ""
+
+#: includes/class-lrob-calendar-admin.php:329
+msgid "max instances per event"
+msgstr ""
+
+#: includes/class-lrob-calendar-admin.php:335
+msgid "max years ahead"
+msgstr ""
+
+#: includes/class-lrob-calendar-admin.php:338
+msgid "Safety caps for recurring-event instance generation. Raise these for events that repeat daily over many years (default 500 / 5 = ~1.4 years of a daily event)."
+msgstr ""
+
+#: includes/class-lrob-calendar-admin.php:343
+msgid "Date & Time Format"
+msgstr ""
+
+#. translators: %1$s: opening anchor tag, %2$s: closing anchor tag
+#: includes/class-lrob-calendar-admin.php:349
+msgid "Date and time formats follow your %1$sWordPress settings%2$s."
+msgstr ""
+
+#: includes/class-lrob-calendar-admin.php:361
+msgid "Save Settings"
+msgstr ""
+
+#: includes/class-lrob-calendar-admin.php:378
+msgid "Visit LRob"
+msgstr ""
+
+#. translators: %s: human-readable file size (e.g. "12 MB")
+#: includes/class-lrob-calendar-admin.php:429
+msgid "Large import file (%s). If the page times out, increase your PHP memory_limit / max_execution_time."
+msgstr ""
+
+#: includes/class-lrob-calendar-admin.php:462
+#: includes/class-lrob-calendar-admin.php:494
+msgid "Color"
+msgstr ""
+
+#: includes/class-lrob-calendar-admin.php:466
+#: includes/class-lrob-calendar-admin.php:500
+msgid "Image"
+msgstr ""
+
+#: includes/class-lrob-calendar-admin.php:473
+#: includes/class-lrob-calendar-admin.php:512
+msgid "Remove Image"
+msgstr ""
+
+#: includes/class-lrob-calendar-admin.php:569
+msgid "Date"
+msgstr ""
+
+#: includes/class-lrob-calendar-admin.php:570
+#: includes/class-lrob-calendar-meta-boxes.php:38
+msgid "Location"
+msgstr ""
+
+#: includes/class-lrob-calendar-admin.php:593
+#: includes/class-lrob-calendar-block-helpers.php:199
+#: includes/class-lrob-calendar-blocks.php:193
+msgid "Recurring"
+msgstr ""
+
+#: includes/class-lrob-calendar-blocks.php:76
+#: includes/class-lrob-calendar-blocks.php:188
+msgid "Close"
+msgstr ""
+
+#: includes/class-lrob-calendar-blocks.php:161
+msgid "Show more"
+msgstr ""
+
+#: includes/class-lrob-calendar-blocks.php:162
+msgid "Show less"
+msgstr ""
+
+#: includes/class-lrob-calendar-blocks.php:189
+msgid "View image"
+msgstr ""
+
+#: includes/class-lrob-calendar-blocks.php:190
+msgid "Previous event"
+msgstr ""
+
+#: includes/class-lrob-calendar-blocks.php:191
+msgid "Next event"
+msgstr ""
+
+#: includes/class-lrob-calendar-blocks.php:192
+msgid "No upcoming events."
+msgstr ""
+
+#: includes/class-lrob-calendar-blocks.php:224
+msgid "Unix timestamp; only events ending at/after this are returned."
+msgstr ""
+
+#: includes/class-lrob-calendar-blocks.php:229
+msgid "Unix timestamp; only events starting at/before this are returned."
+msgstr ""
+
+#: includes/class-lrob-calendar-blocks.php:234
+msgid "Event category term ID."
+msgstr ""
+
+#: includes/class-lrob-calendar-blocks.php:239
+msgid "Event tag term ID."
+msgstr ""
+
+#: includes/class-lrob-calendar-blocks.php:244
+msgid "Maximum number of events to return."
+msgstr ""
+
+#: includes/class-lrob-calendar-blocks.php:252
+msgid "When 1, include events that have already ended (default: upcoming only)."
+msgstr ""
+
+#: includes/class-lrob-calendar-blocks.php:272
+msgid "Event post ID."
+msgstr ""
+
+#. translators: %s: hostname
+#: includes/class-lrob-calendar-import.php:444
+msgid "Imported image(s) reference a private or localhost host (%s). They may not be reachable from your live site after migration."
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:20
+msgid "Date & Time"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:29
+msgid "Recurrence"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:47
+msgid "Contact & Cost"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:74
+msgid "Start"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:84
+msgid "End"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:94
+msgid "Timezone"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:102
+msgid "Event type"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:111
+msgid "Standard event"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:116
+msgid "All day event"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:121
+msgid "No end time (instant event)"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:140
+msgid "Repeat"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:143
+msgid "No repeat"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:144
+msgid "Daily"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:145
+msgid "Weekly"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:146
+msgid "Monthly"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:147
+msgid "Yearly"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:152
+msgid "Every"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:156
+msgid "occurrence(s)"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:160
+msgid "On days"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:163
+msgid "Mon"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:163
+msgid "Tue"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:163
+msgid "Wed"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:163
+msgid "Thu"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:163
+msgid "Fri"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:163
+msgid "Sat"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:163
+msgid "Sun"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:175
+msgid "End repeat"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:178
+msgid "Never"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:179
+msgid "After X occurrences"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:180
+msgid "On date"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:189
+msgid "Exclude dates"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:192
+msgid "Comma-separated dates to exclude (YYYYMMDD format)"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:196
+msgid "Raw RRULE"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:200
+msgid "Advanced: Direct RRULE string (overrides above settings if not empty)"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:213
+msgid "Venue"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:217
+msgid "Address"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:221
+msgid "City"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:224
+msgid "Postal code"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:228
+msgid "Province / State"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:232
+msgid "Country"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:236
+msgid "Coordinates"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:238
+msgid "Latitude"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:239
+msgid "Longitude"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:243
+msgid "Map Options"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:247
+msgid "Show map"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:252
+msgid "Show coordinates"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:265
+msgid "Contact Name"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:269
+msgid "Email"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:273
+msgid "Phone"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:277
+msgid "Website"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:281
+#: includes/class-lrob-calendar-single-event.php:151
+msgid "Cost"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:287
+msgid "Free event"
+msgstr ""
+
+#: includes/class-lrob-calendar-meta-boxes.php:292
+msgid "Ticket URL"
+msgstr ""
+
+#: includes/class-lrob-calendar-post-types.php:23
+msgid "Events"
+msgstr ""
+
+#: includes/class-lrob-calendar-post-types.php:24
+msgid "Event"
+msgstr ""
+
+#: includes/class-lrob-calendar-post-types.php:25
+msgid "Calendar"
+msgstr ""
+
+#: includes/class-lrob-calendar-post-types.php:26
+msgid "Add Event"
+msgstr ""
+
+#: includes/class-lrob-calendar-post-types.php:27
+msgid "Add New Event"
+msgstr ""
+
+#: includes/class-lrob-calendar-post-types.php:28
+msgid "Edit Event"
+msgstr ""
+
+#: includes/class-lrob-calendar-post-types.php:29
+msgid "New Event"
+msgstr ""
+
+#: includes/class-lrob-calendar-post-types.php:30
+msgid "View Event"
+msgstr ""
+
+#: includes/class-lrob-calendar-post-types.php:31
+msgid "Search Events"
+msgstr ""
+
+#: includes/class-lrob-calendar-post-types.php:32
+#: blocks/single-event/edit.js:73
+msgid "No events found"
+msgstr ""
+
+#: includes/class-lrob-calendar-post-types.php:33
+msgid "No events found in Trash"
+msgstr ""
+
+#: includes/class-lrob-calendar-post-types.php:34
+msgid "All Events"
+msgstr ""
+
+#: includes/class-lrob-calendar-post-types.php:97
+msgid "Event Categories"
+msgstr ""
+
+#: includes/class-lrob-calendar-post-types.php:98
+msgid "Event Category"
+msgstr ""
+
+#: includes/class-lrob-calendar-post-types.php:99
+msgid "Search Categories"
+msgstr ""
+
+#: includes/class-lrob-calendar-post-types.php:100
+#: blocks/calendar/edit.js:13
+#: blocks/events-list/edit.js:13
+msgid "All Categories"
+msgstr ""
+
+#: includes/class-lrob-calendar-post-types.php:101
+msgid "Parent Category"
+msgstr ""
+
+#: includes/class-lrob-calendar-post-types.php:102
+msgid "Parent Category:"
+msgstr ""
+
+#: includes/class-lrob-calendar-post-types.php:103
+msgid "Edit Category"
+msgstr ""
+
+#: includes/class-lrob-calendar-post-types.php:104
+msgid "Update Category"
+msgstr ""
+
+#: includes/class-lrob-calendar-post-types.php:105
+msgid "Add New Category"
+msgstr ""
+
+#: includes/class-lrob-calendar-post-types.php:106
+msgid "New Category Name"
+msgstr ""
+
+#: includes/class-lrob-calendar-post-types.php:107
+msgid "Categories"
+msgstr ""
+
+#: includes/class-lrob-calendar-post-types.php:126
+msgid "Event Tags"
+msgstr ""
+
+#: includes/class-lrob-calendar-post-types.php:127
+msgid "Event Tag"
+msgstr ""
+
+#: includes/class-lrob-calendar-post-types.php:128
+msgid "Search Tags"
+msgstr ""
+
+#: includes/class-lrob-calendar-post-types.php:129
+#: blocks/calendar/edit.js:14
+#: blocks/events-list/edit.js:14
+msgid "All Tags"
+msgstr ""
+
+#: includes/class-lrob-calendar-post-types.php:130
+msgid "Edit Tag"
+msgstr ""
+
+#: includes/class-lrob-calendar-post-types.php:131
+msgid "Update Tag"
+msgstr ""
+
+#: includes/class-lrob-calendar-post-types.php:132
+msgid "Add New Tag"
+msgstr ""
+
+#: includes/class-lrob-calendar-post-types.php:133
+msgid "New Tag Name"
+msgstr ""
+
+#: includes/class-lrob-calendar-post-types.php:134
+msgid "Tags"
+msgstr ""
+
+#: includes/class-lrob-calendar-single-event.php:58
+msgid "When"
+msgstr ""
+
+#: includes/class-lrob-calendar-single-event.php:64
+msgid "This event recurs."
+msgstr ""
+
+#: includes/class-lrob-calendar-single-event.php:112
+msgid "Where"
+msgstr ""
+
+#: includes/class-lrob-calendar-single-event.php:156
+msgid "Free"
+msgstr ""
+
+#: includes/class-lrob-calendar-single-event.php:165
+msgid "Get tickets"
+msgstr ""
+
+#: includes/class-lrob-calendar-single-event.php:186
+msgid "Contact"
+msgstr ""
+
+#: includes/class-lrob-calendar-single-event.php:245
+msgid "Event location map"
+msgstr ""
+
+#: includes/class-lrob-calendar-single-event.php:248
+msgid "View larger map"
+msgstr ""
+
+#: blocks/calendar/edit.js:25
+msgid "Layout"
+msgstr ""
+
+#: blocks/calendar/edit.js:28
+#: blocks/calendar/edit.js:103
+msgid "Month grid"
+msgstr ""
+
+#: blocks/calendar/edit.js:29
+#: blocks/calendar/edit.js:102
+msgid "Agenda list"
+msgstr ""
+
+#: blocks/calendar/edit.js:35
+msgid "Filter by Category"
+msgstr ""
+
+#: blocks/calendar/edit.js:42
+msgid "Filter by Tag"
+msgstr ""
+
+#: blocks/calendar/edit.js:49
+msgid "Link Text"
+msgstr ""
+
+#: blocks/calendar/edit.js:53
+msgid "Text for the event link in popup"
+msgstr ""
+
+#: blocks/calendar/edit.js:57
+msgid "Popup Display"
+msgstr ""
+
+#: blocks/calendar/edit.js:59
+msgid "Popup size"
+msgstr ""
+
+#: blocks/calendar/edit.js:62
+#: blocks/single-event/edit.js:111
+msgid "Compact"
+msgstr ""
+
+#: blocks/calendar/edit.js:63
+msgid "Standard"
+msgstr ""
+
+#: blocks/calendar/edit.js:64
+msgid "Spacious"
+msgstr ""
+
+#: blocks/calendar/edit.js:69
+#: blocks/events-list/edit.js:89
+msgid "Show Images"
+msgstr ""
+
+#: blocks/calendar/edit.js:74
+#: blocks/events-list/edit.js:94
+#: blocks/single-event/edit.js:118
+msgid "Image display"
+msgstr ""
+
+#: blocks/calendar/edit.js:77
+#: blocks/events-list/edit.js:97
+#: blocks/single-event/edit.js:121
+msgid "Show whole image"
+msgstr ""
+
+#: blocks/calendar/edit.js:78
+#: blocks/events-list/edit.js:98
+#: blocks/single-event/edit.js:122
+msgid "Crop to fill"
+msgstr ""
+
+#: blocks/calendar/edit.js:83
+#: blocks/events-list/edit.js:103
+#: blocks/single-event/edit.js:127
+msgid "Image height"
+msgstr ""
+
+#: blocks/calendar/edit.js:86
+#: blocks/events-list/edit.js:106
+#: blocks/single-event/edit.js:130
+msgid "Small"
+msgstr ""
+
+#: blocks/calendar/edit.js:87
+#: blocks/events-list/edit.js:107
+#: blocks/single-event/edit.js:131
+msgid "Medium"
+msgstr ""
+
+#: blocks/calendar/edit.js:88
+#: blocks/events-list/edit.js:108
+#: blocks/single-event/edit.js:132
+msgid "Large"
+msgstr ""
+
+#: blocks/calendar/edit.js:98
+msgid "Event Calendar"
+msgstr ""
+
+#: blocks/calendar/edit.js:100
+msgid "Layout:"
+msgstr ""
+
+#: blocks/events-list/edit.js:37
+msgid "List Settings"
+msgstr ""
+
+#: blocks/events-list/edit.js:40
+msgid "Events per page"
+msgstr ""
+
+#: blocks/events-list/edit.js:41
+msgid "Number of Events"
+msgstr ""
+
+#: blocks/events-list/edit.js:47
+msgid "Enable pagination"
+msgstr ""
+
+#: blocks/events-list/edit.js:52
+msgid "Pagination style"
+msgstr ""
+
+#: blocks/events-list/edit.js:55
+msgid "Arrows + page indicator"
+msgstr ""
+
+#: blocks/events-list/edit.js:56
+msgid "Numbered pages"
+msgstr ""
+
+#: blocks/events-list/edit.js:61
+#: blocks/single-event/edit.js:107
+msgid "Template"
+msgstr ""
+
+#: blocks/events-list/edit.js:64
+msgid "List"
+msgstr ""
+
+#: blocks/events-list/edit.js:65
+msgid "Grid"
+msgstr ""
+
+#: blocks/events-list/edit.js:66
+#: blocks/single-event/edit.js:112
+msgid "Minimal"
+msgstr ""
+
+#: blocks/events-list/edit.js:71
+msgid "Order"
+msgstr ""
+
+#: blocks/events-list/edit.js:74
+msgid "Auto (based on past-events toggle)"
+msgstr ""
+
+#: blocks/events-list/edit.js:75
+msgid "Ascending (oldest first)"
+msgstr ""
+
+#: blocks/events-list/edit.js:76
+msgid "Descending (newest first)"
+msgstr ""
+
+#: blocks/events-list/edit.js:78
+msgid "Auto: upcoming events soonest-first when past events are hidden; most-recent-first when shown."
+msgstr ""
+
+#: blocks/events-list/edit.js:82
+msgid "Show Past Events"
+msgstr ""
+
+#: blocks/events-list/edit.js:87
+msgid "Display Options"
+msgstr ""
+
+#: blocks/events-list/edit.js:109
+#: blocks/single-event/edit.js:133
+msgid "Natural"
+msgstr ""
+
+#: blocks/events-list/edit.js:114
+msgid "Show Excerpt"
+msgstr ""
+
+#: blocks/events-list/edit.js:119
+msgid "Show Categories"
+msgstr ""
+
+#: blocks/events-list/edit.js:124
+msgid "Filters"
+msgstr ""
+
+#: blocks/events-list/edit.js:126
+msgid "Category"
+msgstr ""
+
+#: blocks/events-list/edit.js:132
+msgid "Tag"
+msgstr ""
+
+#: blocks/events-list/edit.js:142
+msgid "Events List"
+msgstr ""
+
+#: blocks/events-list/edit.js:142
+msgid "events"
+msgstr ""
+
+#: blocks/events-list/edit.js:153
+msgid "more events"
+msgstr ""
+
+#: blocks/single-event/edit.js:52
+msgid "Event Selection"
+msgstr ""
+
+#: blocks/single-event/edit.js:54
+msgid "Search events"
+msgstr ""
+
+#: blocks/single-event/edit.js:57
+msgid "Type to search..."
+msgstr ""
+
+#: blocks/single-event/edit.js:103
+msgid "Selected:"
+msgstr ""
+
+#: blocks/single-event/edit.js:110
+msgid "Full"
+msgstr ""
+
+#: blocks/single-event/edit.js:153
+msgid "Select an event in the sidebar."
+msgstr ""

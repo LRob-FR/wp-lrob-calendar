@@ -1,0 +1,29 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "lrob-calendar/calendar",
+    "title": "Event Calendar",
+    "description": "Month grid of events with a click-to-preview popup.",
+    "category": "widgets",
+    "icon": "calendar-alt",
+    "textdomain": "lrob-calendar",
+    "supports": {
+        "align": ["wide", "full"]
+    },
+    "attributes": {
+        "view":              { "type": "string",  "default": "month" },
+        "category":          { "type": "number",  "default": 0 },
+        "tag":               { "type": "number",  "default": 0 },
+        "linkText":          { "type": "string",  "default": "" },
+        "align":             { "type": "string",  "default": "" },
+        "popupSize":         { "type": "string",  "default": "standard" },
+        "popupImageDisplay": { "type": "string",  "default": "contain" },
+        "popupImageHeight":  { "type": "string",  "default": "medium" },
+        "popupShowImage":    { "type": "boolean", "default": true }
+    },
+    "editorScript": "lrob-calendar-block-calendar-edit",
+    "editorStyle":  "lrob-calendar-blocks-editor",
+    "viewScript":   "lrob-calendar-view",
+    "style":        ["lrob-calendar-block-calendar", "lrob-calendar-lightbox"],
+    "render":       "file:./render.php"
+}

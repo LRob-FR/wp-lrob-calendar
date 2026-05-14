@@ -1,0 +1,154 @@
+/**
+ * Single-event page styles — injected by `LRob_Calendar_Single_Event` via the_content.
+ * Registered as `lrob-calendar-single-event-page`; enqueued conditionally on
+ * is_singular(POST_TYPE) by class-lrob-calendar.php.
+ */
+
+.lrob-event-single {
+    margin: 0 0 2em;
+    font-size: 0.95em;
+}
+
+.lrob-event-single-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1em 1.5em;
+    padding: 1.25em 1.5em;
+    background: var(--lrob-bg);
+    border: 1px solid var(--lrob-border);
+    border-radius: 6px;
+    margin-bottom: 1.5em;
+}
+
+.lrob-event-block {
+    min-width: 0;
+}
+
+.lrob-event-block-title {
+    margin: 0 0 0.4em;
+    font-size: 0.75em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--lrob-text-light);
+    display: flex;
+    align-items: center;
+    gap: 0.4em;
+}
+
+.lrob-event-block-title .lrob-icon {
+    flex: none;
+}
+
+.lrob-event-contact p {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    margin: 0 0 0.2em;
+    word-break: break-word;
+}
+
+.lrob-event-recurring-note .lrob-icon {
+    vertical-align: -2px;
+    margin-right: 0.3em;
+}
+
+.lrob-event-when-main {
+    margin: 0;
+    font-weight: 500;
+    color: var(--lrob-text);
+}
+
+.lrob-event-recurring-note {
+    margin: 0.4em 0 0.3em;
+    font-size: 0.85em;
+    color: var(--lrob-text-light);
+    font-style: italic;
+}
+
+.lrob-event-next-dates {
+    list-style: none;
+    padding: 0;
+    margin: 0.3em 0 0;
+    font-size: 0.88em;
+    color: var(--lrob-text-light);
+}
+
+.lrob-event-next-dates li {
+    padding: 0.15em 0;
+}
+
+.lrob-event-venue {
+    margin: 0 0 0.3em;
+    font-weight: 500;
+}
+
+.lrob-event-address {
+    margin: 0;
+    font-style: normal;
+    color: var(--lrob-text-light);
+    line-height: 1.45;
+}
+
+.lrob-event-coords {
+    margin: 0.4em 0 0;
+    font-size: 0.82em;
+    color: var(--lrob-text-light);
+    font-family: ui-monospace, SFMono-Regular, monospace;
+}
+
+.lrob-event-cost-value {
+    margin: 0 0 0.4em;
+    font-size: 1.05em;
+    font-weight: 500;
+}
+
+.lrob-event-ticket-link {
+    display: inline-block;
+    margin-top: 0.2em;
+    padding: 6px 12px;
+    background: var(--lrob-primary);
+    color: var(--lrob-white);
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 0.88em;
+    font-weight: 500;
+}
+
+.lrob-event-ticket-link:hover {
+    background: var(--lrob-primary-dark);
+    color: var(--lrob-white);
+}
+
+.lrob-event-contact-name {
+    margin: 0 0 0.3em;
+    font-weight: 500;
+}
+
+.lrob-event-map {
+    margin: 0 0 1.5em;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid var(--lrob-border);
+}
+
+.lrob-event-map iframe {
+    display: block;
+}
+
+.lrob-event-map-link {
+    margin: 0;
+    padding: 0.6em 1em;
+    background: var(--lrob-bg);
+    border-top: 1px solid var(--lrob-border);
+    font-size: 0.85em;
+}
+
+.lrob-event-map-link a {
+    color: var(--lrob-primary);
+    text-decoration: none;
+}
+
+.lrob-event-map-link a:hover {
+    text-decoration: underline;
+}

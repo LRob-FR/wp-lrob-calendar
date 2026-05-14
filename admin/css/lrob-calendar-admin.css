@@ -1,0 +1,151 @@
+/**
+ * LRob Calendar - Admin Styles
+ */
+
+/* Meta tables */
+.lrob-meta-table {
+    width: 100%;
+}
+
+.lrob-meta-table th {
+    width: 150px;
+    padding: 10px 10px 10px 0;
+    vertical-align: top;
+}
+
+.lrob-meta-table td {
+    padding: 10px 0;
+}
+
+.lrob-meta-table input[type="date"],
+.lrob-meta-table input[type="time"] {
+    margin-right: 10px;
+}
+
+.lrob-meta-table select {
+    max-width: 100%;
+}
+
+/* Date preview */
+.lrob-date-formatted {
+    display: inline-block;
+    margin-left: 15px;
+    color: #50575e;
+    font-style: italic;
+}
+
+/* Time inputs — wide enough to show AM/PM on browsers running 12h locales */
+.lrob-time-input {
+    width: 140px;
+}
+
+/* Visual mute for disabled checkbox controls in the event form. Browsers dim the
+   checkbox itself, but the surrounding label text stays full opacity by default
+   — confusing when the whole control is non-interactive. */
+.lrob-meta-table label:has(input[type="checkbox"]:disabled) {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+.lrob-meta-table label:has(input[type="checkbox"]:disabled) input {
+    cursor: not-allowed;
+}
+
+/* Disabled text inputs in the event form — make the inactive state unambiguous
+   beyond the browser's subtle default dimming. */
+.lrob-meta-table input[type="text"]:disabled,
+.lrob-meta-table input[type="url"]:disabled,
+.lrob-meta-table input[type="email"]:disabled,
+.lrob-meta-table input[type="tel"]:disabled,
+.lrob-meta-table input[type="number"]:disabled {
+    background-color: #f0f0f1;
+    color: #8c8f94;
+    border-color: #dcdcde;
+    cursor: not-allowed;
+}
+
+/* Recurrence options */
+.lrob-recurrence-options {
+    transition: opacity 0.2s;
+}
+
+/* Import/Export page */
+.lrob-import-export-container {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.lrob-box {
+    background: #fff;
+    padding: 20px;
+    border: 1px solid #ccd0d4;
+    flex: 1;
+}
+
+.lrob-box h2 {
+    margin-top: 0;
+    padding-top: 0;
+}
+
+/* Admin columns */
+.column-event_date {
+    width: 180px;
+}
+
+.column-event_location {
+    width: 150px;
+}
+
+.column-event_date .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+    color: #666;
+}
+
+/* Category color field - WordPress color picker */
+.lrob-color-picker {
+    max-width: 100px;
+}
+
+/* Ensure color picker displays properly in taxonomy forms */
+.form-field .wp-picker-container {
+    display: block;
+}
+
+/* Image preview */
+.lrob-image-preview {
+    margin-bottom: 10px;
+}
+
+.lrob-image-preview img {
+    max-width: 150px;
+    height: auto;
+    display: block;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.lrob-select-image,
+.lrob-remove-image {
+    margin-right: 5px;
+}
+
+/* Responsive */
+@media screen and (max-width: 782px) {
+    .lrob-import-export-container {
+        flex-direction: column;
+    }
+    
+    .lrob-meta-table th {
+        display: block;
+        width: 100%;
+        padding-bottom: 5px;
+    }
+    
+    .lrob-meta-table td {
+        display: block;
+        padding-top: 0;
+    }
+}

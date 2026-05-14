@@ -1,0 +1,21 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "lrob-calendar/single-event",
+    "title": "Single Event",
+    "description": "Display a single event chosen from a search list.",
+    "category": "widgets",
+    "icon": "calendar",
+    "textdomain": "lrob-calendar",
+    "attributes": {
+        "eventId":      { "type": "number", "default": 0 },
+        "template":     { "type": "string", "default": "full" },
+        "imageDisplay": { "type": "string", "default": "contain" },
+        "imageHeight":  { "type": "string", "default": "medium" }
+    },
+    "editorScript": "lrob-calendar-block-single-event-edit",
+    "editorStyle":  "lrob-calendar-blocks-editor",
+    "viewScript":   ["lrob-calendar-event-card-lightbox", "lrob-calendar-event-card-expand"],
+    "style":        ["lrob-calendar-event-card", "lrob-calendar-lightbox"],
+    "render":       "file:./render.php"
+}

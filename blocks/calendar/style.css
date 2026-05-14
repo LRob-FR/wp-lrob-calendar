@@ -1,0 +1,478 @@
+/**
+ * Calendar block — month grid, popup, lightbox, multi-day bars.
+ * Registered as `lrob-calendar-block-calendar` (deps: lrob-calendar-tokens).
+ */
+
+.lrob-calendar {
+    background: var(--lrob-white);
+    border: 1px solid var(--lrob-border);
+    border-radius: 4px;
+    padding: 15px;
+    position: relative;
+    box-sizing: border-box;
+    /* overflow:visible so the popup's external prev/next arrows aren't clipped
+       at the calendar edge. The table inside is naturally width-bounded so
+       multi-day bars stay contained without this clipping. */
+}
+
+/* WordPress alignment support — default to content width */
+.wp-block-lrob-calendar-calendar {
+    max-width: var(--wp--style--global--content-size, 650px);
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.wp-block-lrob-calendar-calendar.alignwide {
+    max-width: var(--wp--style--global--wide-size, 1200px);
+}
+
+.wp-block-lrob-calendar-calendar.alignfull {
+    max-width: none;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.lrob-cal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.lrob-cal-title {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.lrob-cal-prev,
+.lrob-cal-next {
+    background: var(--lrob-white);
+    border: 1px solid var(--lrob-border);
+    padding: 8px 14px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.lrob-cal-prev:hover,
+.lrob-cal-next:hover {
+    background: var(--lrob-bg);
+}
+
+/* Grid */
+.lrob-cal-table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+}
+
+.lrob-cal-table th,
+.lrob-cal-table td {
+    width: 14.28%;
+}
+
+.lrob-cal-table th {
+    overflow: hidden;
+}
+
+.lrob-cal-table th {
+    padding: 8px 2px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.8em;
+    color: var(--lrob-text-light);
+    border-bottom: 2px solid var(--lrob-border);
+}
+
+.lrob-cal-table td {
+    padding: 4px;
+    vertical-align: top;
+    border: 1px solid #eee;
+    height: 80px;
+    position: relative;
+    /* `overflow: visible` so multi-day bars and overflowing titles extend across
+       adjacent cells. NOT `visible hidden` — the CSS spec says mixing visible
+       with hidden computes the visible axis to `auto`, which creates scrollbars.
+       Vertical bleed isn't a concern in practice: JS caps the cell at 2 events
+       (~47px content) which fits inside the 80px row. */
+    overflow: visible;
+}
+
+.lrob-cal-empty {
+    background: #fafafa;
+}
+
+.lrob-cal-day-num {
+    display: block;
+    font-weight: 600;
+    font-size: 0.85em;
+    margin-bottom: 2px;
+}
+
+.lrob-cal-today {
+    background: #fffde7;
+}
+
+.lrob-cal-today .lrob-cal-day-num {
+    background: var(--lrob-primary);
+    color: white;
+    width: 22px;
+    height: 22px;
+    line-height: 22px;
+    text-align: center;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.lrob-cal-has-events {
+    background: #f0f7ff;
+}
+
+.lrob-cal-events {
+    font-size: 0.7em;
+    /* Visible so multi-day bars and long titles can extend across adjacent cells. */
+    overflow: visible;
+}
+
+.lrob-cal-event-item {
+    display: block;
+    padding: 1px 4px;
+    margin-bottom: 1px;
+    background: var(--lrob-primary);
+    color: var(--lrob-white);
+    border-radius: 2px;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+.lrob-cal-event-item:hover {
+    background: var(--lrob-primary-dark);
+}
+
+/* Agenda layout — chronological list, no month grid. */
+.lrob-cal-agenda {
+    display: flex;
+    flex-direction: column;
+}
+
+.lrob-cal-agenda-date {
+    margin: 1em 0 0.4em;
+    padding-bottom: 0.3em;
+    border-bottom: 1px solid var(--lrob-border);
+    font-size: 0.95em;
+    font-weight: 600;
+    color: var(--lrob-text);
+    text-transform: capitalize;
+}
+
+.lrob-cal-agenda-date:first-child {
+    margin-top: 0;
+}
+
+.lrob-cal-agenda-item {
+    display: grid;
+    grid-template-columns: 64px 1fr auto;
+    gap: 8px 12px;
+    align-items: baseline;
+    padding: 10px 12px;
+    margin: 0 0 4px;
+    background: transparent;
+    border: 0;
+    border-radius: 4px;
+    text-align: left;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+    width: 100%;
+    /* Reset the .lrob-cal-event-item primary-blue background — agenda uses neutral rows */
+    background-color: transparent;
+}
+
+.lrob-cal-agenda-item:hover {
+    background: var(--lrob-bg);
+}
+
+.lrob-cal-agenda-time {
+    font-weight: 600;
+    color: var(--lrob-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+.lrob-cal-agenda-title {
+    font-weight: 500;
+    color: var(--lrob-text);
+}
+
+.lrob-cal-agenda-location {
+    font-size: 0.85em;
+    color: var(--lrob-text-light);
+    grid-column: 2 / -1;
+}
+
+.lrob-cal-agenda-empty {
+    padding: 30px;
+    text-align: center;
+    color: var(--lrob-text-light);
+    background: var(--lrob-bg);
+    border-radius: 4px;
+}
+
+@media (max-width: 480px) {
+    .lrob-cal-agenda-item {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Multi-day event: rendered ONCE in its start cell (or week-start after a wrap)
+   with an inline `min-width: calc(N * 100% + ...)` that visually spans the cells
+   it occupies. Long titles overflow into adjacent cells too — the parent <td>
+   uses `overflow: visible hidden` so the bar isn't clipped horizontally.
+   Z-index keeps the bar above neighbouring cells' single-day events when they
+   visually overlap. */
+.lrob-cal-event-multiday {
+    position: relative;
+    z-index: 2;
+    /* Override `.lrob-cal-event-item` defaults so the inline `min-width: N00%`
+       inline-style actually expands the bar. */
+    overflow: visible;
+    max-width: none;
+    text-overflow: clip;
+}
+
+/* Continuation cells get an invisible row that reserves the multi-day bar's
+   vertical slot. Without this, a single-day event starting on a day the
+   multi-day passes through would render at the top and overlap the bar's
+   visual extension into that cell. */
+.lrob-cal-event-placeholder {
+    visibility: hidden;
+    pointer-events: none;
+    background: transparent;
+    /* keep block-level layout from .lrob-cal-event-item so the height matches */
+}
+
+.lrob-cal-more {
+    display: block;
+    color: var(--lrob-text-light);
+    font-size: 0.9em;
+}
+
+/* Popup
+   Width is driven by a class on the calendar container — three presets that
+   the editor exposes as Compact / Standard / Spacious. Image height is a
+   separate setting. */
+.lrob-cal-popup {
+    position: absolute;
+    z-index: 1000;
+    width: var(--lrob-popup-width, 360px);
+    max-width: calc(100% - 20px);
+    display: none;
+}
+
+/* Popup-size presets (set CSS var on the calendar container) */
+.lrob-calendar.lrob-cal-popup-size-compact  { --lrob-popup-width: 300px; --lrob-popup-img-height: 150px; }
+.lrob-calendar.lrob-cal-popup-size-standard { --lrob-popup-width: 360px; --lrob-popup-img-height: 200px; }
+.lrob-calendar.lrob-cal-popup-size-spacious { --lrob-popup-width: 440px; --lrob-popup-img-height: 260px; }
+
+/* Image-height overrides (independent from popup-size) */
+.lrob-calendar.lrob-cal-popup-imgh-small  { --lrob-popup-img-height: 140px; }
+.lrob-calendar.lrob-cal-popup-imgh-medium { --lrob-popup-img-height: 200px; }
+.lrob-calendar.lrob-cal-popup-imgh-large  { --lrob-popup-img-height: 280px; }
+
+/* Image-display override */
+.lrob-calendar.lrob-cal-popup-img-cover   .lrob-cal-popup-thumb img { object-fit: cover; }
+.lrob-calendar.lrob-cal-popup-img-contain .lrob-cal-popup-thumb img { object-fit: contain; }
+
+.lrob-cal-popup-content {
+    background: var(--lrob-white);
+    border: 1px solid var(--lrob-border);
+    border-radius: 6px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+    position: relative;
+    overflow: hidden;
+}
+
+.lrob-cal-popup-close {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 28px;
+    height: 28px;
+    background: rgba(255,255,255,0.92);
+    border: none;
+    border-radius: 50%;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--lrob-text);
+    padding: 0;
+    z-index: 2;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+
+.lrob-cal-popup-close:hover {
+    background: #fff;
+}
+
+/* Prev/next event navigation arrows — visible on the popup's left/right edges */
+.lrob-cal-popup-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 36px;
+    background: rgba(255,255,255,0.92);
+    border: none;
+    border-radius: 50%;
+    font-size: 24px;
+    line-height: 1;
+    color: var(--lrob-text);
+    cursor: pointer;
+    padding: 0;
+    z-index: 3;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.18);
+}
+
+.lrob-cal-popup-nav:hover {
+    background: #fff;
+}
+
+/* Sit fully outside the popup card with a small visual gap.
+   36px button width + 8px gap = -44px from the popup edge. */
+.lrob-cal-popup-nav--prev {
+    left: -44px;
+}
+
+.lrob-cal-popup-nav--next {
+    right: -44px;
+}
+
+/* Mobile: not enough horizontal room for outside arrows — keep them inside. */
+@media (max-width: 600px) {
+    .lrob-cal-popup-nav--prev { left: 6px; }
+    .lrob-cal-popup-nav--next { right: 6px; }
+}
+
+.lrob-cal-popup-thumb {
+    display: block;
+    width: 100%;
+    height: var(--lrob-popup-img-height, 200px);
+    overflow: hidden;
+    background: #f3f4f6;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    cursor: zoom-in;
+}
+
+.lrob-cal-popup-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    transition: opacity 0.2s ease;
+}
+
+.lrob-cal-popup-thumb:hover img {
+    opacity: 0.92;
+}
+
+.lrob-cal-popup-body {
+    padding: 14px 16px 16px;
+}
+
+.lrob-cal-popup-title {
+    margin: 0 0 8px;
+    padding-right: 28px;
+    font-size: 1.05em;
+    line-height: 1.3;
+    font-weight: 600;
+}
+
+.lrob-cal-popup-title a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.lrob-cal-popup-title a:hover {
+    text-decoration: underline;
+}
+
+.lrob-cal-popup-meta {
+    margin: 0 0 6px;
+    font-size: 0.85em;
+    color: var(--lrob-text-light);
+    line-height: 1.4;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.lrob-cal-popup-meta .lrob-icon {
+    flex: none;
+}
+
+.lrob-cal-popup-date {
+    color: var(--lrob-text);
+    font-weight: 500;
+}
+
+.lrob-cal-popup-excerpt {
+    margin: 10px 0 12px;
+    font-size: 0.88em;
+    line-height: 1.45;
+    color: var(--lrob-text);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.lrob-cal-popup-link {
+    display: inline-block;
+    margin-top: 4px;
+    padding: 7px 14px;
+    background: var(--lrob-primary);
+    color: var(--lrob-white);
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 0.85em;
+    font-weight: 500;
+}
+
+.lrob-cal-popup-link:hover {
+    background: var(--lrob-primary-dark);
+    color: var(--lrob-white);
+}
+
+/* Lightbox styles live in assets/css/lightbox.css (shared) */
+
+@media (max-width: 600px) {
+    .lrob-cal-table td {
+        height: 60px;
+        padding: 2px;
+    }
+    .lrob-cal-day-num {
+        font-size: 0.75em;
+    }
+    .lrob-cal-events {
+        font-size: 0.6em;
+    }
+
+    /* Popup becomes a fixed centered modal — the relative-positioned 360px
+       box is unusable on phone screens. !important overrides the inline
+       top/left/width JS sets for desktop positioning. */
+    .lrob-cal-popup {
+        position: fixed !important;
+        top: 5vh !important;
+        left: 5vw !important;
+        right: 5vw !important;
+        bottom: auto !important;
+        width: 90vw !important;
+        max-width: none !important;
+        max-height: 90vh;
+        overflow-y: auto;
+        z-index: 100001; /* above lightbox backdrop, below lightbox close button */
+    }
+}
