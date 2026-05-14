@@ -586,15 +586,18 @@
     /* Popup becomes a fullscreen flex overlay. No transform on the popup
        itself (only on its descendants), so `position: fixed` children — namely
        the prev/next arrows — resolve to VIEWPORT coordinates instead of being
-       trapped inside a transformed ancestor. */
+       trapped inside a transformed ancestor.
+       Individual `top/right/bottom/left: 0 !important` (rather than `inset`)
+       so they always beat any inline `top/left` jQuery may have set during a
+       previous DESKTOP open of this same popup element. */
     .lrob-cal-popup {
         position: fixed !important;
-        inset: 0 !important;
-        top: auto !important;
-        left: auto !important;
-        right: auto !important;
-        bottom: auto !important;
+        top: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        left: 0 !important;
         width: auto !important;
+        height: auto !important;
         max-width: none !important;
         max-height: none !important;
         background: rgba(0, 0, 0, 0.55);
