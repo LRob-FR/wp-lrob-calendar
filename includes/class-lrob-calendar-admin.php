@@ -372,14 +372,14 @@ class LRob_Calendar_Admin {
     }
 
     /**
-     * Add "Plugin page" + "GitHub" links to this plugin's row on wp-admin/plugins.php.
+     * Add a "GitHub" link to this plugin's row on wp-admin/plugins.php.
+     * WordPress already renders a "Plugin site" link from the Plugin URI
+     * header, so we don't duplicate that one here.
      */
     public function plugin_row_meta(array $links, string $file): array {
         if ($file !== LROB_CALENDAR_BASENAME) {
             return $links;
         }
-        $links[] = '<a href="' . esc_url(LROB_CALENDAR_PLUGIN_URL) . '" target="_blank" rel="noopener">' .
-            esc_html__('Plugin page', 'lrob-calendar') . '</a>';
         $links[] = '<a href="' . esc_url(LROB_CALENDAR_GITHUB_URL) . '" target="_blank" rel="noopener">' .
             esc_html__('GitHub', 'lrob-calendar') . '</a>';
         return $links;

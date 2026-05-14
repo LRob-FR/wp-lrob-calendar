@@ -4,7 +4,7 @@
  * Plugin URI: https://www.lrob.fr/wordpress/plugins/lrob-calendar/
  * Description: A powerful and clean event calendar for WordPress with recurring events, categories, locations, import/export and more.
  * Version: 1.0.1
- * Author: Robin Labadie - LRob
+ * Author: LRob
  * Author URI: https://www.lrob.fr
  * License: GPL-2.0+
  * License URI: http://www.gnu.org/licenses/gpl-2.0.txt

@@ -1,4 +1,4 @@
-# Copyright (C) 2026 Robin Labadie - LRob
+# Copyright (C) 2026 LRob
 # This file is distributed under the same license as the LRob - Calendar plugin.
 msgid ""
 msgstr ""
@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-05-14T15:09:53+00:00\n"
+"POT-Creation-Date: 2026-05-14T15:12:42+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: lrob-calendar\n"
@@ -27,7 +27,7 @@ msgid "A powerful and clean event calendar for WordPress with recurring events, 
 msgstr ""
 
 #. Author of the plugin
-msgid "Robin Labadie - LRob"
+msgid "LRob"
 msgstr ""
 
 #. Author URI of the plugin
@@ -251,10 +251,6 @@ msgstr ""
 
 #: includes/class-lrob-calendar-admin.php:365
 msgid "Save Settings"
-msgstr ""
-
-#: includes/class-lrob-calendar-admin.php:382
-msgid "Plugin page"
 msgstr ""
 
 #: includes/class-lrob-calendar-admin.php:384

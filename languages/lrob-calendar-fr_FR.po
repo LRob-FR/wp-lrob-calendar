@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: LRob Calendar 1.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/lrob-calendar\n"
-"POT-Creation-Date: 2026-05-14T15:09:53+00:00\n"
+"POT-Creation-Date: 2026-05-14T15:12:42+00:00\n"
 "PO-Revision-Date: 2026-05-12 18:00+0200\n"
 "Last-Translator: Robin Labadie <claude@lrob.fr>\n"
 "Language-Team: French <claude@lrob.fr>\n"
@@ -33,8 +33,8 @@ msgstr ""
 "récurrents, catégories, lieux, import/export et plus encore."
 
 #. Author of the plugin
-msgid "Robin Labadie - LRob"
-msgstr "Robin Labadie - LRob"
+msgid "LRob"
+msgstr "LRob"
 
 #. Author URI of the plugin
 msgid "https://www.lrob.fr"
@@ -279,10 +279,6 @@ msgstr "Les formats de date et d'heure suivent vos %1$sréglages WordPress%2$s."
 #: includes/class-lrob-calendar-admin.php:365
 msgid "Save Settings"
 msgstr "Enregistrer les réglages"
-
-#: includes/class-lrob-calendar-admin.php:382
-msgid "Plugin page"
-msgstr "Page de l'extension"
 
 #: includes/class-lrob-calendar-admin.php:384
 msgid "GitHub"
@@ -1023,6 +1019,9 @@ msgstr "Complet"
 #: blocks/single-event/edit.js:159
 msgid "Select an event in the sidebar."
 msgstr "Sélectionnez un événement dans la barre latérale."
+
+#~ msgid "Plugin page"
+#~ msgstr "Page de l'extension"
 
 #~ msgid "Show Date"
 #~ msgstr "Afficher la date"
