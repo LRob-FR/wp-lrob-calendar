@@ -19,13 +19,27 @@ class LRob_Calendar_Block_Helpers {
         $post_id  = $event->get_post_id();
         $thumb_id = get_post_thumbnail_id($post_id);
 
+        // For recurring events, prefer the next upcoming instance over the base.
+        // Otherwise an event whose base happened years ago but recurs forever
+        // would display its original 2018 date in the popup — confusing.
+        $start_dt = $event->get_start_datetime();
+        $end_dt   = $event->get_end_datetime();
+        if ($event->is_recurring()) {
+            $next = $event->get_next_instance_after(time());
+            if ($next) {
+                $tz = new DateTimeZone($event->get('timezone') ?: 'UTC');
+                $start_dt = (new DateTime('@' . (int) $next['start']))->setTimezone($tz);
+                $end_dt   = (new DateTime('@' . (int) $next['end']))->setTimezone($tz);
+            }
+        }
+
         return [
             'id'            => $post_id,
             'title'         => $post->post_title,
             'excerpt'       => self::build_excerpt($post),
             'url'           => get_permalink($post_id),
-            'start'         => $event->get_start_datetime()->format('c'),
-            'end'           => $event->get_end_datetime()->format('c'),
+            'start'         => $start_dt->format('c'),
+            'end'           => $end_dt->format('c'),
             'allDay'        => $event->is_allday(),
             'instant'       => $event->is_instant(),
             'recurring'     => $event->is_recurring(),
@@ -33,6 +47,9 @@ class LRob_Calendar_Block_Helpers {
             'city'          => $event->get('city'),
             'thumbnail'     => $thumb_id ? wp_get_attachment_image_url($thumb_id, 'medium') : null,
             'thumbnailFull' => $thumb_id ? wp_get_attachment_image_url($thumb_id, 'large')  : null,
+            'isFree'        => $event->is_free(),
+            'cost'          => $event->get('cost') ?: null,
+            'ticketUrl'     => $event->get('ticket_url') ?: null,
         ];
     }
 

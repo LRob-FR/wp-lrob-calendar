@@ -23,6 +23,8 @@ define('LROB_CALENDAR_FILE', __FILE__);
 define('LROB_CALENDAR_PATH', plugin_dir_path(__FILE__));
 define('LROB_CALENDAR_URL', plugin_dir_url(__FILE__));
 define('LROB_CALENDAR_BASENAME', plugin_basename(__FILE__));
+define('LROB_CALENDAR_GITHUB_URL', 'https://github.com/LRob-FR/wp-lrob-calendar');
+define('LROB_CALENDAR_GITHUB_ISSUES_URL', LROB_CALENDAR_GITHUB_URL . '/issues');
 
 // Autoload
 spl_autoload_register(function ($class) {

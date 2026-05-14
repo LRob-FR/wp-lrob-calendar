@@ -191,6 +191,8 @@ class LRob_Calendar_Blocks {
                 'nextEvent'   => __('Next event', 'lrob-calendar'),
                 'noUpcoming'  => __('No upcoming events.', 'lrob-calendar'),
                 'recurring'   => __('Recurring', 'lrob-calendar'),
+                'free'        => __('Free', 'lrob-calendar'),
+                'getTickets'  => __('Get tickets', 'lrob-calendar'),
             ],
             // SVG markup for the popup's inline pictograms — single source of truth (LRob_Calendar_Icons).
             'icons' => [
@@ -198,6 +200,7 @@ class LRob_Calendar_Blocks {
                 'clock'     => LRob_Calendar_Icons::get('clock'),
                 'location'  => LRob_Calendar_Icons::get('location'),
                 'recurring' => LRob_Calendar_Icons::get('recurring'),
+                'ticket'    => LRob_Calendar_Icons::get('ticket'),
             ],
         ]);
     }

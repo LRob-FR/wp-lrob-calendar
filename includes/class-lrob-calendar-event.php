@@ -351,18 +351,38 @@ class LRob_Calendar_Event {
     
     public function get_instances(int $limit = 100): array {
         global $wpdb;
-        
+
         if ($this->post_id <= 0) {
             return [];
         }
-        
+
         $table = LRob_Calendar_Database::get_instances_table();
-        
+
         return $wpdb->get_results($wpdb->prepare(
             "SELECT id, start, end FROM {$table} WHERE post_id = %d ORDER BY start ASC LIMIT %d",
             $this->post_id,
             $limit
         ), ARRAY_A);
+    }
+
+    /**
+     * Find the earliest instance that hasn't ended yet (or any instance if all
+     * are past). Used so recurring events whose base is in the past but whose
+     * recurrence continues forward still display a useful "next occurrence" date.
+     * Returns ['start' => int, 'end' => int] or null.
+     */
+    public function get_next_instance_after(int $from): ?array {
+        global $wpdb;
+        if ($this->post_id <= 0) {
+            return null;
+        }
+        $table = LRob_Calendar_Database::get_instances_table();
+        $row = $wpdb->get_row($wpdb->prepare(
+            "SELECT start, end FROM {$table} WHERE post_id = %d AND end >= %d ORDER BY start ASC LIMIT 1",
+            $this->post_id,
+            $from
+        ), ARRAY_A);
+        return $row ?: null;
     }
     
     // Static query methods
@@ -389,19 +409,30 @@ class LRob_Calendar_Event {
 
         $where = ["p.post_type = %s", "p.post_status = %s"];
         $params = [LRob_Calendar_Post_Types::POST_TYPE, $args['status']];
+        $instances_table = LRob_Calendar_Database::get_instances_table();
 
         if ($args['start'] !== null) {
-            $where[] = "e.end >= %d";
+            // Include events whose base end is >= start (the simple case), OR
+            // recurring events that have at least one instance still ending >= start.
+            // This catches "happening now" non-recurring events (e.end > now) AND
+            // recurring events whose base is past but whose recurrence is ongoing.
+            $where[] = "(e.end >= %d OR (e.recurrence_rules <> '' AND EXISTS (
+                SELECT 1 FROM {$instances_table} ix WHERE ix.post_id = e.post_id AND ix.end >= %d
+            )))";
+            $params[] = $args['start'];
             $params[] = $args['start'];
         }
-        
+
         if ($args['end'] !== null) {
-            $where[] = "e.start <= %d";
+            $where[] = "(e.start <= %d OR (e.recurrence_rules <> '' AND EXISTS (
+                SELECT 1 FROM {$instances_table} ix2 WHERE ix2.post_id = e.post_id AND ix2.start <= %d
+            )))";
+            $params[] = $args['end'];
             $params[] = $args['end'];
         }
-        
+
         $join = '';
-        
+
         if ($args['category']) {
             $join .= " INNER JOIN {$wpdb->term_relationships} tr ON p.ID = tr.object_id";
             $join .= " INNER JOIN {$wpdb->term_taxonomy} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id";
@@ -409,7 +440,7 @@ class LRob_Calendar_Event {
             $params[] = LRob_Calendar_Post_Types::TAX_CATEGORY;
             $params[] = $args['category'];
         }
-        
+
         if ($args['tag']) {
             if (!$args['category']) {
                 $join .= " INNER JOIN {$wpdb->term_relationships} tr ON p.ID = tr.object_id";
@@ -494,13 +525,21 @@ class LRob_Calendar_Event {
 
         $where  = ['p.post_type = %s', 'p.post_status = %s'];
         $params = [LRob_Calendar_Post_Types::POST_TYPE, $args['status']];
+        $instances_table = LRob_Calendar_Database::get_instances_table();
 
         if ($args['start'] !== null) {
-            $where[]  = 'e.end >= %d';
+            // Mirror get_events(): also count recurring events with an ongoing instance.
+            $where[] = "(e.end >= %d OR (e.recurrence_rules <> '' AND EXISTS (
+                SELECT 1 FROM {$instances_table} ix WHERE ix.post_id = e.post_id AND ix.end >= %d
+            )))";
+            $params[] = $args['start'];
             $params[] = $args['start'];
         }
         if ($args['end'] !== null) {
-            $where[]  = 'e.start <= %d';
+            $where[] = "(e.start <= %d OR (e.recurrence_rules <> '' AND EXISTS (
+                SELECT 1 FROM {$instances_table} ix2 WHERE ix2.post_id = e.post_id AND ix2.start <= %d
+            )))";
+            $params[] = $args['end'];
             $params[] = $args['end'];
         }
 

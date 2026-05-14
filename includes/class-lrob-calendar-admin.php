@@ -205,6 +205,10 @@ class LRob_Calendar_Admin {
                 esc_html(LROB_CALENDAR_VERSION)
             );
             ?>
+            &nbsp;·&nbsp;
+            <a href="<?php echo esc_url(LROB_CALENDAR_GITHUB_URL); ?>" target="_blank" rel="noopener"><?php esc_html_e('Source on GitHub', 'lrob-calendar'); ?></a>
+            &nbsp;·&nbsp;
+            <a href="<?php echo esc_url(LROB_CALENDAR_GITHUB_ISSUES_URL); ?>" target="_blank" rel="noopener"><?php esc_html_e('Report an issue', 'lrob-calendar'); ?></a>
         </p>
         <?php
     }
@@ -368,12 +372,14 @@ class LRob_Calendar_Admin {
     }
 
     /**
-     * Add a "Visit LRob" link to this plugin's row on wp-admin/plugins.php.
+     * Add "GitHub" + "Visit LRob" links to this plugin's row on wp-admin/plugins.php.
      */
     public function plugin_row_meta(array $links, string $file): array {
         if ($file !== LROB_CALENDAR_BASENAME) {
             return $links;
         }
+        $links[] = '<a href="' . esc_url(LROB_CALENDAR_GITHUB_URL) . '" target="_blank" rel="noopener">' .
+            esc_html__('GitHub', 'lrob-calendar') . '</a>';
         $links[] = '<a href="https://www.lrob.fr" target="_blank" rel="noopener">' .
             esc_html__('Visit LRob', 'lrob-calendar') . '</a>';
         return $links;

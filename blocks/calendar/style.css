@@ -291,6 +291,27 @@
     box-shadow: 0 8px 24px rgba(0,0,0,0.18);
     position: relative;
     overflow: hidden;
+    /* Animation fires every time the popup content is (re)rendered — including
+       when navigatePopupTo() swaps to the next event. innerHTML replacement
+       creates a fresh DOM node, which triggers the keyframe from scratch. */
+    animation: lrob-cal-popup-slide-in 0.22s ease-out;
+}
+
+@keyframes lrob-cal-popup-slide-in {
+    from {
+        opacity: 0;
+        transform: translateX(16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .lrob-cal-popup-content {
+        animation: none;
+    }
 }
 
 .lrob-cal-popup-close {
@@ -446,9 +467,35 @@
     color: var(--lrob-white);
 }
 
+.lrob-cal-popup-link--ticket {
+    background: transparent;
+    color: var(--lrob-primary);
+    border: 1px solid var(--lrob-primary);
+    margin-right: 6px;
+}
+
+.lrob-cal-popup-link--ticket:hover {
+    background: var(--lrob-primary);
+    color: var(--lrob-white);
+}
+
+.lrob-cal-popup-cost--free span {
+    color: var(--lrob-primary);
+    font-weight: 600;
+}
+
 /* Lightbox styles live in assets/css/lightbox.css (shared) */
 
 @media (max-width: 600px) {
+    /* Clip horizontal overflow at mobile widths. Multi-day bars with inline
+       min-width: calc(N * 100% + ...px) can exceed the table width by a few
+       pixels (the +Npx accounts for cell padding/border), and on a narrow
+       viewport that becomes a visible horizontal scrollbar. Popup arrows on
+       mobile are inside the fixed modal so they aren't affected by this clip. */
+    .lrob-calendar {
+        overflow-x: hidden;
+    }
+
     .lrob-cal-table td {
         height: 60px;
         padding: 2px;
@@ -462,7 +509,8 @@
 
     /* Popup becomes a fixed centered modal — the relative-positioned 360px
        box is unusable on phone screens. !important overrides the inline
-       top/left/width JS sets for desktop positioning. */
+       top/left/width JS sets for desktop positioning. z-index sits below the
+       lightbox (200000) so a lightbox opened from the popup wins on iOS. */
     .lrob-cal-popup {
         position: fixed !important;
         top: 5vh !important;
@@ -473,6 +521,6 @@
         max-width: none !important;
         max-height: 90vh;
         overflow-y: auto;
-        z-index: 100001; /* above lightbox backdrop, below lightbox close button */
+        z-index: 100001;
     }
 }

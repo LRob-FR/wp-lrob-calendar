@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: LRob Calendar 1.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/lrob-calendar\n"
-"POT-Creation-Date: 2026-05-14T12:03:21+00:00\n"
+"POT-Creation-Date: 2026-05-14T13:57:24+00:00\n"
 "PO-Revision-Date: 2026-05-12 18:00+0200\n"
 "Last-Translator: Robin Labadie <claude@lrob.fr>\n"
 "Language-Team: French <claude@lrob.fr>\n"
@@ -89,8 +89,8 @@ msgid "Settings"
 msgstr "Réglages"
 
 #: includes/class-lrob-calendar-admin.php:96
-#: includes/class-lrob-calendar-admin.php:470
-#: includes/class-lrob-calendar-admin.php:509
+#: includes/class-lrob-calendar-admin.php:476
+#: includes/class-lrob-calendar-admin.php:515
 msgid "Select Image"
 msgstr "Sélectionner une image"
 
@@ -157,56 +157,64 @@ msgstr "Importer depuis JSON"
 msgid "%1$s — version %2$s"
 msgstr "%1$s — version %2$s"
 
-#: includes/class-lrob-calendar-admin.php:243
+#: includes/class-lrob-calendar-admin.php:209
+msgid "Source on GitHub"
+msgstr "Code source sur GitHub"
+
+#: includes/class-lrob-calendar-admin.php:211
+msgid "Report an issue"
+msgstr "Signaler un problème"
+
+#: includes/class-lrob-calendar-admin.php:247
 msgid "Settings saved."
 msgstr "Réglages enregistrés."
 
-#: includes/class-lrob-calendar-admin.php:254
+#: includes/class-lrob-calendar-admin.php:258
 msgid "Sunday"
 msgstr "Dimanche"
 
-#: includes/class-lrob-calendar-admin.php:255
+#: includes/class-lrob-calendar-admin.php:259
 msgid "Monday"
 msgstr "Lundi"
 
-#: includes/class-lrob-calendar-admin.php:256
+#: includes/class-lrob-calendar-admin.php:260
 msgid "Saturday"
 msgstr "Samedi"
 
-#: includes/class-lrob-calendar-admin.php:261 blocks/calendar/edit.js:23
+#: includes/class-lrob-calendar-admin.php:265 blocks/calendar/edit.js:23
 msgid "Calendar Settings"
 msgstr "Réglages du calendrier"
 
-#: includes/class-lrob-calendar-admin.php:268
+#: includes/class-lrob-calendar-admin.php:272
 msgid "Default Timezone"
 msgstr "Fuseau horaire par défaut"
 
-#: includes/class-lrob-calendar-admin.php:273
+#: includes/class-lrob-calendar-admin.php:277
 msgid "Default timezone for new events."
 msgstr "Fuseau horaire par défaut pour les nouveaux événements."
 
-#: includes/class-lrob-calendar-admin.php:277
+#: includes/class-lrob-calendar-admin.php:281
 msgid "First day of the week"
 msgstr "Premier jour de la semaine"
 
 #. translators: %s: the auto-detected first day of the week (e.g. Sunday or Monday)
-#: includes/class-lrob-calendar-admin.php:284
+#: includes/class-lrob-calendar-admin.php:288
 msgid "Auto — follow site language (currently %s)"
 msgstr "Auto — selon la langue du site (actuellement %s)"
 
-#: includes/class-lrob-calendar-admin.php:293
+#: includes/class-lrob-calendar-admin.php:297
 msgid "Day shown in the first column of the calendar grid."
 msgstr "Jour affiché dans la première colonne de la grille du calendrier."
 
-#: includes/class-lrob-calendar-admin.php:297
+#: includes/class-lrob-calendar-admin.php:301
 msgid "Public event pages"
 msgstr "Pages publiques des événements"
 
-#: includes/class-lrob-calendar-admin.php:301
+#: includes/class-lrob-calendar-admin.php:305
 msgid "Disable dedicated pages for events and categories"
 msgstr "Désactiver les pages dédiées pour les événements et les catégories"
 
-#: includes/class-lrob-calendar-admin.php:304
+#: includes/class-lrob-calendar-admin.php:308
 msgid ""
 "When disabled, events and their taxonomies are only accessible through the "
 "calendar. Direct URLs return 404, and frontend links are stripped from "
@@ -216,15 +224,15 @@ msgstr ""
 "le calendrier. L'accès direct aux URL renvoie une erreur 404, et les liens "
 "sont retirés des blocs et de l'infobulle du calendrier."
 
-#: includes/class-lrob-calendar-admin.php:310
+#: includes/class-lrob-calendar-admin.php:314
 msgid "Maximum event age"
 msgstr "Ancienneté maximale des événements"
 
-#: includes/class-lrob-calendar-admin.php:315
+#: includes/class-lrob-calendar-admin.php:319
 msgid "months"
 msgstr "mois"
 
-#: includes/class-lrob-calendar-admin.php:317
+#: includes/class-lrob-calendar-admin.php:321
 msgid ""
 "Queries that don't set their own date range will ignore events older than "
 "this. Use 0 for no limit. Helps performance on sites with thousands of "
@@ -234,19 +242,19 @@ msgstr ""
 "événements plus anciens. Utilisez 0 pour ne pas limiter. Améliore les "
 "performances sur les sites comportant des milliers d'événements historiques."
 
-#: includes/class-lrob-calendar-admin.php:323
+#: includes/class-lrob-calendar-admin.php:327
 msgid "Recurrence limits"
 msgstr "Limites de récurrence"
 
-#: includes/class-lrob-calendar-admin.php:329
+#: includes/class-lrob-calendar-admin.php:333
 msgid "max instances per event"
 msgstr "occurrences max par événement"
 
-#: includes/class-lrob-calendar-admin.php:335
+#: includes/class-lrob-calendar-admin.php:339
 msgid "max years ahead"
 msgstr "années max à l'avance"
 
-#: includes/class-lrob-calendar-admin.php:338
+#: includes/class-lrob-calendar-admin.php:342
 msgid ""
 "Safety caps for recurring-event instance generation. Raise these for events "
 "that repeat daily over many years (default 500 / 5 = ~1.4 years of a daily "
@@ -256,25 +264,29 @@ msgstr ""
 "récurrents. À augmenter pour des événements quotidiens sur plusieurs années "
 "(500 / 5 par défaut = environ 1,4 an pour un événement quotidien)."
 
-#: includes/class-lrob-calendar-admin.php:343
+#: includes/class-lrob-calendar-admin.php:347
 msgid "Date & Time Format"
 msgstr "Format de date et d'heure"
 
 #. translators: %1$s: opening anchor tag, %2$s: closing anchor tag
-#: includes/class-lrob-calendar-admin.php:349
+#: includes/class-lrob-calendar-admin.php:353
 msgid "Date and time formats follow your %1$sWordPress settings%2$s."
 msgstr "Les formats de date et d'heure suivent vos %1$sréglages WordPress%2$s."
 
-#: includes/class-lrob-calendar-admin.php:361
+#: includes/class-lrob-calendar-admin.php:365
 msgid "Save Settings"
 msgstr "Enregistrer les réglages"
 
-#: includes/class-lrob-calendar-admin.php:378
+#: includes/class-lrob-calendar-admin.php:382
+msgid "GitHub"
+msgstr "GitHub"
+
+#: includes/class-lrob-calendar-admin.php:384
 msgid "Visit LRob"
 msgstr "Visiter LRob"
 
 #. translators: %s: human-readable file size (e.g. "12 MB")
-#: includes/class-lrob-calendar-admin.php:429
+#: includes/class-lrob-calendar-admin.php:435
 msgid ""
 "Large import file (%s). If the page times out, increase your PHP "
 "memory_limit / max_execution_time."
@@ -282,32 +294,32 @@ msgstr ""
 "Fichier d'import volumineux (%s). Si la page expire, augmentez le "
 "memory_limit / max_execution_time de PHP."
 
-#: includes/class-lrob-calendar-admin.php:462
-#: includes/class-lrob-calendar-admin.php:494
+#: includes/class-lrob-calendar-admin.php:468
+#: includes/class-lrob-calendar-admin.php:500
 msgid "Color"
 msgstr "Couleur"
 
-#: includes/class-lrob-calendar-admin.php:466
-#: includes/class-lrob-calendar-admin.php:500
+#: includes/class-lrob-calendar-admin.php:472
+#: includes/class-lrob-calendar-admin.php:506
 msgid "Image"
 msgstr "Image"
 
-#: includes/class-lrob-calendar-admin.php:473
-#: includes/class-lrob-calendar-admin.php:512
+#: includes/class-lrob-calendar-admin.php:479
+#: includes/class-lrob-calendar-admin.php:518
 msgid "Remove Image"
 msgstr "Retirer l'image"
 
-#: includes/class-lrob-calendar-admin.php:569
+#: includes/class-lrob-calendar-admin.php:575
 msgid "Date"
 msgstr "Date"
 
-#: includes/class-lrob-calendar-admin.php:570
+#: includes/class-lrob-calendar-admin.php:576
 #: includes/class-lrob-calendar-meta-boxes.php:38
 msgid "Location"
 msgstr "Lieu"
 
-#: includes/class-lrob-calendar-admin.php:593
-#: includes/class-lrob-calendar-block-helpers.php:199
+#: includes/class-lrob-calendar-admin.php:599
+#: includes/class-lrob-calendar-block-helpers.php:216
 #: includes/class-lrob-calendar-blocks.php:193
 msgid "Recurring"
 msgstr "Récurrent"
@@ -341,37 +353,47 @@ msgstr "Événement suivant"
 msgid "No upcoming events."
 msgstr "Aucun événement à venir."
 
-#: includes/class-lrob-calendar-blocks.php:224
+#: includes/class-lrob-calendar-blocks.php:194
+#: includes/class-lrob-calendar-single-event.php:156
+msgid "Free"
+msgstr "Gratuit"
+
+#: includes/class-lrob-calendar-blocks.php:195
+#: includes/class-lrob-calendar-single-event.php:165
+msgid "Get tickets"
+msgstr "Réserver une place"
+
+#: includes/class-lrob-calendar-blocks.php:227
 msgid "Unix timestamp; only events ending at/after this are returned."
 msgstr ""
 "Horodatage Unix ; seuls les événements se terminant à partir de cette date "
 "sont retournés."
 
-#: includes/class-lrob-calendar-blocks.php:229
+#: includes/class-lrob-calendar-blocks.php:232
 msgid "Unix timestamp; only events starting at/before this are returned."
 msgstr ""
 "Horodatage Unix ; seuls les événements commençant avant cette date sont "
 "retournés."
 
-#: includes/class-lrob-calendar-blocks.php:234
+#: includes/class-lrob-calendar-blocks.php:237
 msgid "Event category term ID."
 msgstr "Identifiant de catégorie d'événement."
 
-#: includes/class-lrob-calendar-blocks.php:239
+#: includes/class-lrob-calendar-blocks.php:242
 msgid "Event tag term ID."
 msgstr "Identifiant d'étiquette d'événement."
 
-#: includes/class-lrob-calendar-blocks.php:244
+#: includes/class-lrob-calendar-blocks.php:247
 msgid "Maximum number of events to return."
 msgstr "Nombre maximum d'événements à retourner."
 
-#: includes/class-lrob-calendar-blocks.php:252
+#: includes/class-lrob-calendar-blocks.php:255
 msgid ""
 "When 1, include events that have already ended (default: upcoming only)."
 msgstr ""
 "Si 1, inclut les événements déjà terminés (par défaut : à venir uniquement)."
 
-#: includes/class-lrob-calendar-blocks.php:272
+#: includes/class-lrob-calendar-blocks.php:275
 msgid "Event post ID."
 msgstr "Identifiant de l'article d'événement."
 
@@ -741,14 +763,6 @@ msgstr "Cet événement est récurrent."
 #: includes/class-lrob-calendar-single-event.php:112
 msgid "Where"
 msgstr "Où"
-
-#: includes/class-lrob-calendar-single-event.php:156
-msgid "Free"
-msgstr "Gratuit"
-
-#: includes/class-lrob-calendar-single-event.php:165
-msgid "Get tickets"
-msgstr "Réserver une place"
 
 #: includes/class-lrob-calendar-single-event.php:186
 msgid "Contact"

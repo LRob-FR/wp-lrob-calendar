@@ -531,10 +531,28 @@
                 + '</p>';
         }
 
+        // Cost / Free badge
+        if (event.isFree) {
+            html += '<p class="lrob-cal-popup-meta lrob-cal-popup-cost lrob-cal-popup-cost--free">'
+                + (this.icons.ticket || '')
+                + '<span>' + this.escapeHtml(this.i18n.free || 'Free') + '</span>'
+                + '</p>';
+        } else if (event.cost) {
+            html += '<p class="lrob-cal-popup-meta lrob-cal-popup-cost">'
+                + (this.icons.ticket || '')
+                + '<span>' + this.escapeHtml(event.cost) + '</span>'
+                + '</p>';
+        }
+
         if (event.excerpt) {
             html += '<p class="lrob-cal-popup-excerpt">' + this.escapeHtml(event.excerpt) + '</p>';
         }
 
+        // CTA row: ticket URL (always shown if set) + page link (when public pages enabled).
+        if (event.ticketUrl) {
+            html += '<a href="' + event.ticketUrl + '" class="lrob-cal-popup-link lrob-cal-popup-link--ticket" target="_blank" rel="noopener">'
+                + this.escapeHtml(this.i18n.getTickets || 'Get tickets') + ' &rarr;</a>';
+        }
         if (this.publicPagesEnabled) {
             html += '<a href="' + event.url + '" class="lrob-cal-popup-link">' + this.escapeHtml(this.linkText) + ' &rarr;</a>';
         }
