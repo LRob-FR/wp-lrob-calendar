@@ -471,40 +471,50 @@
         });
     };
 
-    LRobCalendar.prototype.showPopup = function(eventId, $trigger, clickEvent) {
-        var event = this.events.find(function(e) { return e.id === eventId; });
-        if (!event) return;
-
-        this.currentPopupEventId = eventId;
-        var formatted = this.formatEventWhen(event);
-
-        var closeLabel = this.i18n.close || 'Close';
-        var viewImageLabel = this.i18n.viewImage || 'View image';
+    /**
+     * Build the HTML for prev/next arrow buttons. Returns '' if neither
+     * sibling exists. Buttons carry `data-target-id` so the click handler
+     * (delegated on $popup in bindPopupHandlers) knows where to go.
+     */
+    LRobCalendar.prototype.buildArrowsHtml = function(siblings) {
         var prevLabel = this.i18n.prevEvent || 'Previous event';
         var nextLabel = this.i18n.nextEvent || 'Next event';
-
-        // Compute prev/next availability for nav buttons
-        var siblings = this.getSortedEventsAroundId(eventId);
-
         var html = '';
-        // Nav arrows live OUTSIDE .lrob-cal-popup-content so the content's
-        // overflow:hidden (which clips the rounded-corner image) doesn't hide them.
         if (siblings.prev) {
-            html += '<button class="lrob-cal-popup-nav lrob-cal-popup-nav--prev" type="button" aria-label="' + this.escapeHtml(prevLabel) + '" data-target-id="' + siblings.prev.id + '">&lsaquo;</button>';
+            html += '<button class="lrob-cal-popup-nav lrob-cal-popup-nav--prev" type="button" '
+                  + 'aria-label="' + this.escapeHtml(prevLabel) + '" '
+                  + 'data-target-id="' + siblings.prev.id + '">&lsaquo;</button>';
         }
         if (siblings.next) {
-            html += '<button class="lrob-cal-popup-nav lrob-cal-popup-nav--next" type="button" aria-label="' + this.escapeHtml(nextLabel) + '" data-target-id="' + siblings.next.id + '">&rsaquo;</button>';
+            html += '<button class="lrob-cal-popup-nav lrob-cal-popup-nav--next" type="button" '
+                  + 'aria-label="' + this.escapeHtml(nextLabel) + '" '
+                  + 'data-target-id="' + siblings.next.id + '">&rsaquo;</button>';
         }
+        return html;
+    };
 
-        html += '<div class="lrob-cal-popup-content">';
+    /**
+     * Build the .lrob-cal-popup-content card HTML for a single event.
+     * No event handlers attached here — clicks are delegated on the popup
+     * (see bindPopupHandlers). The lightbox URL travels as `data-full-url`
+     * on the thumbnail button so the delegated handler can read it without
+     * re-binding per card.
+     */
+    LRobCalendar.prototype.buildCardHtml = function(event) {
+        var formatted      = this.formatEventWhen(event);
+        var closeLabel     = this.i18n.close     || 'Close';
+        var viewImageLabel = this.i18n.viewImage || 'View image';
+        var fullUrl        = event.thumbnailFull || event.thumbnail || '';
+
+        var html = '<div class="lrob-cal-popup-content" data-event-id="' + event.id + '">';
         html += '<button class="lrob-cal-popup-close" type="button" aria-label="' + this.escapeHtml(closeLabel) + '">&times;</button>';
 
-        // Thumbnail click-behavior depends on popupImageLightbox: when on (default)
-        // it's a button that opens the fullscreen lightbox; when off it's a plain
-        // <div> with the same look but no click handler.
         if (event.thumbnail && this.popupShowImage) {
             if (this.popupImageLightbox) {
-                html += '<button class="lrob-cal-popup-thumb" type="button" aria-label="' + this.escapeHtml(viewImageLabel) + '">';
+                html += '<button class="lrob-cal-popup-thumb" type="button" '
+                      + 'aria-label="' + this.escapeHtml(viewImageLabel) + '" '
+                      + 'data-full-url="' + this.escapeHtml(fullUrl) + '" '
+                      + 'data-event-title="' + this.escapeHtml(event.title || '') + '">';
                 html += '<img src="' + event.thumbnail + '" alt="" loading="lazy">';
                 html += '</button>';
             } else {
@@ -528,7 +538,7 @@
         if (event.venue || event.city) {
             var location = [];
             if (event.venue) location.push(this.escapeHtml(event.venue));
-            if (event.city) location.push(this.escapeHtml(event.city));
+            if (event.city)  location.push(this.escapeHtml(event.city));
             html += '<p class="lrob-cal-popup-meta lrob-cal-popup-location">'
                 + (this.icons.location || '')
                 + '<span>' + location.join(', ') + '</span>'
@@ -542,7 +552,6 @@
                 + '</p>';
         }
 
-        // Cost / Free badge
         if (event.isFree) {
             html += '<p class="lrob-cal-popup-meta lrob-cal-popup-cost lrob-cal-popup-cost--free">'
                 + (this.icons.ticket || '')
@@ -559,7 +568,6 @@
             html += '<p class="lrob-cal-popup-excerpt">' + this.escapeHtml(event.excerpt) + '</p>';
         }
 
-        // CTA row: ticket URL (always shown if set) + page link (when public pages enabled).
         if (event.ticketUrl) {
             html += '<a href="' + event.ticketUrl + '" class="lrob-cal-popup-link lrob-cal-popup-link--ticket" target="_blank" rel="noopener">'
                 + this.escapeHtml(this.i18n.getTickets || 'Get tickets') + ' &rarr;</a>';
@@ -567,69 +575,100 @@
         if (this.publicPagesEnabled) {
             html += '<a href="' + event.url + '" class="lrob-cal-popup-link">' + this.escapeHtml(this.linkText) + ' &rarr;</a>';
         }
-        html += '</div>';
-        html += '</div>';
-        
+        html += '</div>';  // body
+        html += '</div>';  // content
+        return html;
+    };
+
+    LRobCalendar.prototype.showPopup = function(eventId, $trigger, clickEvent) {
+        var event = this.events.find(function(e) { return e.id === eventId; });
+        if (!event) return;
+
+        this.currentPopupEventId = eventId;
+        var siblings = this.getSortedEventsAroundId(eventId);
+
+        // Build the full popup body: arrows (outside the card) + stage holding
+        // the single card. The stage is the container responsible for clipping
+        // sliding cards during navigation — see .lrob-cal-popup-stage CSS.
+        var html = this.buildArrowsHtml(siblings)
+                 + '<div class="lrob-cal-popup-stage">'
+                 + this.buildCardHtml(event)
+                 + '</div>';
+
         var $popup = this.$container.find('.lrob-cal-popup');
         $popup.html(html).show();
-        // Fade-in: force a reflow so the browser applies opacity:0 before we
-        // add the .is-shown class (otherwise the transition wouldn't trigger).
+        // Force a reflow so the opacity transition picks up the display change.
         $popup[0].offsetHeight; // eslint-disable-line no-unused-expressions
         $popup.addClass('is-shown');
 
-        // Lightbox-on-click for the thumbnail. Bind ONLY to the <button>
-        // variant — the static <div> uses the same class but should not be
-        // clickable.
-        var self = this;
-        var fullUrl = event.thumbnailFull || event.thumbnail;
-        $popup.find('button.lrob-cal-popup-thumb').on('click', function(e) {
-            e.preventDefault();
-            self.openLightbox(fullUrl, event.title);
-        });
+        // Body scroll lock on mobile (the CSS rule is scoped to ≤600px).
+        document.body.classList.add('lrob-cal-popup-open');
 
-        // Preload prev/next thumbnails so navigation feels instant — the next
-        // popup doesn't have to wait on the image to render.
+        // Preload prev/next thumbnails so navigation feels instant.
         if (siblings.prev && siblings.prev.thumbnail) { (new Image()).src = siblings.prev.thumbnail; }
         if (siblings.next && siblings.next.thumbnail) { (new Image()).src = siblings.next.thumbnail; }
 
-        // Position popup relative to the clicked element within the container
+        // Desktop only: position the popup near the clicked cell. Mobile uses
+        // CSS flex centering — overriding inline top/left via !important.
+        if (!window.matchMedia || !window.matchMedia('(max-width: 600px)').matches) {
+            this.positionPopupNearTrigger($popup, $trigger);
+        }
+    };
+
+    /**
+     * Desktop popup positioning: anchor the card to the clicked cell, then
+     * adjust to keep it inside the calendar container. No-op on mobile.
+     */
+    LRobCalendar.prototype.positionPopupNearTrigger = function($popup, $trigger) {
         var containerOffset = this.$container.offset();
-        var containerWidth = this.$container.outerWidth();
+        var containerWidth  = this.$container.outerWidth();
         var containerHeight = this.$container.outerHeight();
-        var triggerOffset = $trigger.offset();
-        var popupWidth = $popup.outerWidth() || 360;
-        var popupHeight = $popup.outerHeight() || 200;
-        
-        // Calculate position relative to container
-        var top = triggerOffset.top - containerOffset.top + $trigger.outerHeight() + 5;
+        var triggerOffset   = $trigger.offset();
+        var popupWidth      = $popup.outerWidth()  || 360;
+        var popupHeight     = $popup.outerHeight() || 200;
+
+        var top  = triggerOffset.top  - containerOffset.top  + $trigger.outerHeight() + 5;
         var left = triggerOffset.left - containerOffset.left;
-        
-        // Adjust if popup would overflow right edge
-        if (left + popupWidth > containerWidth - 10) {
-            left = containerWidth - popupWidth - 10;
-        }
-        
-        // Adjust if popup would overflow left edge
-        if (left < 10) {
-            left = 10;
-        }
-        
-        // Adjust if popup would overflow bottom - show above instead
+        if (left + popupWidth > containerWidth - 10) left = containerWidth - popupWidth - 10;
+        if (left < 10) left = 10;
         if (top + popupHeight > containerHeight - 10) {
             top = triggerOffset.top - containerOffset.top - popupHeight - 5;
         }
-        
-        // Make sure top is not negative
-        if (top < 10) {
-            top = 10;
-        }
-        
-        $popup.css({ top: top, left: left });
-        
-        $popup.find('.lrob-cal-popup-close').on('click', this.hidePopup.bind(this));
+        if (top < 10) top = 10;
 
-        // Prev/next nav buttons → navigate to the sibling event, changing month if needed.
-        $popup.find('.lrob-cal-popup-nav').on('click', function (e) {
+        $popup.css({ top: top, left: left });
+    };
+
+    /**
+     * One-time popup-level handlers bound on the persistent .lrob-cal-popup
+     * element. $popup.html() replaces inner content but keeps these listeners
+     * alive — re-binding in showPopup would stack handlers and fire navigation
+     * multiple times after a few opens. All click handlers use jQuery event
+     * delegation so they survive content swaps (initial open AND two-card
+     * navigation swap).
+     */
+    LRobCalendar.prototype.bindPopupHandlers = function() {
+        var self = this;
+        var $popup = this.$container.find('.lrob-cal-popup');
+
+        // Close button — delegated.
+        $popup.on('click', '.lrob-cal-popup-close', function (e) {
+            e.preventDefault();
+            self.hidePopup();
+        });
+
+        // Thumbnail → lightbox. Bound ONLY to the <button> variant; the
+        // static <div> shares the class but should not be clickable.
+        $popup.on('click', 'button.lrob-cal-popup-thumb', function (e) {
+            e.preventDefault();
+            var $btn  = $(this);
+            var url   = $btn.attr('data-full-url')    || '';
+            var title = $btn.attr('data-event-title') || '';
+            self.openLightbox(url, title);
+        });
+
+        // Prev/next nav arrows — delegated; direction is derived from class.
+        $popup.on('click', '.lrob-cal-popup-nav', function (e) {
             e.preventDefault();
             e.stopPropagation();
             var $btn = $(this);
@@ -638,17 +677,7 @@
             self.navigatePopupTo(targetId, dir);
         });
 
-    };
-
-    /**
-     * One-time popup-level handlers (swipe nav, ESC, etc.). Bound on the
-     * persistent .lrob-cal-popup element — $popup.html() replaces children
-     * but keeps these listeners alive, so we must NOT re-bind in showPopup
-     * (which would stack handlers and fire navigation multiple times).
-     */
-    LRobCalendar.prototype.bindPopupHandlers = function() {
-        var self = this;
-        var $popup = this.$container.find('.lrob-cal-popup');
+        // Mobile swipe nav.
         var swipeStartX = 0;
         var swipeStartY = 0;
         var swipeTracking = false;
@@ -669,7 +698,7 @@
             var t = e.originalEvent.changedTouches[0];
             var dx = t.clientX - swipeStartX;
             var dy = t.clientY - swipeStartY;
-            // Lower threshold (40px) + reject mostly-vertical motion.
+            // Lower threshold + reject mostly-vertical motion.
             if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.3) {
                 var siblings = self.getSortedEventsAroundId(self.currentPopupEventId);
                 var target = dx < 0 ? siblings.next : siblings.prev;
@@ -683,6 +712,7 @@
         var $popup = this.$container.find('.lrob-cal-popup');
         if (!$popup.hasClass('is-shown')) {
             $popup.hide();
+            document.body.classList.remove('lrob-cal-popup-open');
             return;
         }
         $popup.removeClass('is-shown');
@@ -691,6 +721,7 @@
             // Skip hide() if a new popup opened in the meantime (re-added .is-shown).
             if (!$popup.hasClass('is-shown')) {
                 $popup.hide();
+                document.body.classList.remove('lrob-cal-popup-open');
             }
         }, 200);
     };
@@ -729,12 +760,9 @@
         var self = this;
         var $popup = this.$container.find('.lrob-cal-popup');
 
-        // direction: 'left' → user moved to NEXT (current card slides off left,
-        //                     new card enters from the right).
-        //            'right' → user moved to PREV (current slides off right,
-        //                      new enters from the left).
-        // Fallback when callers don't pass a direction (programmatic nav, etc.):
-        // derive from index order.
+        // direction: 'left' → NEXT (current slides off left, new in from right).
+        //            'right' → PREV (current slides off right, new in from left).
+        // Fallback when callers don't pass a direction: derive from index order.
         if (!direction) {
             var sorted = this.events.slice().sort(function (a, b) {
                 return new Date(a.start) - new Date(b.start);
@@ -746,34 +774,69 @@
             }
             direction = targetIdx > currIdx ? 'left' : 'right';
         }
-        var outClass    = direction === 'left' ? 'is-slide-out-left' : 'is-slide-out-right';
-        var inFromAttr  = direction === 'left' ? 'right' : 'left';
 
         var d = new Date(ev.start);
         var sameMonth = d.getMonth() === this.currentMonth && d.getFullYear() === this.currentYear;
 
-        $popup.addClass(outClass);
-        setTimeout(function () {
-            $popup.removeClass('is-slide-out-left is-slide-out-right');
-            // CSS rule .lrob-cal-popup[data-slide-in-from="..."] picks the
-            // matching slide-in keyframe so the new card enters from the
-            // correct side.
-            $popup.attr('data-slide-in-from', inFromAttr);
+        // Cross-month: re-render the grid + fall back to a single-card fade-in
+        // via showPopup. The two-card slide doesn't make sense when the whole
+        // calendar layout is also changing.
+        if (!sameMonth) {
+            this.currentMonth = d.getMonth();
+            this.currentYear  = d.getFullYear();
+            this.pendingPopupId = targetId;
+            this.showPopup(targetId, this.$container, null);
+            this.checkAndLoadEvents();
+            return;
+        }
 
-            if (sameMonth) {
-                var $cell = self.$container.find('.lrob-cal-event-item[data-event-id="' + targetId + '"]').first();
-                self.showPopup(targetId, $cell.length ? $cell : self.$container, null);
-            } else {
-                self.currentMonth = d.getMonth();
-                self.currentYear = d.getFullYear();
-                self.pendingPopupId = targetId;
-                self.showPopup(targetId, self.$container, null);
-                self.checkAndLoadEvents();
-            }
-            // Drop the direction attr after the in-animation finishes — the
-            // next regular open will use the default right-to-left direction.
-            setTimeout(function () { $popup.removeAttr('data-slide-in-from'); }, 250);
-        }, 120);
+        var $stage = $popup.find('.lrob-cal-popup-stage');
+        if (!$stage.length) {
+            // Defensive: stage missing means popup wasn't built by the current
+            // showPopup. Fall back to a full rebuild.
+            this.showPopup(targetId, this.$container, null);
+            return;
+        }
+
+        // Two-card slide: insert the new card as a SIBLING of the outgoing
+        // card inside the stage. Both animate simultaneously (one out, one in)
+        // so the user never sees an empty popup — that gap was the source of
+        // the "blinking to black" flash.
+        var siblings = this.getSortedEventsAroundId(targetId);
+        var $newCard = $(this.buildCardHtml(ev)).addClass('is-incoming');
+        $stage.append($newCard);
+
+        // Refresh arrows for the NEW event's siblings (the outgoing arrows
+        // were keyed to the previous event).
+        $popup.find('.lrob-cal-popup-nav').remove();
+        var arrowsHtml = this.buildArrowsHtml(siblings);
+        if (arrowsHtml) {
+            $popup.prepend(arrowsHtml);
+        }
+
+        // Force reflow so both cards' initial transforms are committed before
+        // the animation classes fire — otherwise the browser might collapse
+        // the from→to states into a single frame and skip the animation.
+        $stage[0].offsetHeight; // eslint-disable-line no-unused-expressions
+
+        var navClass = direction === 'left' ? 'is-navigating-left' : 'is-navigating-right';
+        $stage.addClass(navClass);
+
+        // Update tracked event id immediately so subsequent swipes target the
+        // newly-displayed card's siblings, not the outgoing card's.
+        this.currentPopupEventId = targetId;
+
+        // After the animation finishes, drop the outgoing card and clean up
+        // the staging classes so the new card sits in normal flow.
+        setTimeout(function () {
+            $stage.find('.lrob-cal-popup-content').not('.is-incoming').remove();
+            $newCard.removeClass('is-incoming');
+            $stage.removeClass('is-navigating-left is-navigating-right');
+        }, 260);
+
+        // Preload thumbs for THIS card's siblings so the next swipe is also instant.
+        if (siblings.prev && siblings.prev.thumbnail) { (new Image()).src = siblings.prev.thumbnail; }
+        if (siblings.next && siblings.next.thumbnail) { (new Image()).src = siblings.next.thumbnail; }
     };
 
     /**

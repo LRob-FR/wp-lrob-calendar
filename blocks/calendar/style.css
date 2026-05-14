@@ -296,6 +296,16 @@
 .lrob-calendar.lrob-cal-popup-img-cover   .lrob-cal-popup-thumb img { object-fit: cover; }
 .lrob-calendar.lrob-cal-popup-img-contain .lrob-cal-popup-thumb img { object-fit: contain; }
 
+/* Stage holds the popup card(s). During navigation it briefly contains TWO
+   cards (the outgoing one + the incoming `.is-incoming`) so they can cross-fade
+   in opposite directions without a "no-content" gap. overflow:hidden clips the
+   cards as they translate off-screen. */
+.lrob-cal-popup-stage {
+    position: relative;
+    overflow: hidden;
+    border-radius: 6px;
+}
+
 .lrob-cal-popup-content {
     background: var(--lrob-white);
     border: 1px solid var(--lrob-border);
@@ -303,52 +313,62 @@
     box-shadow: 0 8px 24px rgba(0,0,0,0.18);
     position: relative;
     overflow: hidden;
-    /* Animation fires every time the popup content is (re)rendered — including
-       when navigatePopupTo() swaps to the next event. innerHTML replacement
-       creates a fresh DOM node, which triggers the keyframe from scratch.
-       Default: slide in from the right (matches the typical "next" swipe). */
-    animation: lrob-cal-popup-slide-in-right 0.22s ease-out;
+    /* No per-card entrance animation — the popup wrapper's opacity transition
+       handles the initial fade-in, and navigation slides are driven by the
+       .is-navigating-* classes on the stage. Avoiding a default animation
+       here prevents an unintended fade-in flicker when .is-incoming is
+       removed from the newly-arrived card after a slide. */
 }
 
-/* Direction override: when navigatePopupTo() sets data-slide-in-from="left"
-   on the popup parent (i.e. user swiped right / pressed prev), the new card
-   slides in from the LEFT to match the gesture. */
-.lrob-cal-popup[data-slide-in-from="left"] .lrob-cal-popup-content {
-    animation: lrob-cal-popup-slide-in-left 0.22s ease-out;
+/* During navigation, the new card is inserted as a SIBLING of the outgoing
+   card, with `.is-incoming` to overlay it. Both then animate simultaneously
+   so the user sees one card sliding off while the other slides in. */
+.lrob-cal-popup-content.is-incoming {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
 }
 
-/* Slide-out: the CURRENT card slides off in the swipe direction before the
-   content is replaced. JS adds .is-slide-out-{left,right} on the popup
-   parent, waits ~120ms, then calls showPopup() which swaps the inner HTML. */
-.lrob-cal-popup.is-slide-out-left .lrob-cal-popup-content {
-    animation: lrob-cal-popup-slide-out-left 0.12s ease-in forwards;
+/* Navigation animations: `.is-navigating-{left,right}` is added to the stage
+   for the duration of the slide. The outgoing card (no `.is-incoming`) slides
+   off in the gesture direction; the incoming card slides in from the opposite
+   edge. */
+.lrob-cal-popup-stage.is-navigating-left .lrob-cal-popup-content:not(.is-incoming) {
+    animation: lrob-cal-popup-slide-out-left 0.24s ease-in-out forwards;
 }
-.lrob-cal-popup.is-slide-out-right .lrob-cal-popup-content {
-    animation: lrob-cal-popup-slide-out-right 0.12s ease-in forwards;
+.lrob-cal-popup-stage.is-navigating-left .lrob-cal-popup-content.is-incoming {
+    animation: lrob-cal-popup-slide-in-from-right 0.24s ease-in-out;
+}
+.lrob-cal-popup-stage.is-navigating-right .lrob-cal-popup-content:not(.is-incoming) {
+    animation: lrob-cal-popup-slide-out-right 0.24s ease-in-out forwards;
+}
+.lrob-cal-popup-stage.is-navigating-right .lrob-cal-popup-content.is-incoming {
+    animation: lrob-cal-popup-slide-in-from-left 0.24s ease-in-out;
 }
 
-@keyframes lrob-cal-popup-slide-in-right {
-    from { opacity: 0; transform: translateX(16px); }
-    to   { opacity: 1; transform: translateX(0); }
-}
-@keyframes lrob-cal-popup-slide-in-left {
-    from { opacity: 0; transform: translateX(-16px); }
-    to   { opacity: 1; transform: translateX(0); }
-}
 @keyframes lrob-cal-popup-slide-out-left {
-    from { opacity: 1; transform: translateX(0); }
-    to   { opacity: 0; transform: translateX(-30px); }
+    from { transform: translateX(0); }
+    to   { transform: translateX(-100%); }
 }
 @keyframes lrob-cal-popup-slide-out-right {
-    from { opacity: 1; transform: translateX(0); }
-    to   { opacity: 0; transform: translateX(30px); }
+    from { transform: translateX(0); }
+    to   { transform: translateX(100%); }
+}
+@keyframes lrob-cal-popup-slide-in-from-right {
+    from { transform: translateX(100%); }
+    to   { transform: translateX(0); }
+}
+@keyframes lrob-cal-popup-slide-in-from-left {
+    from { transform: translateX(-100%); }
+    to   { transform: translateX(0); }
 }
 
 @media (prefers-reduced-motion: reduce) {
     .lrob-cal-popup-content,
-    .lrob-cal-popup[data-slide-in-from="left"] .lrob-cal-popup-content,
-    .lrob-cal-popup.is-slide-out-left .lrob-cal-popup-content,
-    .lrob-cal-popup.is-slide-out-right .lrob-cal-popup-content {
+    .lrob-cal-popup-content.is-incoming,
+    .lrob-cal-popup-stage.is-navigating-left .lrob-cal-popup-content,
+    .lrob-cal-popup-stage.is-navigating-right .lrob-cal-popup-content {
         animation: none;
     }
 }
@@ -408,11 +428,8 @@
     right: -44px;
 }
 
-/* Mobile: not enough horizontal room for outside arrows — keep them inside. */
-@media (max-width: 600px) {
-    .lrob-cal-popup-nav--prev { left: 6px; }
-    .lrob-cal-popup-nav--next { right: 6px; }
-}
+/* (Mobile arrow positioning is handled by the consolidated mobile media query
+   at the bottom of this file — they're pinned to viewport edges there.) */
 
 .lrob-cal-popup-thumb {
     display: block;
@@ -559,45 +576,61 @@
         font-size: 0.6em;
     }
 
-    /* Popup becomes a fixed CENTERED modal with a fullscreen backdrop.
-       Width 84vw (not 90vw) leaves room for nav arrows to sit just outside.
-       !important overrides the inline top/left/width that JS sets for desktop. */
+    /* Body scroll lock while the popup is open — toggled from JS via the
+       .lrob-cal-popup-open class on <body>. Scoped to mobile only so desktop
+       users keep their normal page scroll behaviour. */
+    body.lrob-cal-popup-open {
+        overflow: hidden;
+    }
+
+    /* Popup becomes a fullscreen flex overlay. No transform on the popup
+       itself (only on its descendants), so `position: fixed` children — namely
+       the prev/next arrows — resolve to VIEWPORT coordinates instead of being
+       trapped inside a transformed ancestor. */
     .lrob-cal-popup {
         position: fixed !important;
-        top: 50% !important;
-        left: 50% !important;
+        inset: 0 !important;
+        top: auto !important;
+        left: auto !important;
         right: auto !important;
         bottom: auto !important;
-        width: 84vw !important;
+        width: auto !important;
         max-width: none !important;
+        max-height: none !important;
+        background: rgba(0, 0, 0, 0.55);
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        z-index: 100001;
+    }
+
+    /* Override jQuery's inline `display: block` (from `.show()`) so the popup
+       lays out as a flex container — required for the centered card. */
+    .lrob-cal-popup.is-shown {
+        display: flex !important;
+    }
+
+    /* The card area inside the popup. Explicit size so flex has something
+       concrete to center; cards inside fill this stage. */
+    .lrob-cal-popup-stage {
+        width: 84vw;
+        max-width: 84vw;
+        max-height: 86vh;
+    }
+
+    /* Card on mobile: no border (shadow handles edge separation), prominent
+       shadow that no longer gets clipped by the popup container. */
+    .lrob-cal-popup-content {
+        width: 100%;
         max-height: 86vh;
         overflow-y: auto;
-        z-index: 100001;
-        /* translate works alongside the existing opacity transition. */
-        transform: translate(-50%, -50%);
+        border: none;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
     }
 
-    /* Darkened backdrop behind the centered popup. The ::before is a child of
-       the popup's stacking context (z-index: -1) so it sits below the popup's
-       own content but above all other page elements with z-index < 100001. */
-    .lrob-cal-popup.is-shown::before {
-        content: '';
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.55);
-        z-index: -1;
-        animation: lrob-cal-backdrop-fade 0.18s ease-out;
-    }
-
-    @keyframes lrob-cal-backdrop-fade {
-        from { opacity: 0; }
-        to   { opacity: 1; }
-    }
-
-    /* Nav arrows: pinned to viewport edges, vertically centered, ALWAYS visible.
-       Previously the arrows sat at -34px relative to the popup, but with popup
-       at 84vw centered (8vw per side ≈ 28px on a 360px phone), -34px landed
-       just off-screen — so the arrows were effectively invisible on mobile. */
+    /* Nav arrows pinned to VIEWPORT edges. Because the popup no longer has a
+       transform, `position: fixed` on these children resolves to the viewport
+       — they sit just inside the screen edges, OUTSIDE the popup card. */
     .lrob-cal-popup-nav {
         position: fixed;
         top: 50%;
@@ -606,7 +639,7 @@
         height: 38px;
         font-size: 24px;
         z-index: 100002;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        box-shadow: 0 2px 6px rgba(0,0,0,0.35);
     }
     .lrob-cal-popup-nav--prev { left: 4px; right: auto; }
     .lrob-cal-popup-nav--next { right: 4px; left: auto; }
