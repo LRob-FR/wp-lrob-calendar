@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-05-14T15:06:03+00:00\n"
+"POT-Creation-Date: 2026-05-14T15:09:53+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: lrob-calendar\n"
@@ -19,8 +19,7 @@ msgid "LRob - Calendar"
 msgstr ""
 
 #. Plugin URI of the plugin
-#. Author URI of the plugin
-msgid "https://www.lrob.fr"
+msgid "https://www.lrob.fr/wordpress/plugins/lrob-calendar/"
 msgstr ""
 
 #. Description of the plugin
@@ -29,6 +28,10 @@ msgstr ""
 
 #. Author of the plugin
 msgid "Robin Labadie - LRob"
+msgstr ""
+
+#. Author URI of the plugin
+msgid "https://www.lrob.fr"
 msgstr ""
 
 #: blocks/calendar/render.php:20
@@ -251,11 +254,11 @@ msgid "Save Settings"
 msgstr ""
 
 #: includes/class-lrob-calendar-admin.php:382
-msgid "GitHub"
+msgid "Plugin page"
 msgstr ""
 
 #: includes/class-lrob-calendar-admin.php:384
-msgid "Visit LRob"
+msgid "GitHub"
 msgstr ""
 
 #. translators: %s: human-readable file size (e.g. "12 MB")

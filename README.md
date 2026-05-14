@@ -2,6 +2,8 @@
 
 A clean, performant event calendar plugin for WordPress with recurring events, click-to-preview month grid, agenda view, AJAX-paginated event lists, and an OpenStreetMap embed on single-event pages.
 
+**Plugin homepage:** [lrob.fr/wordpress/plugins/lrob-calendar](https://www.lrob.fr/wordpress/plugins/lrob-calendar/)
+
 ## Features
 
 - **Month grid calendar** — click any event for an in-page preview with image, date range, location, excerpt, and prev/next event navigation

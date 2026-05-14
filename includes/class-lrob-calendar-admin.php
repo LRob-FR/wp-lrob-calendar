@@ -201,7 +201,7 @@ class LRob_Calendar_Admin {
             printf(
                 /* translators: 1: plugin name with link to author, 2: version number */
                 esc_html__('%1$s — version %2$s', 'lrob-calendar'),
-                '<strong><a href="https://www.lrob.fr" target="_blank" rel="noopener">LRob Calendar</a></strong>',
+                '<strong><a href="' . esc_url(LROB_CALENDAR_PLUGIN_URL) . '" target="_blank" rel="noopener">LRob Calendar</a></strong>',
                 esc_html(LROB_CALENDAR_VERSION)
             );
             ?>
@@ -372,16 +372,16 @@ class LRob_Calendar_Admin {
     }
 
     /**
-     * Add "GitHub" + "Visit LRob" links to this plugin's row on wp-admin/plugins.php.
+     * Add "Plugin page" + "GitHub" links to this plugin's row on wp-admin/plugins.php.
      */
     public function plugin_row_meta(array $links, string $file): array {
         if ($file !== LROB_CALENDAR_BASENAME) {
             return $links;
         }
+        $links[] = '<a href="' . esc_url(LROB_CALENDAR_PLUGIN_URL) . '" target="_blank" rel="noopener">' .
+            esc_html__('Plugin page', 'lrob-calendar') . '</a>';
         $links[] = '<a href="' . esc_url(LROB_CALENDAR_GITHUB_URL) . '" target="_blank" rel="noopener">' .
             esc_html__('GitHub', 'lrob-calendar') . '</a>';
-        $links[] = '<a href="https://www.lrob.fr" target="_blank" rel="noopener">' .
-            esc_html__('Visit LRob', 'lrob-calendar') . '</a>';
         return $links;
     }
 
