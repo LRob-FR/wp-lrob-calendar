@@ -91,6 +91,17 @@
                             onChange: (value) => setAttributes({ showImages: value })
                         }),
                         attributes.showImages && el(SelectControl, {
+                            label: __('Image position', 'lrob-calendar'),
+                            value: attributes.imagePosition,
+                            options: [
+                                { value: 'right',   label: __('Right column', 'lrob-calendar') },
+                                { value: 'left',    label: __('Left column',  'lrob-calendar') },
+                                { value: 'below',   label: __('Below content (full width)', 'lrob-calendar') }
+                            ],
+                            help: __('Vertical/portrait images look best in a side column. Wide/landscape images look best below the content.', 'lrob-calendar'),
+                            onChange: (value) => setAttributes({ imagePosition: value })
+                        }),
+                        attributes.showImages && el(SelectControl, {
                             label: __('Image display', 'lrob-calendar'),
                             value: attributes.imageDisplay,
                             options: [
@@ -116,10 +127,16 @@
                             checked: attributes.imageLightbox,
                             onChange: (value) => setAttributes({ imageLightbox: value })
                         }),
-                        el(ToggleControl, {
-                            label: __('Show Excerpt', 'lrob-calendar'),
-                            checked: attributes.showExcerpt,
-                            onChange: (value) => setAttributes({ showExcerpt: value })
+                        el(SelectControl, {
+                            label: __('Event description', 'lrob-calendar'),
+                            value: attributes.descriptionMode,
+                            options: [
+                                { value: 'inline', label: __('Show inline in each row', 'lrob-calendar') },
+                                { value: 'button', label: __('Hidden — show "Details" button (opens popup)', 'lrob-calendar') },
+                                { value: 'none',   label: __('Don’t show', 'lrob-calendar') }
+                            ],
+                            help: __('Inline puts the description in the row. The button mode opens the full event in a popup card on click.', 'lrob-calendar'),
+                            onChange: (value) => setAttributes({ descriptionMode: value })
                         }),
                         el(ToggleControl, {
                             label: __('Show Categories', 'lrob-calendar'),

@@ -178,6 +178,46 @@ GPL-2.0-or-later — same as WordPress. See [LICENSE](LICENSE) for the full text
 
 ## Changelog
 
+### 1.1.0 — Frontend overhaul
+
+A visual + UX rebuild. No feature removals, no DB migrations, no breaking changes to imports — installs over 1.0.x cleanly.
+
+**Design language**
+- Flat / modern / breathable. New design-token system (`tokens.css`): 8px spacing scale, radius scale, surface palette, soft elevated shadow, primary / primary-soft / primary-hover / primary-fg derived via `color-mix()`. Old `--lrob-*` names kept as aliases so theme overrides still work.
+- New "Appearance" section in the plugin settings page: configurable primary + secondary brand colors (WP color picker). Per-category colors untouched.
+
+**Month grid**
+- Crisp light grid, no filled cells. Today indicator is a small primary-colored pill behind the day number, not a full cell tint.
+- Events render as colored dot + title pill (one dot per event, tinted by category color).
+- Multi-day spans become soft tinted bars.
+- Ghost chevron buttons for prev/next month.
+
+**Popup card**
+- New layout: date block (large day number over uppercase short month) on the left of the header, title centered, ghost prev/next + close on the right.
+- Meta rows with stroke icons (Lucide-style).
+- Featured image moved BELOW meta as supporting content, not the hero.
+- Primary CTA filled button at bottom-right (sticky to viewport bottom on mobile, `safe-area-inset` respected).
+
+**Events list templates**
+- `list` / `full`: date block on the left, content on the right; image moved lower.
+- `grid`: image-on-top with a small date-badge overlay in the top-left corner.
+- `minimal`: single-line row — date pill + title + optional time.
+- Ghost-style pagination (no boxed paginator look).
+
+**Mobile**
+- Popup is now a full-screen modal: edge-to-edge, sticky header with the close button, sticky CTA at the bottom.
+- Month grid: smaller cells, events become pure colored dots (no titles).
+- **Tap a day with events → opens a day-agenda list** of that day's events; tap an event in the list to open its full card.
+- Minimum 44px tap targets enforced on interactive elements.
+
+**Icons**
+- Stroke-style SVG icon set replacing the previous filled icons. Single source of truth in `class-lrob-calendar-icons.php`.
+- New icons: `chevron-left`, `chevron-right`, `x`, `arrow-right`.
+
+### 1.0.1 — Bug fixes, UX polish, mobile popup overhaul
+
+See [v1.0.1 release notes](https://github.com/LRob-FR/wp-lrob-calendar/releases/tag/v1.0.1).
+
 ### 1.0.0 — Initial release
 
 **Core**

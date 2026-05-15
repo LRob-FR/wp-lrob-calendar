@@ -1,131 +1,203 @@
 /**
  * Event-card styles, shared by the `events-list` and `single-event` blocks.
  * Registered as `lrob-calendar-event-card` (deps: lrob-calendar-tokens).
+ *
+ * Three templates, all variants of the same component:
+ *   .lrob-event-list    — date block on the left, content on the right
+ *   .lrob-event-full    — same, with extra spacing (used by single-event "full")
+ *   .lrob-event-grid    — image on top with date-badge overlay, content below
+ *   .lrob-event-minimal — one-line row: date pill + title + optional time
  */
 
+/* ─── Base card ──────────────────────────────────────────────────────────── */
+
 .lrob-event-card {
-    background: var(--lrob-white);
-    border: 1px solid var(--lrob-border);
-    border-radius: 4px;
-    overflow: hidden;
-}
-
-.lrob-event-card.lrob-event-list {
-    display: flex;
-}
-
-.lrob-event-card.lrob-event-list .lrob-event-thumbnail {
-    flex: 0 0 180px;
-}
-
-.lrob-event-card .lrob-event-thumbnail img {
-    width: 100%;
-    height: 180px; /* overridden by .lrob-event-card--image-height-* */
-    object-fit: contain; /* overridden by .lrob-event-card--image-cover */
-    background: #f3f4f6;
-    display: block;
-}
-
-/* Clickable thumbnail (renders a <button>) — opens the shared lightbox.
-   Reset the browser's default button chrome so it matches the previous <a>. */
-.lrob-event-thumbnail--clickable {
-    background: #f3f4f6;
+    color: var(--lrob-cal-text);
+    line-height: var(--lrob-cal-line-comfortable);
+    background: transparent;
     border: 0;
-    padding: 0;
-    margin: 0;
-    width: 100%;
-    cursor: zoom-in;
-    display: block;
+    border-radius: 0;
+    box-shadow: none;
+    overflow: visible;
 }
 
-.lrob-event-thumbnail--clickable img {
-    transition: opacity 0.2s ease;
+/* Grid template keeps the card chrome — image-on-top format reads better
+   with a real card boundary. */
+.lrob-event-card.lrob-event-grid {
+    background: var(--lrob-cal-surface);
+    border: 1px solid var(--lrob-cal-border);
+    border-radius: var(--lrob-cal-radius-lg);
+    box-shadow: var(--lrob-cal-shadow-card);
+    overflow: hidden;
+    transition: border-color var(--lrob-cal-duration) var(--lrob-cal-ease);
 }
 
-.lrob-event-thumbnail--clickable:hover img {
-    opacity: 0.92;
+.lrob-event-card.lrob-event-grid:hover {
+    border-color: var(--lrob-cal-border-strong);
 }
 
-/* Per-block image-display setting */
-.lrob-event-card--image-cover   .lrob-event-thumbnail img { object-fit: cover; }
-.lrob-event-card--image-contain .lrob-event-thumbnail img { object-fit: contain; }
-
-/* Per-block image-height setting */
-.lrob-event-card--image-height-small  .lrob-event-thumbnail img { height: 110px; }
-.lrob-event-card--image-height-medium .lrob-event-thumbnail img { height: 180px; }
-.lrob-event-card--image-height-large  .lrob-event-thumbnail img { height: 280px; }
-
-/* Natural: width fills the card, height follows the image's own aspect ratio.
-   object-fit is irrelevant here — the image renders at its natural box.
-   render_event_card() also drops the lightbox button in this mode since the
-   image is already shown at full visual fidelity. */
-.lrob-event-card--image-height-auto .lrob-event-thumbnail,
-.lrob-event-card--image-height-auto .lrob-event-thumbnail img {
-    height: auto;
+/* LIST + FULL: subtle line separator between rows. No card chrome. */
+.lrob-event-card.lrob-event-list,
+.lrob-event-card.lrob-event-full {
+    border-bottom: 1px solid var(--lrob-cal-border);
+    padding: var(--lrob-cal-space-3) 0;
 }
-.lrob-event-card--image-height-auto .lrob-event-thumbnail img {
-    object-fit: initial;
+
+.lrob-event-card.lrob-event-list:last-child,
+.lrob-event-card.lrob-event-full:last-child {
+    border-bottom: 0;
 }
+
+/* ─── Date block (large day over uppercase short month) ──────────────────── */
+
+/* Date block — fixed-height rounded rectangle, vertically centered next to
+   the content. Background + text color are inline styles set by PHP from
+   either the category color or a deterministic hashed pastel, so each event
+   gets its own coherent shade. */
+.lrob-event-card__date-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 64px;
+    height: 64px;
+    padding: var(--lrob-cal-space-2);
+    align-self: center;
+    border-radius: var(--lrob-cal-radius-md);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+    /* Fallback in case inline style is missing */
+    background: var(--lrob-cal-surface-muted);
+    color: var(--lrob-cal-text);
+}
+
+.lrob-event-card__date-day {
+    font-size: 1.5em;
+    font-weight: var(--lrob-cal-font-weight-bold);
+    letter-spacing: -0.02em;
+    color: inherit;
+}
+
+.lrob-event-card__date-month {
+    font-size: 0.7em;
+    font-weight: var(--lrob-cal-font-weight-bold);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 2px;
+    color: inherit;
+}
+
+/* ─── List + Full templates ──────────────────────────────────────────────── */
+
+.lrob-event-card.lrob-event-list,
+.lrob-event-card.lrob-event-full {
+    display: flex;
+    align-items: center;
+    gap: var(--lrob-cal-space-4);
+}
+
+.lrob-event-card.lrob-event-full {
+    padding-block: var(--lrob-cal-space-4);
+}
+
+.lrob-event-card.lrob-event-full .lrob-event-card__date-block {
+    width: 80px;
+    height: 80px;
+}
+
+.lrob-event-card.lrob-event-full .lrob-event-card__date-day {
+    font-size: 2em;
+}
+
+.lrob-event-card.lrob-event-full .lrob-event-card__date-month {
+    font-size: 0.8em;
+}
+
+/* ─── Content column ─────────────────────────────────────────────────────── */
 
 .lrob-event-content {
-    padding: 15px;
-    flex: 1;
+    padding: 0;
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--lrob-cal-space-2);
+    min-width: 0;
+}
+
+/* Grid keeps the previous in-card padding (it still has card chrome). */
+.lrob-event-card.lrob-event-grid .lrob-event-content {
+    padding: var(--lrob-cal-space-4);
 }
 
 .lrob-event-title {
-    margin: 0 0 10px;
+    margin: 0;
     font-size: 1.1em;
+    line-height: var(--lrob-cal-line-tight);
+    font-weight: var(--lrob-cal-font-weight-semibold);
+    color: var(--lrob-cal-text);
+}
+
+.lrob-event-card.lrob-event-full .lrob-event-title {
+    font-size: 1.4em;
 }
 
 .lrob-event-title a {
-    color: var(--lrob-text);
+    color: inherit;
     text-decoration: none;
 }
 
 .lrob-event-title a:hover {
-    color: var(--lrob-primary);
+    color: var(--lrob-cal-primary);
 }
+
+/* ─── Meta rows ──────────────────────────────────────────────────────────── */
 
 .lrob-event-meta {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
-    font-size: 0.85em;
-    color: var(--lrob-text-light);
-    margin-bottom: 10px;
+    gap: var(--lrob-cal-space-2) var(--lrob-cal-space-4);
+    font-size: 0.9em;
+    color: var(--lrob-cal-text-muted);
 }
 
-.lrob-event-meta span {
+.lrob-event-meta > span {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: var(--lrob-cal-space-2);
 }
 
-.lrob-event-categories {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-    margin-top: 10px;
+.lrob-event-meta .lrob-icon {
+    width: 16px;
+    height: 16px;
+    color: var(--lrob-cal-primary);
+    flex: none;
 }
 
-.lrob-category-badge {
-    padding: 2px 8px;
-    font-size: 0.75em;
-    color: var(--lrob-white);
-    background: var(--lrob-primary);
-    border-radius: 12px;
-    text-decoration: none;
+.lrob-event-date {
+    color: var(--lrob-cal-text);
+    font-weight: var(--lrob-cal-font-weight-medium);
 }
+
+.lrob-event-cost--free {
+    color: var(--lrob-cal-primary);
+    font-weight: var(--lrob-cal-font-weight-medium);
+}
+
+/* ─── Excerpt ────────────────────────────────────────────────────────────── */
 
 .lrob-event-excerpt {
-    margin-top: 10px;
-    color: var(--lrob-text-light);
-    line-height: 1.5;
+    color: var(--lrob-cal-text);
+    font-size: 0.95em;
+    line-height: var(--lrob-cal-line-comfortable);
 }
 
-/* When excerpt is "clampable", limit height with a gradient fade-out at the
-   bottom. JS measures overflow and adds the toggle button if needed; cards
-   with short content stay un-clamped visually (no button shown either). */
+.lrob-event-excerpt > :first-child { margin-top: 0; }
+.lrob-event-excerpt > :last-child  { margin-bottom: 0; }
+
+/* Clamp with a soft fade-out at the bottom. JS measures overflow and adds
+   the "Show more" toggle only when the content actually overflows. */
 .lrob-event-excerpt.lrob-cal-clampable {
     position: relative;
     max-height: 7.5em;
@@ -139,7 +211,7 @@
     right: 0;
     bottom: 0;
     height: 2.5em;
-    background: linear-gradient(to bottom, rgba(255,255,255,0), var(--lrob-white) 80%);
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0), var(--lrob-cal-surface) 85%);
     pointer-events: none;
 }
 
@@ -152,22 +224,20 @@
     display: none;
 }
 
-.lrob-event-excerpt > :first-child { margin-top: 0; }
-.lrob-event-excerpt > :last-child  { margin-bottom: 0; }
-
 .lrob-cal-expand-toggle {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    margin-top: 8px;
-    padding: 4px 0;
+    gap: var(--lrob-cal-space-1);
+    margin-top: var(--lrob-cal-space-1);
+    padding: var(--lrob-cal-space-1) 0;
     background: transparent;
     border: 0;
-    color: var(--lrob-primary);
+    color: var(--lrob-cal-primary);
     cursor: pointer;
     font: inherit;
-    font-size: 0.9em;
-    font-weight: 500;
+    font-size: 0.92em;
+    font-weight: var(--lrob-cal-font-weight-medium);
+    align-self: flex-start;
 }
 
 .lrob-cal-expand-toggle:hover {
@@ -180,11 +250,451 @@
     line-height: 1;
 }
 
-@media (max-width: 600px) {
-    .lrob-event-card.lrob-event-list {
-        flex-direction: column;
+/* ─── Thumbnail ──────────────────────────────────────────────────────────── */
+
+.lrob-event-thumbnail {
+    position: relative;
+    background: var(--lrob-cal-surface-muted);
+    border: 0;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    display: block;
+    overflow: hidden;
+    border-radius: var(--lrob-cal-radius-md);
+}
+
+.lrob-event-card.lrob-event-grid .lrob-event-thumbnail {
+    border-radius: 0;
+}
+
+.lrob-event-thumbnail img {
+    width: 100%;
+    height: 140px;            /* overridden by .lrob-event-card--image-height-* */
+    object-fit: contain;       /* overridden by .lrob-event-card--image-cover */
+    display: block;
+    transition: opacity 0.2s ease;
+}
+
+.lrob-event-thumbnail--clickable {
+    cursor: zoom-in;
+}
+
+.lrob-event-thumbnail--clickable:hover img {
+    opacity: 0.92;
+}
+
+/* Per-block image-display setting */
+.lrob-event-card--image-cover   .lrob-event-thumbnail img { object-fit: cover; }
+.lrob-event-card--image-contain .lrob-event-thumbnail img { object-fit: contain; }
+
+/* Per-block image-height setting. Trimmed in v1.1.0 — the previous values
+   made the image dominate the card; defaults are now closer to "supporting
+   content" sizes. */
+.lrob-event-card--image-height-small  .lrob-event-thumbnail img { height: 100px; }
+.lrob-event-card--image-height-medium .lrob-event-thumbnail img { height: 140px; }
+.lrob-event-card--image-height-large  .lrob-event-thumbnail img { height: 220px; }
+
+.lrob-event-card--image-height-auto .lrob-event-thumbnail,
+.lrob-event-card--image-height-auto .lrob-event-thumbnail img {
+    height: auto;
+}
+.lrob-event-card--image-height-auto .lrob-event-thumbnail img {
+    object-fit: initial;
+}
+
+/* For LIST + FULL with image-position=below, the thumbnail sits BELOW the
+   content. Add a top margin to separate it. */
+.lrob-event-card--image-position-below.lrob-event-list .lrob-event-thumbnail,
+.lrob-event-card--image-position-below.lrob-event-full .lrob-event-thumbnail {
+    margin-top: var(--lrob-cal-space-2);
+}
+
+/* ─── Image-as-column (LIST + FULL with image-position left/right) ────────
+   The .lrob-event-thumbnail is a SIBLING of .lrob-event-content; the card
+   itself is a flex row, so the thumb becomes a fixed-width vertical column
+   whose height stretches to match the content. The "height" preset is
+   reinterpreted as the column WIDTH for portrait images (which is what
+   users actually want when they tick "right column"). */
+.lrob-event-card--image-position-right,
+.lrob-event-card--image-position-left {
+    align-items: stretch;
+}
+
+.lrob-event-card--image-position-right.lrob-event-list .lrob-event-thumbnail,
+.lrob-event-card--image-position-right.lrob-event-full .lrob-event-thumbnail,
+.lrob-event-card--image-position-left.lrob-event-list .lrob-event-thumbnail,
+.lrob-event-card--image-position-left.lrob-event-full .lrob-event-thumbnail {
+    flex: 0 0 var(--lrob-cal-img-col-width, 180px);
+    align-self: stretch;
+    margin: 0;
+    border-radius: 0;
+}
+
+.lrob-event-card--image-position-right.lrob-event-list .lrob-event-thumbnail img,
+.lrob-event-card--image-position-right.lrob-event-full .lrob-event-thumbnail img,
+.lrob-event-card--image-position-left.lrob-event-list  .lrob-event-thumbnail img,
+.lrob-event-card--image-position-left.lrob-event-full  .lrob-event-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* "Cover/contain" still respected even in column mode */
+.lrob-event-card--image-position-right.lrob-event-card--image-contain .lrob-event-thumbnail img,
+.lrob-event-card--image-position-left.lrob-event-card--image-contain  .lrob-event-thumbnail img {
+    object-fit: contain;
+    background: var(--lrob-cal-surface-muted);
+}
+
+/* Column WIDTH presets — reuse the image-height attribute. Small/medium/large
+   here map to portrait-column widths. "Auto" mode picks a sensible default. */
+.lrob-event-card--image-position-right.lrob-event-card--image-height-small,
+.lrob-event-card--image-position-left.lrob-event-card--image-height-small  {
+    --lrob-cal-img-col-width: 140px;
+}
+.lrob-event-card--image-position-right.lrob-event-card--image-height-medium,
+.lrob-event-card--image-position-left.lrob-event-card--image-height-medium {
+    --lrob-cal-img-col-width: 180px;
+}
+.lrob-event-card--image-position-right.lrob-event-card--image-height-large,
+.lrob-event-card--image-position-left.lrob-event-card--image-height-large  {
+    --lrob-cal-img-col-width: 240px;
+}
+.lrob-event-card--image-position-right.lrob-event-card--image-height-auto,
+.lrob-event-card--image-position-left.lrob-event-card--image-height-auto   {
+    --lrob-cal-img-col-width: 200px;
+}
+
+/* ─── Grid template ──────────────────────────────────────────────────────── */
+
+.lrob-event-card.lrob-event-grid {
+    display: flex;
+    flex-direction: column;
+}
+
+.lrob-event-card.lrob-event-grid .lrob-event-thumbnail {
+    border-radius: 0;
+    margin: 0;
+}
+
+.lrob-event-card.lrob-event-grid .lrob-event-thumbnail--placeholder {
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--lrob-cal-primary-soft);
+}
+
+/* Date badge overlay on grid template (corner of the image) */
+.lrob-event-card__date-badge {
+    position: absolute;
+    top: var(--lrob-cal-space-3);
+    left: var(--lrob-cal-space-3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 52px;
+    padding: var(--lrob-cal-space-2) var(--lrob-cal-space-2);
+    background: var(--lrob-cal-surface);
+    color: var(--lrob-cal-text);
+    border-radius: var(--lrob-cal-radius-md);
+    box-shadow: var(--lrob-cal-shadow-card);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+.lrob-event-card__date-badge .lrob-event-card__date-day {
+    font-size: 1.35em;
+}
+
+.lrob-event-card__date-badge .lrob-event-card__date-month {
+    font-size: 0.68em;
+    margin-top: 2px;
+}
+
+.lrob-event-card__date-badge--standalone {
+    position: static;
+    box-shadow: none;
+    background: transparent;
+}
+
+/* ─── Categories ─────────────────────────────────────────────────────────── */
+
+.lrob-event-categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--lrob-cal-space-1);
+    margin-top: var(--lrob-cal-space-1);
+}
+
+.lrob-category-badge {
+    display: inline-block;
+    padding: 2px var(--lrob-cal-space-2);
+    font-size: 0.78em;
+    font-weight: var(--lrob-cal-font-weight-medium);
+    color: var(--lrob-cal-text);
+    background: var(--lrob-cal-badge-color, var(--lrob-cal-surface-muted));
+    border: 1px solid var(--lrob-cal-border);
+    border-radius: var(--lrob-cal-radius-pill);
+    text-decoration: none;
+    line-height: 1.4;
+}
+
+/* When the category has its own color, drop the border so the chip reads
+   as a solid colored pill. */
+.lrob-category-badge[style*="--lrob-cal-badge-color"] {
+    border-color: transparent;
+    color: var(--lrob-cal-surface);
+}
+
+/* ─── CTA buttons ────────────────────────────────────────────────────────── */
+
+.lrob-event-cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--lrob-cal-space-2);
+    margin-top: var(--lrob-cal-space-2);
+}
+
+.lrob-event-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--lrob-cal-space-2);
+    padding: var(--lrob-cal-space-2) var(--lrob-cal-space-4);
+    font-size: 0.92em;
+    font-weight: var(--lrob-cal-font-weight-medium);
+    border-radius: var(--lrob-cal-radius-md);
+    text-decoration: none;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background-color var(--lrob-cal-duration) var(--lrob-cal-ease),
+                border-color var(--lrob-cal-duration) var(--lrob-cal-ease),
+                color var(--lrob-cal-duration) var(--lrob-cal-ease);
+}
+
+.lrob-event-btn .lrob-icon {
+    width: 16px;
+    height: 16px;
+}
+
+.lrob-event-btn--primary {
+    background: var(--lrob-cal-primary);
+    color: var(--lrob-cal-primary-fg);
+}
+
+.lrob-event-btn--primary:hover {
+    background: var(--lrob-cal-primary-hover);
+    color: var(--lrob-cal-primary-fg);
+}
+
+.lrob-event-btn--secondary {
+    background: var(--lrob-cal-surface);
+    color: var(--lrob-cal-text);
+    border-color: var(--lrob-cal-border-strong);
+}
+
+.lrob-event-btn--secondary:hover {
+    background: var(--lrob-cal-surface-hover);
+    color: var(--lrob-cal-text);
+    border-color: var(--lrob-cal-border-strong);
+}
+
+/* Ghost variant — used by the "View details" trigger when descriptionMode
+   = button. Transparent, primary-colored text, subtle hover tint. */
+.lrob-event-btn--ghost {
+    background: transparent;
+    color: var(--lrob-cal-primary);
+    border-color: transparent;
+    padding-inline: var(--lrob-cal-space-2);
+    align-self: flex-start;
+}
+
+.lrob-event-btn--ghost:hover {
+    background: var(--lrob-cal-primary-soft);
+    color: var(--lrob-cal-primary);
+}
+
+/* Row-level "View details" — vertically centered on the right edge of
+   list/full rows. Grid template inlines it in the content column instead
+   (where it sits flush-left below the excerpt). */
+.lrob-event-details-btn {
+    align-self: center;
+    flex: 0 0 auto;
+    white-space: nowrap;
+}
+
+.lrob-event-card.lrob-event-grid .lrob-event-details-btn {
+    align-self: flex-start;
+    margin-top: var(--lrob-cal-space-1);
+}
+
+.lrob-event-details-btn .lrob-icon {
+    width: 18px;
+    height: 18px;
+}
+
+/* ─── Minimal template ───────────────────────────────────────────────────── */
+
+.lrob-event-card.lrob-event-minimal {
+    display: flex;
+    align-items: center;
+    gap: var(--lrob-cal-space-3);
+    padding: var(--lrob-cal-space-3) var(--lrob-cal-space-4);
+    box-shadow: none;
+}
+
+.lrob-event-card__date-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--lrob-cal-space-1);
+    padding: 2px var(--lrob-cal-space-2);
+    background: var(--lrob-cal-primary-soft);
+    color: var(--lrob-cal-primary);
+    font-size: 0.82em;
+    font-weight: var(--lrob-cal-font-weight-semibold);
+    border-radius: var(--lrob-cal-radius-pill);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    flex: none;
+}
+
+.lrob-event-card__title {
+    flex: 1 1 auto;
+    font-weight: var(--lrob-cal-font-weight-medium);
+    color: var(--lrob-cal-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.lrob-event-card__title a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.lrob-event-card__title a:hover {
+    color: var(--lrob-cal-primary);
+}
+
+.lrob-event-card__time {
+    font-size: 0.85em;
+    color: var(--lrob-cal-text-muted);
+    font-variant-numeric: tabular-nums;
+    flex: none;
+}
+
+/* ─── Mobile ─────────────────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
+    /* Keep the desktop side-by-side layout on mobile — date pill on the
+       left, content beside it, image / details button on the right. Just
+       scale things down. */
+
+    .lrob-event-card.lrob-event-list,
+    .lrob-event-card.lrob-event-full {
+        gap: var(--lrob-cal-space-3);
     }
-    .lrob-event-card.lrob-event-list .lrob-event-thumbnail {
-        flex: none;
+
+    /* Slightly smaller date pill, but same shape/orientation (day on top,
+       month below, both centered). */
+    .lrob-event-card.lrob-event-list .lrob-event-card__date-block,
+    .lrob-event-card.lrob-event-full .lrob-event-card__date-block {
+        width: 56px;
+        height: 56px;
+        padding: var(--lrob-cal-space-1);
+    }
+    .lrob-event-card.lrob-event-list .lrob-event-card__date-day,
+    .lrob-event-card.lrob-event-full .lrob-event-card__date-day {
+        font-size: 1.25em;
+    }
+    .lrob-event-card.lrob-event-list .lrob-event-card__date-month,
+    .lrob-event-card.lrob-event-full .lrob-event-card__date-month {
+        font-size: 0.6em;
+        letter-spacing: 0.06em;
+    }
+
+    /* Narrower side-column image so the content has room to breathe. */
+    .lrob-event-card--image-position-right.lrob-event-list .lrob-event-thumbnail,
+    .lrob-event-card--image-position-right.lrob-event-full .lrob-event-thumbnail,
+    .lrob-event-card--image-position-left.lrob-event-list .lrob-event-thumbnail,
+    .lrob-event-card--image-position-left.lrob-event-full .lrob-event-thumbnail {
+        flex: 0 0 var(--lrob-cal-img-col-width-mobile, 100px);
+    }
+
+    .lrob-event-card--image-position-right.lrob-event-card--image-height-small,
+    .lrob-event-card--image-position-left.lrob-event-card--image-height-small  {
+        --lrob-cal-img-col-width-mobile: 80px;
+    }
+    .lrob-event-card--image-position-right.lrob-event-card--image-height-medium,
+    .lrob-event-card--image-position-left.lrob-event-card--image-height-medium {
+        --lrob-cal-img-col-width-mobile: 100px;
+    }
+    .lrob-event-card--image-position-right.lrob-event-card--image-height-large,
+    .lrob-event-card--image-position-left.lrob-event-card--image-height-large  {
+        --lrob-cal-img-col-width-mobile: 130px;
+    }
+
+    .lrob-event-card.lrob-event-minimal {
+        flex-wrap: wrap;
+    }
+
+    /* Mobile: when the row has a thumbnail AND descriptionMode = button,
+       the THUMBNAIL itself becomes the popup trigger (handled in
+       event-list-popup.js). Hiding the explicit "View details" button
+       declutters the row — the image is the affordance.
+       :has(...) is supported in every evergreen browser we care about. */
+    .lrob-event-card.lrob-event-list:has([data-mobile-popup-for]) .lrob-event-details-btn,
+    .lrob-event-card.lrob-event-full:has([data-mobile-popup-for]) .lrob-event-details-btn {
+        display: none;
+    }
+    .lrob-event-card.lrob-event-list:has([data-mobile-popup-for]) .lrob-event-thumbnail,
+    .lrob-event-card.lrob-event-full:has([data-mobile-popup-for]) .lrob-event-thumbnail {
+        cursor: pointer;
+    }
+
+    /* Otherwise: details button collapses to an icon-only square — saves the
+       ~80px the "View details" label was claiming. The aria-label keeps it
+       accessible for screen readers. */
+    .lrob-event-details-btn {
+        width: 38px;
+        height: 38px;
+        padding: 0;
+        justify-content: center;
+        gap: 0;
+    }
+    .lrob-event-details-btn__label {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
+    .lrob-event-details-btn .lrob-icon {
+        width: 20px;
+        height: 20px;
+    }
+
+    /* Grid template: still wants the labelled button (no left-side image to
+       compete with). Restore the label. */
+    .lrob-event-card.lrob-event-grid .lrob-event-details-btn {
+        width: auto;
+        height: auto;
+        padding: var(--lrob-cal-space-2) var(--lrob-cal-space-4);
+        gap: var(--lrob-cal-space-2);
+    }
+    .lrob-event-card.lrob-event-grid .lrob-event-details-btn .lrob-event-details-btn__label {
+        position: static;
+        width: auto;
+        height: auto;
+        clip: auto;
+        margin: 0;
+        overflow: visible;
     }
 }

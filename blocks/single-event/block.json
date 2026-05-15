@@ -12,6 +12,7 @@
         "template":     { "type": "string", "default": "full" },
         "imageDisplay":  { "type": "string",  "default": "contain" },
         "imageHeight":   { "type": "string",  "default": "medium" },
+        "imagePosition": { "type": "string",  "default": "right" },
         "imageLightbox": { "type": "boolean", "default": true }
     },
     "editorScript": "lrob-calendar-block-single-event-edit",

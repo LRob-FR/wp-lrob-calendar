@@ -65,6 +65,15 @@ if ($pagination) {
 }
 
 $events = LRob_Calendar_Event::get_events($args);
+
+// "View details" popup mode requires the popup CSS (defined in the calendar
+// block's stylesheet) + the events-list popup-trigger JS. Both are
+// registered globally; enqueue conditionally here so vanilla list pages
+// don't pay the cost.
+if (($attributes['descriptionMode'] ?? 'inline') === 'button') {
+    wp_enqueue_style('lrob-calendar-block-calendar');
+    wp_enqueue_script('lrob-calendar-event-list-popup');
+}
 ?>
 <div class="lrob-cal-events-list-wrapper">
 <?php if (empty($events)): ?>

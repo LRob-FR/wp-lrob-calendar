@@ -1,27 +1,100 @@
 /**
  * Design tokens shared across every block + page rendering.
  * Registered as `lrob-calendar-tokens`; all block stylesheets list it as a dep.
+ *
+ * Every CSS variable carries the `--lrob-cal-` prefix to avoid colliding with
+ * theme/plugin globals on the same page. Admin Appearance settings override
+ * --lrob-cal-primary via inline style on this same handle.
  */
 
 :root {
-    --lrob-primary: #3788d8;
-    --lrob-primary-dark: #2c6cb5;
-    --lrob-text: #333;
-    --lrob-text-light: #666;
-    --lrob-border: #ddd;
-    --lrob-bg: #f9f9f9;
-    --lrob-white: #fff;
+    /* ─── Color palette ──────────────────────────────────────────── */
+
+    /* Primary (CTAs, today indicator, focus rings). Overridable from
+       the admin Appearance section — inline style on this handle bumps
+       only --lrob-cal-primary and derives the rest via color-mix. */
+    --lrob-cal-primary:        #3b82f6;
+    --lrob-cal-primary-hover:  color-mix(in srgb, var(--lrob-cal-primary) 88%, black);
+    --lrob-cal-primary-soft:   color-mix(in srgb, var(--lrob-cal-primary) 12%, transparent);
+    --lrob-cal-primary-fg:     #ffffff;
+
+    /* Secondary (used sparingly — accent areas where primary would
+       be too loud). Optional; defaults to a neutral slate. */
+    --lrob-cal-secondary:      #64748b;
+    --lrob-cal-secondary-soft: color-mix(in srgb, var(--lrob-cal-secondary) 10%, transparent);
+
+    /* Neutral surfaces and text */
+    --lrob-cal-surface:        #ffffff;
+    --lrob-cal-surface-muted:  #f8fafc;
+    --lrob-cal-surface-hover:  #f1f5f9;
+    --lrob-cal-text:           #0f172a;
+    --lrob-cal-text-muted:     #64748b;
+    --lrob-cal-text-subtle:    #94a3b8;
+    --lrob-cal-border:         #e2e8f0;
+    --lrob-cal-border-strong:  #cbd5e1;
+
+    /* Elevated surface (popup, modals). Soft and diffuse — not dark. */
+    --lrob-cal-shadow-elevated: 0 4px 6px -1px rgba(15, 23, 42, 0.04),
+                                 0 10px 30px -8px rgba(15, 23, 42, 0.12);
+    --lrob-cal-shadow-card:     0 1px 2px rgba(15, 23, 42, 0.04),
+                                 0 1px 3px rgba(15, 23, 42, 0.06);
+
+    /* ─── Spacing scale (8px grid, with one 4px sub-step) ───────── */
+    --lrob-cal-space-1: 4px;
+    --lrob-cal-space-2: 8px;
+    --lrob-cal-space-3: 12px;
+    --lrob-cal-space-4: 16px;
+    --lrob-cal-space-5: 24px;
+    --lrob-cal-space-6: 32px;
+    --lrob-cal-space-7: 48px;
+    --lrob-cal-space-8: 64px;
+
+    /* ─── Radius scale ───────────────────────────────────────────── */
+    --lrob-cal-radius-sm: 6px;   /* small pills, dots, badges */
+    --lrob-cal-radius-md: 8px;   /* buttons, inputs */
+    --lrob-cal-radius-lg: 12px;  /* cards, popups, major surfaces */
+    --lrob-cal-radius-pill: 999px;
+
+    /* ─── Typography ─────────────────────────────────────────────── */
+    --lrob-cal-line-tight:      1.25;
+    --lrob-cal-line-comfortable: 1.55;
+    --lrob-cal-font-weight-medium: 500;
+    --lrob-cal-font-weight-semibold: 600;
+    --lrob-cal-font-weight-bold: 700;
+
+    /* ─── Motion ─────────────────────────────────────────────────── */
+    --lrob-cal-ease:     cubic-bezier(0.4, 0, 0.2, 1);
+    --lrob-cal-duration: 0.18s;
+
+    /* ─── Backwards-compat aliases ───────────────────────────────── */
+    /* Old short-form names from the v1.0 token set. Kept as aliases so
+       any third-party CSS that may have leaned on them still resolves.
+       Internal stylesheets use the --lrob-cal-* names exclusively. */
+    --lrob-primary:       var(--lrob-cal-primary);
+    --lrob-primary-dark:  var(--lrob-cal-primary-hover);
+    --lrob-text:          var(--lrob-cal-text);
+    --lrob-text-light:    var(--lrob-cal-text-muted);
+    --lrob-border:        var(--lrob-cal-border);
+    --lrob-bg:            var(--lrob-cal-surface-muted);
+    --lrob-white:         var(--lrob-cal-surface);
 }
 
+/* Shared icon utility — sizing handled by parent context, colour follows
+   currentColor (every icon is a stroke SVG with stroke=currentColor). */
 .lrob-icon {
     flex-shrink: 0;
+    display: inline-block;
+    vertical-align: middle;
+    color: currentColor;
 }
 
 /* Empty-state copy reused by every block */
 .lrob-no-events {
     text-align: center;
-    padding: 30px;
-    color: var(--lrob-text-light);
-    background: var(--lrob-bg);
-    border-radius: 4px;
+    padding: var(--lrob-cal-space-6);
+    color: var(--lrob-cal-text-muted);
+    background: var(--lrob-cal-surface-muted);
+    border: 1px solid var(--lrob-cal-border);
+    border-radius: var(--lrob-cal-radius-lg);
+    line-height: var(--lrob-cal-line-comfortable);
 }

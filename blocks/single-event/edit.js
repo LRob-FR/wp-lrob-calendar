@@ -115,6 +115,17 @@
                             __nextHasNoMarginBottom: true
                         }),
                         el(SelectControl, {
+                            label: __('Image position', 'lrob-calendar'),
+                            value: attributes.imagePosition,
+                            options: [
+                                { value: 'right',   label: __('Right column', 'lrob-calendar') },
+                                { value: 'left',    label: __('Left column',  'lrob-calendar') },
+                                { value: 'below',   label: __('Below content (full width)', 'lrob-calendar') }
+                            ],
+                            help: __('Vertical/portrait images look best in a side column. Wide/landscape images look best below the content.', 'lrob-calendar'),
+                            onChange: (value) => setAttributes({ imagePosition: value })
+                        }),
+                        el(SelectControl, {
                             label: __('Image display', 'lrob-calendar'),
                             value: attributes.imageDisplay,
                             options: [

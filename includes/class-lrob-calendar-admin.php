@@ -56,14 +56,29 @@ class LRob_Calendar_Admin {
     
     public function enqueue_assets(string $hook): void {
         global $post_type, $taxonomy;
-        
+
+        // The Appearance section on the Settings page also needs the WP
+        // color picker. Hook name pattern for a submenu under the lrob_event
+        // CPT: "{cpt}_page_{slug}".
+        $is_settings_page = ($hook === LRob_Calendar_Post_Types::POST_TYPE . '_page_lrob-calendar-settings');
+
         // Load on event edit pages and category pages
         $is_event_page = ($post_type === LRob_Calendar_Post_Types::POST_TYPE);
         $is_category_page = (
             $taxonomy === LRob_Calendar_Post_Types::TAX_CATEGORY ||
             (isset($_GET['taxonomy']) && $_GET['taxonomy'] === LRob_Calendar_Post_Types::TAX_CATEGORY)
         );
-        
+
+        if ($is_settings_page) {
+            wp_enqueue_style('wp-color-picker');
+            wp_enqueue_script('wp-color-picker');
+            wp_add_inline_script(
+                'wp-color-picker',
+                'jQuery(function($){ $(".lrob-color-field").wpColorPicker(); });'
+            );
+            return;
+        }
+
         if (!$is_event_page && !$is_category_page) {
             return;
         }
@@ -244,6 +259,14 @@ class LRob_Calendar_Admin {
             update_option('lrob_calendar_max_recurrence_instances', $max_inst);
             update_option('lrob_calendar_max_recurrence_years', $max_years);
 
+            // Appearance: primary + secondary brand colors. Sanitize via
+            // sanitize_hex_color() — empty string clears the override and
+            // the frontend falls back to the default token value.
+            $primary_color   = sanitize_hex_color($_POST['primary_color']   ?? '');
+            $secondary_color = sanitize_hex_color($_POST['secondary_color'] ?? '');
+            update_option('lrob_calendar_primary_color',   $primary_color   ?: '');
+            update_option('lrob_calendar_secondary_color', $secondary_color ?: '');
+
             echo '<div class="notice notice-success"><p>' . __('Settings saved.', 'lrob-calendar') . '</p></div>';
         }
 
@@ -253,6 +276,8 @@ class LRob_Calendar_Admin {
         $max_age          = (int) get_option('lrob_calendar_max_event_age_months', 0);
         $max_inst         = (int) get_option('lrob_calendar_max_recurrence_instances', 500);
         $max_years        = (int) get_option('lrob_calendar_max_recurrence_years', 5);
+        $primary_color    = (string) get_option('lrob_calendar_primary_color', '');
+        $secondary_color  = (string) get_option('lrob_calendar_secondary_color', '');
         $effective_start_of_week = LRob_Calendar::get_start_of_week();
         $day_labels = [
             0 => __('Sunday', 'lrob-calendar'),
@@ -343,6 +368,41 @@ class LRob_Calendar_Admin {
                             </p>
                         </td>
                     </tr>
+                </table>
+
+                <h2 style="margin-top: 2em;"><?php esc_html_e('Appearance', 'lrob-calendar'); ?></h2>
+                <p class="description" style="max-width: 640px;">
+                    <?php esc_html_e('Brand colors used by the calendar, popup, event cards, and CTA buttons. Leave empty to use the defaults. Per-category colors are configured on each category and are not affected.', 'lrob-calendar'); ?>
+                </p>
+                <table class="form-table">
+                    <tr>
+                        <th scope="row"><label for="primary_color"><?php esc_html_e('Primary color', 'lrob-calendar'); ?></label></th>
+                        <td>
+                            <input type="text" id="primary_color" name="primary_color"
+                                   value="<?php echo esc_attr($primary_color); ?>"
+                                   class="lrob-color-field"
+                                   data-default-color="#3b82f6">
+                            <p class="description">
+                                <?php esc_html_e('Used for CTA buttons, today indicator, active states, and accent links. Default: clean blue.', 'lrob-calendar'); ?>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="secondary_color"><?php esc_html_e('Secondary color', 'lrob-calendar'); ?></label></th>
+                        <td>
+                            <input type="text" id="secondary_color" name="secondary_color"
+                                   value="<?php echo esc_attr($secondary_color); ?>"
+                                   class="lrob-color-field"
+                                   data-default-color="#64748b">
+                            <p class="description">
+                                <?php esc_html_e('Optional. Used sparingly for secondary accents. Default: neutral slate.', 'lrob-calendar'); ?>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+
+                <h2 style="margin-top: 2em;"><?php esc_html_e('Other', 'lrob-calendar'); ?></h2>
+                <table class="form-table">
                     <tr>
                         <th scope="row"><?php esc_html_e('Date & Time Format', 'lrob-calendar'); ?></th>
                         <td>

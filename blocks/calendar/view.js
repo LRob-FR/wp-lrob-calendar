@@ -14,6 +14,12 @@
         this.$container = $(container);
         this.linkText = this.$container.data('link-text') || 'View event';
         this.view = this.$container.data('view') || 'month';
+        // currentView is the RUNTIME view (toggleable via the in-header
+        // switcher). It starts at the block's configured view and can be
+        // changed at runtime (month ↔ week). Agenda blocks keep currentView
+        // === 'agenda' and never render the switcher.
+        this.currentView = this.view;
+        this.weekAnchor  = new Date();
         
         // Parse events from data attribute
         var eventsData = this.$container.data('events');
@@ -106,34 +112,98 @@
         this.$container.on('click', '.lrob-cal-prev', function(e) {
             e.preventDefault();
             if (self.loading) return;
-            self.currentMonth--;
-            if (self.currentMonth < 0) {
-                self.currentMonth = 11;
-                self.currentYear--;
+            if (self.currentView === 'week') {
+                self.weekAnchor = new Date(self.weekAnchor.getFullYear(), self.weekAnchor.getMonth(), self.weekAnchor.getDate() - 7);
+                self.currentMonth = self.weekAnchor.getMonth();
+                self.currentYear  = self.weekAnchor.getFullYear();
+            } else {
+                self.currentMonth--;
+                if (self.currentMonth < 0) {
+                    self.currentMonth = 11;
+                    self.currentYear--;
+                }
             }
             self.checkAndLoadEvents();
         });
-        
+
         this.$container.on('click', '.lrob-cal-next', function(e) {
             e.preventDefault();
             if (self.loading) return;
-            self.currentMonth++;
-            if (self.currentMonth > 11) {
-                self.currentMonth = 0;
-                self.currentYear++;
+            if (self.currentView === 'week') {
+                self.weekAnchor = new Date(self.weekAnchor.getFullYear(), self.weekAnchor.getMonth(), self.weekAnchor.getDate() + 7);
+                self.currentMonth = self.weekAnchor.getMonth();
+                self.currentYear  = self.weekAnchor.getFullYear();
+            } else {
+                self.currentMonth++;
+                if (self.currentMonth > 11) {
+                    self.currentMonth = 0;
+                    self.currentYear++;
+                }
             }
             self.checkAndLoadEvents();
         });
+
+        // "Today" jumps the calendar to the current month/week.
+        this.$container.on('click', '.lrob-cal-today', function(e) {
+            e.preventDefault();
+            var now = new Date();
+            self.currentMonth = now.getMonth();
+            self.currentYear  = now.getFullYear();
+            self.weekAnchor   = now;
+            self.checkAndLoadEvents();
+        });
+
+        // View switcher (Month / Week pill).
+        this.$container.on('click', '.lrob-cal-view-btn', function(e) {
+            e.preventDefault();
+            var newView = $(this).attr('data-view');
+            if (!newView || newView === self.currentView) return;
+            self.currentView = newView;
+            if (newView === 'week') {
+                // Anchor the week to the currently-displayed month so the
+                // user doesn't lose context.
+                self.weekAnchor = new Date(self.currentYear, self.currentMonth, 1);
+            }
+            self.render();
+        });
+
+        // "+N more" pill — opens the day-list popup for the given date.
+        this.$container.on('click', '.lrob-cal-more', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var dateStr = $(this).attr('data-date');
+            if (dateStr) self.showDayList(dateStr, $(this).closest('td'));
+        });
         
+        // Event-item click. On mobile, events render as tiny dots so the
+        // useful interaction is "open the list of events for this day";
+        // on desktop the user can read the title in the cell, so tapping
+        // it should jump straight to that event's full card.
         this.$container.on('click', '.lrob-cal-event-item', function(e) {
             e.preventDefault();
             e.stopPropagation();
+            if (self.isMobileViewport()) {
+                var $cell = $(this).closest('td');
+                var dateStr = $cell.attr('data-date');
+                if (dateStr) {
+                    self.showDayList(dateStr, $cell.length ? $cell : self.$container);
+                    return;
+                }
+            }
             var eventId = $(this).data('event-id');
             self.showPopup(eventId, $(this), e);
         });
-        
+
+        // Mobile-only: tapping the cell background (any area within a day
+        // cell that has events) also opens the day-list. Skips empty cells.
+        this.$container.on('click', '.lrob-cal-table td.lrob-cal-has-events', function(e) {
+            if (!self.isMobileViewport()) return;
+            var dateStr = $(this).attr('data-date');
+            if (dateStr) self.showDayList(dateStr, $(this));
+        });
+
         $(document).on('click', function(e) {
-            if (!$(e.target).closest('.lrob-cal-popup, .lrob-cal-event-item').length) {
+            if (!$(e.target).closest('.lrob-cal-popup, .lrob-cal-event-item, .lrob-cal-table td').length) {
                 self.hidePopup();
             }
         });
@@ -209,8 +279,13 @@
 
     LRobCalendar.prototype.render = function() {
         this.ensureShell();
+        // Agenda is a block-level mode (no switcher). Month + Week can both
+        // be reached at runtime via the in-header pill control; currentView
+        // tracks which one is active.
         if (this.view === 'agenda') {
             this.renderAgenda();
+        } else if (this.currentView === 'week') {
+            this.renderWeek();
         } else {
             this.renderMonth();
         }
@@ -249,112 +324,276 @@
     };
 
     LRobCalendar.prototype.renderMonth = function() {
-        var firstDay = new Date(this.currentYear, this.currentMonth, 1);
-        var lastDay = new Date(this.currentYear, this.currentMonth + 1, 0);
-        // Number of empty cells before the 1st, given the configured week start
-        var startDay = (firstDay.getDay() - this.startOfWeek + 7) % 7;
+        var firstDay  = new Date(this.currentYear, this.currentMonth, 1);
+        var lastDay   = new Date(this.currentYear, this.currentMonth + 1, 0);
+        // Number of in-flow padding cells before the 1st, given the
+        // configured week start. We now FILL these with the trailing days of
+        // the previous month (rendered as .lrob-cal-day--out-of-month) so the
+        // user can see which weekday the month starts on at a glance.
+        var startDay  = (firstDay.getDay() - this.startOfWeek + 7) % 7;
         var totalDays = lastDay.getDate();
-        var today = new Date();
+        var today     = new Date();
 
-        var html = '<div class="lrob-cal-header">';
-        html += '<button class="lrob-cal-prev" type="button"' + (this.loading ? ' disabled' : '') + '>&laquo;</button>';
-        html += '<span class="lrob-cal-title">' + this.monthNames[this.currentMonth] + ' ' + this.currentYear + '</span>';
-        html += '<button class="lrob-cal-next" type="button"' + (this.loading ? ' disabled' : '') + '>&raquo;</button>';
-        html += '</div>';
+        var prevMonthLastDay = new Date(this.currentYear, this.currentMonth, 0).getDate();
+        var prevMonth = this.currentMonth === 0 ? 11 : this.currentMonth - 1;
+        var prevYear  = this.currentMonth === 0 ? this.currentYear - 1 : this.currentYear;
+        var nextMonth = this.currentMonth === 11 ? 0 : this.currentMonth + 1;
+        var nextYear  = this.currentMonth === 11 ? this.currentYear + 1 : this.currentYear;
+
+        // Header
+        var html = this.buildCalendarHeader();
 
         html += '<table class="lrob-cal-table"><thead><tr>';
         for (var d = 0; d < 7; d++) {
             html += '<th>' + this.dayNames[(this.startOfWeek + d) % 7] + '</th>';
         }
         html += '</tr></thead><tbody>';
-        
-        var day = 1;
-        for (var i = 0; i < 6; i++) {
-            html += '<tr>';
-            for (var j = 0; j < 7; j++) {
-                if (i === 0 && j < startDay) {
-                    html += '<td class="lrob-cal-empty"></td>';
-                } else if (day > totalDays) {
-                    html += '<td class="lrob-cal-empty"></td>';
-                } else {
-                    var dateStr = this.currentYear + '-' + 
-                        String(this.currentMonth + 1).padStart(2, '0') + '-' + 
-                        String(day).padStart(2, '0');
-                    var dayEvents = this.getEventsForDate(dateStr);
-                    var classes = 'lrob-cal-day';
-                    
-                    if (dayEvents.length > 0) classes += ' lrob-cal-has-events';
-                    
-                    if (day === today.getDate() && 
-                        this.currentMonth === today.getMonth() && 
-                        this.currentYear === today.getFullYear()) {
-                        classes += ' lrob-cal-today';
+
+        // Render the grid as a 6-week block, walking a cursor through prev/
+        // current/next-month days so out-of-month cells get a real day number.
+        var dayNum = 1;
+        var totalCells = 6 * 7;
+        for (var cell = 0; cell < totalCells; cell++) {
+            var rowStart = cell % 7 === 0;
+            var rowEnd   = cell % 7 === 6;
+            if (rowStart) html += '<tr>';
+
+            var cellMonth, cellYear, cellDay, isCurrentMonth;
+            if (cell < startDay) {
+                // Trailing days of the previous month
+                cellDay   = prevMonthLastDay - (startDay - cell - 1);
+                cellMonth = prevMonth;
+                cellYear  = prevYear;
+                isCurrentMonth = false;
+            } else if (dayNum > totalDays) {
+                // Leading days of the next month
+                cellDay   = cell - (startDay + totalDays) + 1;
+                cellMonth = nextMonth;
+                cellYear  = nextYear;
+                isCurrentMonth = false;
+            } else {
+                cellDay   = dayNum;
+                cellMonth = this.currentMonth;
+                cellYear  = this.currentYear;
+                isCurrentMonth = true;
+                dayNum++;
+            }
+
+            // Bail out early if we're past the last current-month day AND past
+            // the row that contained it — saves rendering a blank trailing week.
+            var dateStr = cellYear + '-' +
+                String(cellMonth + 1).padStart(2, '0') + '-' +
+                String(cellDay).padStart(2, '0');
+
+            var dayEvents = isCurrentMonth ? this.getEventsForDate(dateStr) : [];
+            var classes = 'lrob-cal-day';
+            if (!isCurrentMonth)        classes += ' lrob-cal-day--out-of-month';
+            if (dayEvents.length > 0)   classes += ' lrob-cal-has-events';
+            if (isCurrentMonth &&
+                cellDay   === today.getDate() &&
+                cellMonth === today.getMonth() &&
+                cellYear  === today.getFullYear()) {
+                classes += ' lrob-cal-today';
+            }
+
+            html += '<td class="' + classes + '" data-date="' + dateStr + '">';
+            html += '<span class="lrob-cal-day-num">' + cellDay + '</span>';
+
+            // Classify each event for this cell. Multi-day events render as a
+            // visible bar only in the start cell (or week-start after a wrap);
+            // continuation cells get an invisible placeholder so single-day
+            // events on those cells stack BELOW the bar's visual extension.
+            var renderable = [];
+            for (var k = 0; k < dayEvents.length; k++) {
+                var ev0 = dayEvents[k];
+                var span0 = this.classifyEventDay(ev0, dateStr, cell % 7);
+                var isPlaceholder = span0.multiDay && span0.position !== 'start' && !span0.weekStart;
+                renderable.push({ ev: ev0, span: span0, isPlaceholder: isPlaceholder });
+            }
+
+            if (renderable.length > 0) {
+                html += '<div class="lrob-cal-events">';
+                for (var e = 0; e < Math.min(renderable.length, 2); e++) {
+                    var ev   = renderable[e].ev;
+                    var span = renderable[e].span;
+
+                    if (renderable[e].isPlaceholder) {
+                        html += '<span class="lrob-cal-event-item lrob-cal-event-placeholder" aria-hidden="true">&nbsp;</span>';
+                        continue;
                     }
-                    
-                    html += '<td class="' + classes + '">';
-                    html += '<span class="lrob-cal-day-num">' + day + '</span>';
-                    
-                    // Classify each event for this cell. Multi-day events are rendered
-                    // as a visible bar ONLY in the start cell (or week-start cell on a
-                    // wrap). On continuation cells they render as an invisible
-                    // placeholder — same height as a real event — so single-day events
-                    // on those cells stack BELOW the multi-day bar's visual extension
-                    // instead of colliding with it.
-                    var renderable = [];
-                    for (var k = 0; k < dayEvents.length; k++) {
-                        var ev0 = dayEvents[k];
-                        var span0 = this.classifyEventDay(ev0, dateStr, j);
-                        var isPlaceholder = span0.multiDay && span0.position !== 'start' && !span0.weekStart;
-                        renderable.push({ ev: ev0, span: span0, isPlaceholder: isPlaceholder });
+
+                    var itemClasses = 'lrob-cal-event-item';
+                    var styleAttr = '';
+                    if (ev.color) {
+                        styleAttr = ' style="--lrob-cal-event-color: ' + this.escapeHtml(ev.color) + '"';
                     }
 
-                    if (renderable.length > 0) {
-                        html += '<div class="lrob-cal-events">';
-                        for (var e = 0; e < Math.min(renderable.length, 2); e++) {
-                            var ev = renderable[e].ev;
-                            var span = renderable[e].span;
-
-                            if (renderable[e].isPlaceholder) {
-                                // Invisible row reserving the lane for the multi-day bar
-                                // visually passing through from a previous cell.
-                                html += '<span class="lrob-cal-event-item lrob-cal-event-placeholder" aria-hidden="true">&nbsp;</span>';
-                                continue;
-                            }
-
-                            var itemClasses = 'lrob-cal-event-item';
-                            var styleAttr = '';
-
-                            if (span.multiDay) {
-                                itemClasses += ' lrob-cal-event-multiday';
-                                // How many days does this event occupy in *this* week row?
-                                var spanInWeek = this.calcSpanInWeek(ev, dateStr, j);
-                                if (spanInWeek > 1) {
-                                    // 100% per cell + ~8px per cell-boundary (border + padding × 2).
-                                    // min-width so longer titles can still overflow naturally.
-                                    styleAttr = ' style="min-width: calc(' + (spanInWeek * 100) + '% + ' + ((spanInWeek - 1) * 8) + 'px)"';
-                                }
-                            }
-                            html += '<span class="' + itemClasses + '" data-event-id="' + ev.id + '"' + styleAttr + '>';
-                            html += this.escapeHtml(ev.title);
-                            html += '</span>';
+                    if (span.multiDay) {
+                        itemClasses += ' lrob-cal-event-multiday';
+                        var spanInWeek = this.calcSpanInWeek(ev, dateStr, cell % 7);
+                        if (spanInWeek > 1) {
+                            var min = 'min-width: calc(' + (spanInWeek * 100) + '% + ' + ((spanInWeek - 1) * 8) + 'px)';
+                            styleAttr = ev.color
+                                ? ' style="--lrob-cal-event-color: ' + this.escapeHtml(ev.color) + '; ' + min + '"'
+                                : ' style="' + min + '"';
                         }
-                        if (renderable.length > 2) {
-                            html += '<span class="lrob-cal-more">+' + (renderable.length - 2) + '</span>';
-                        }
-                        html += '</div>';
                     }
-                    
-                    html += '</td>';
-                    day++;
+                    html += '<span class="' + itemClasses + '" data-event-id="' + ev.id + '"' + styleAttr + '>';
+                    html += '<span class="lrob-cal-event-dot" aria-hidden="true"></span>';
+                    html += '<span class="lrob-cal-event-title">' + this.escapeHtml(ev.title) + '</span>';
+                    html += '</span>';
+                }
+                if (renderable.length > 2) {
+                    // Clickable "+N more" — opens the day-list popup.
+                    html += '<button class="lrob-cal-more" type="button" data-date="' + dateStr + '">'
+                          + '+' + (renderable.length - 2) + '</button>';
+                }
+                html += '</div>';
+            }
+
+            html += '</td>';
+
+            if (rowEnd) {
+                html += '</tr>';
+                // Skip rendering rows that are entirely in the next month.
+                if (dayNum > totalDays && cellMonth !== this.currentMonth) {
+                    break;
                 }
             }
-            html += '</tr>';
-            if (day > totalDays) break;
         }
-        
+
         html += '</tbody></table>';
 
         this.$container.find('.lrob-cal-grid').html(html);
+    };
+
+    /**
+     * Calendar header — month/year title on the left (large, bold), grouped
+     * prev/next chevrons, Today button, and the Month/Week segmented toggle.
+     */
+    LRobCalendar.prototype.buildCalendarHeader = function() {
+        var chevLeft   = this.icons.chevronLeft  || '&lsaquo;';
+        var chevRight  = this.icons.chevronRight || '&rsaquo;';
+        var prevLabel  = this.i18n.prevMonth || 'Previous month';
+        var nextLabel  = this.i18n.nextMonth || 'Next month';
+        var todayLabel = this.i18n.today     || 'Today';
+        var monthLbl   = this.i18n.monthView || 'Month';
+        var weekLbl    = this.i18n.weekView  || 'Week';
+        var titleText  = this.currentView === 'week'
+            ? this.formatWeekTitle()
+            : this.monthNames[this.currentMonth] + ' ' + this.currentYear;
+
+        var html = '<div class="lrob-cal-header">';
+        html += '<h2 class="lrob-cal-title">' + this.escapeHtml(titleText) + '</h2>';
+        html += '<div class="lrob-cal-header-controls">';
+
+        html += '<div class="lrob-cal-nav-group" role="group">';
+        html += '<button class="lrob-cal-prev" type="button" aria-label="' + this.escapeHtml(prevLabel) + '"' + (this.loading ? ' disabled' : '') + '>' + chevLeft + '</button>';
+        html += '<button class="lrob-cal-next" type="button" aria-label="' + this.escapeHtml(nextLabel) + '"' + (this.loading ? ' disabled' : '') + '>' + chevRight + '</button>';
+        html += '</div>';
+
+        html += '<button class="lrob-cal-today" type="button">' + this.escapeHtml(todayLabel) + '</button>';
+
+        // View switcher — only shown when the block's `view` setting is one
+        // of the switchable views (month/week). Agenda-only blocks stay
+        // single-view and skip the toggle.
+        if (this.view === 'month' || this.view === 'week') {
+            html += '<div class="lrob-cal-view-switcher" role="tablist" aria-label="Calendar view">';
+            html += '<button class="lrob-cal-view-btn' + (this.currentView === 'month' ? ' is-active' : '')
+                  + '" type="button" data-view="month" role="tab" aria-selected="' + (this.currentView === 'month' ? 'true' : 'false') + '">'
+                  + this.escapeHtml(monthLbl) + '</button>';
+            html += '<button class="lrob-cal-view-btn' + (this.currentView === 'week' ? ' is-active' : '')
+                  + '" type="button" data-view="week" role="tab" aria-selected="' + (this.currentView === 'week' ? 'true' : 'false') + '">'
+                  + this.escapeHtml(weekLbl) + '</button>';
+            html += '</div>';
+        }
+
+        html += '</div>';
+        html += '</div>';
+        return html;
+    };
+
+    /**
+     * Render the week view — a 7-day vertical agenda. Each day is a row
+     * with the weekday + date + events for that day. Compact, scannable,
+     * good for "what's happening this week" use cases.
+     */
+    LRobCalendar.prototype.renderWeek = function() {
+        var html = this.buildCalendarHeader();
+
+        var start = this.weekStartDate();      // Date at 00:00 local
+        var today = new Date();
+        var dayLongFmt = new Intl.DateTimeFormat(this.siteLocale, { weekday: 'long' });
+        var dayNumFmt  = new Intl.DateTimeFormat(this.siteLocale, { day: 'numeric', month: 'short' });
+        var timeFmt    = new Intl.DateTimeFormat(this.siteLocale, { hour: '2-digit', minute: '2-digit' });
+
+        html += '<div class="lrob-cal-week">';
+
+        for (var i = 0; i < 7; i++) {
+            var d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i);
+            var dateStr = d.getFullYear() + '-' +
+                String(d.getMonth() + 1).padStart(2, '0') + '-' +
+                String(d.getDate()).padStart(2, '0');
+            var dayEvents = this.getEventsForDate(dateStr).slice().sort(function (a, b) {
+                return new Date(a.start) - new Date(b.start);
+            });
+            var isToday = d.getDate()  === today.getDate()
+                       && d.getMonth() === today.getMonth()
+                       && d.getYear()  === today.getYear();
+
+            html += '<div class="lrob-cal-week-day' + (isToday ? ' lrob-cal-week-day--today' : '') + '" data-date="' + dateStr + '">';
+            html += '<div class="lrob-cal-week-day-header">';
+            html += '<span class="lrob-cal-week-day-name">' + this.escapeHtml(dayLongFmt.format(d)) + '</span>';
+            html += '<span class="lrob-cal-week-day-date">' + this.escapeHtml(dayNumFmt.format(d)) + '</span>';
+            html += '</div>';
+
+            if (dayEvents.length === 0) {
+                html += '<div class="lrob-cal-week-day-empty">·</div>';
+            } else {
+                html += '<ul class="lrob-cal-week-events">';
+                for (var k = 0; k < dayEvents.length; k++) {
+                    var ev = dayEvents[k];
+                    var dotStyle = ev.color
+                        ? ' style="--lrob-cal-event-color: ' + this.escapeHtml(ev.color) + '"'
+                        : '';
+                    var time = ev.allDay
+                        ? ''
+                        : timeFmt.format(new Date(ev.start));
+                    html += '<li>'
+                          + '<button class="lrob-cal-week-event lrob-cal-event-item" type="button" data-event-id="' + ev.id + '"' + dotStyle + '>'
+                          + '<span class="lrob-cal-event-dot" aria-hidden="true"></span>'
+                          + (time ? '<span class="lrob-cal-week-event-time">' + this.escapeHtml(time) + '</span>' : '')
+                          + '<span class="lrob-cal-event-title">' + this.escapeHtml(ev.title) + '</span>'
+                          + '</button>'
+                          + '</li>';
+                }
+                html += '</ul>';
+            }
+            html += '</div>';
+        }
+
+        html += '</div>';
+
+        this.$container.find('.lrob-cal-grid').html(html);
+    };
+
+    /**
+     * Start-of-week date for the current state. Anchored on `currentDate`
+     * when in week view; resets to today when the view first switches.
+     */
+    LRobCalendar.prototype.weekStartDate = function() {
+        var anchor = this.weekAnchor instanceof Date ? this.weekAnchor : new Date();
+        var dow = anchor.getDay();
+        var diff = (dow - this.startOfWeek + 7) % 7;
+        return new Date(anchor.getFullYear(), anchor.getMonth(), anchor.getDate() - diff);
+    };
+
+    LRobCalendar.prototype.formatWeekTitle = function() {
+        var start = this.weekStartDate();
+        var end = new Date(start.getFullYear(), start.getMonth(), start.getDate() + 6);
+        var fmt = new Intl.DateTimeFormat(this.siteLocale, { day: 'numeric', month: 'short' });
+        var yearFmt = new Intl.DateTimeFormat(this.siteLocale, { year: 'numeric' });
+        return fmt.format(start) + ' – ' + fmt.format(end) + ' ' + yearFmt.format(end);
     };
 
     /**
@@ -472,25 +711,131 @@
     };
 
     /**
+     * Single source of truth for "is this a small-screen layout?" The number
+     * is intentionally kept in sync with the mobile breakpoint used in
+     * blocks/calendar/style.css (640px in v1.1.0).
+     */
+    LRobCalendar.prototype.isMobileViewport = function() {
+        return !!(window.matchMedia && window.matchMedia('(max-width: 640px)').matches);
+    };
+
+    /**
+     * Build the day-list view HTML — used on mobile when the user taps a day
+     * cell with multiple events. Lists every event for that date with a
+     * tappable row that opens the full event card.
+     */
+    LRobCalendar.prototype.buildDayListHtml = function(dateStr) {
+        var events = this.getEventsForDate(dateStr).slice().sort(function (a, b) {
+            return new Date(a.start) - new Date(b.start);
+        });
+
+        var date = new Date(dateStr + 'T00:00:00');
+        var titleFmt = new Intl.DateTimeFormat(this.siteLocale, {
+            weekday: 'long', day: 'numeric', month: 'long'
+        });
+        var timeFmt = new Intl.DateTimeFormat(this.siteLocale, {
+            hour: '2-digit', minute: '2-digit'
+        });
+
+        var closeLabel = this.i18n.close || 'Close';
+        var closeIcon  = this.icons.close || '&times;';
+
+        var html = '<div class="lrob-cal-popup-content" data-mode="day-list">';
+        html += '<div class="lrob-cal-day-list-title">';
+        html += '<span>' + this.escapeHtml(titleFmt.format(date)) + '</span>';
+        html += '<button class="lrob-cal-popup-close" type="button" aria-label="' + this.escapeHtml(closeLabel) + '">' + closeIcon + '</button>';
+        html += '</div>';
+
+        html += '<ul class="lrob-cal-day-list">';
+        for (var i = 0; i < events.length; i++) {
+            var ev = events[i];
+            var dot = ev.color
+                ? '<span class="lrob-cal-day-list-dot" style="--lrob-cal-event-color: ' + this.escapeHtml(ev.color) + '"></span>'
+                : '<span class="lrob-cal-day-list-dot"></span>';
+            var startDate = new Date(ev.start);
+            var time = ev.allDay ? '' : timeFmt.format(startDate);
+            html += '<li>'
+                  + '<button class="lrob-cal-day-list-item" type="button" data-event-id="' + ev.id + '">'
+                  + dot
+                  + '<span class="lrob-cal-day-list-title-text">' + this.escapeHtml(ev.title) + '</span>'
+                  + '<span class="lrob-cal-day-list-time">' + this.escapeHtml(time) + '</span>'
+                  + '</button>'
+                  + '</li>';
+        }
+        html += '</ul>';
+        html += '</div>';
+        return html;
+    };
+
+    /**
+     * Open the popup in day-list mode for the given date string.
+     * Tapping an event in the list re-opens the popup as a regular event card
+     * (handled by the delegated `.lrob-cal-day-list-item` click in
+     * bindPopupHandlers).
+     */
+    LRobCalendar.prototype.showDayList = function(dateStr, $trigger) {
+        var events = this.getEventsForDate(dateStr);
+        if (!events.length) return;
+
+        // If exactly one event, skip the intermediate list and go straight
+        // to the full card — a one-item list is just friction.
+        if (events.length === 1) {
+            this.showPopup(events[0].id, $trigger || this.$container, null);
+            return;
+        }
+
+        this.currentPopupEventId = null;
+        this.currentDayListDate = dateStr;
+
+        var html = '<div class="lrob-cal-popup-stage">'
+                 + this.buildDayListHtml(dateStr)
+                 + '</div>';
+
+        var $popup = this.$container.find('.lrob-cal-popup');
+        $popup.html(html).show();
+        $popup[0].offsetHeight; // reflow
+        $popup.addClass('is-shown');
+        document.body.classList.add('lrob-cal-popup-open');
+
+        // Position only matters on desktop; mobile is fullscreen via CSS.
+        if (!this.isMobileViewport()) {
+            this.positionPopupNearTrigger($popup, $trigger || this.$container);
+        }
+    };
+
+    /**
      * Build the HTML for prev/next arrow buttons. Returns '' if neither
      * sibling exists. Buttons carry `data-target-id` so the click handler
      * (delegated on $popup in bindPopupHandlers) knows where to go.
+     * In v1.1.0 the arrows live INSIDE the popup header alongside the
+     * close button — no longer floated outside the card.
      */
     LRobCalendar.prototype.buildArrowsHtml = function(siblings) {
         var prevLabel = this.i18n.prevEvent || 'Previous event';
         var nextLabel = this.i18n.nextEvent || 'Next event';
+        var chevLeft  = this.icons.chevronLeft  || '&lsaquo;';
+        var chevRight = this.icons.chevronRight || '&rsaquo;';
         var html = '';
         if (siblings.prev) {
             html += '<button class="lrob-cal-popup-nav lrob-cal-popup-nav--prev" type="button" '
                   + 'aria-label="' + this.escapeHtml(prevLabel) + '" '
-                  + 'data-target-id="' + siblings.prev.id + '">&lsaquo;</button>';
+                  + 'data-target-id="' + siblings.prev.id + '">' + chevLeft + '</button>';
         }
         if (siblings.next) {
             html += '<button class="lrob-cal-popup-nav lrob-cal-popup-nav--next" type="button" '
                   + 'aria-label="' + this.escapeHtml(nextLabel) + '" '
-                  + 'data-target-id="' + siblings.next.id + '">&rsaquo;</button>';
+                  + 'data-target-id="' + siblings.next.id + '">' + chevRight + '</button>';
         }
         return html;
+    };
+
+    /**
+     * Short uppercase month name for the date block (e.g. "JUIN", "JUN").
+     * Pulled from the localized monthNames array, truncated to 3 chars.
+     */
+    LRobCalendar.prototype.shortMonthName = function(monthIndex) {
+        var name = (this.monthNames && this.monthNames[monthIndex]) || '';
+        return name.substring(0, 3).toUpperCase();
     };
 
     /**
@@ -500,15 +845,100 @@
      * on the thumbnail button so the delegated handler can read it without
      * re-binding per card.
      */
-    LRobCalendar.prototype.buildCardHtml = function(event) {
-        var formatted      = this.formatEventWhen(event);
+    LRobCalendar.prototype.buildCardHtml = function(event, siblings) {
+        siblings = siblings || { prev: null, next: null };
+        var when           = this.formatEventDateAndTime(event);
         var closeLabel     = this.i18n.close     || 'Close';
         var viewImageLabel = this.i18n.viewImage || 'View image';
         var fullUrl        = event.thumbnailFull || event.thumbnail || '';
+        var closeIcon      = this.icons.close || '&times;';
+        var arrowIcon      = this.icons.arrowRight || '&rarr;';
+
+        var startDate = new Date(event.start);
+        var dayNum    = startDate.getDate();
+        var monthStr  = this.shortMonthName(startDate.getMonth());
+
+        // Date-block color pair — same per-event hashed-or-category pastel
+        // pair the events-list cards use (PHP-computed, shipped with the
+        // event payload). Falls back to the primary-soft pair if absent.
+        var pillStyle = '';
+        if (event.pillBg || event.pillText) {
+            pillStyle = ' style="background-color: ' + this.escapeHtml(event.pillBg || '')
+                      + '; color: ' + this.escapeHtml(event.pillText || '') + '"';
+        }
 
         var html = '<div class="lrob-cal-popup-content" data-event-id="' + event.id + '">';
-        html += '<button class="lrob-cal-popup-close" type="button" aria-label="' + this.escapeHtml(closeLabel) + '">&times;</button>';
 
+        // Header: date block (left) + title (center) + nav/close (right).
+        html += '<div class="lrob-cal-popup-header">';
+        html += '<div class="lrob-cal-date-block" aria-hidden="true"' + pillStyle + '>';
+        html += '<span class="lrob-cal-date-block-day">' + dayNum + '</span>';
+        html += '<span class="lrob-cal-date-block-month">' + this.escapeHtml(monthStr) + '</span>';
+        html += '</div>';
+
+        if (this.publicPagesEnabled) {
+            html += '<h4 class="lrob-cal-popup-title"><a href="' + event.url + '">' + this.escapeHtml(event.title) + '</a></h4>';
+        } else {
+            html += '<h4 class="lrob-cal-popup-title">' + this.escapeHtml(event.title) + '</h4>';
+        }
+
+        html += '<div class="lrob-cal-popup-actions">';
+        html += this.buildArrowsHtml(siblings);
+        html += '<button class="lrob-cal-popup-close" type="button" aria-label="' + this.escapeHtml(closeLabel) + '">' + closeIcon + '</button>';
+        html += '</div>';
+        html += '</div>';  // header
+
+        // Body
+        html += '<div class="lrob-cal-popup-body">';
+
+        // Meta rows. Date and time stacked on two lines (no preposition).
+        html += '<div class="lrob-cal-popup-meta-list">';
+        html += '<p class="lrob-cal-popup-meta lrob-cal-popup-date">'
+              + (this.icons.calendar || '')
+              + '<span class="lrob-cal-popup-meta-stack">'
+              + '<span class="lrob-cal-popup-date-date">' + this.escapeHtml(when.date) + '</span>'
+              + (when.time
+                  ? '<span class="lrob-cal-popup-date-time">' + this.escapeHtml(when.time) + '</span>'
+                  : '')
+              + '</span>'
+              + '</p>';
+
+        if (event.venue || event.city) {
+            var location = [];
+            if (event.venue) location.push(this.escapeHtml(event.venue));
+            if (event.city)  location.push(this.escapeHtml(event.city));
+            html += '<p class="lrob-cal-popup-meta lrob-cal-popup-location">'
+                  + (this.icons.location || '')
+                  + '<span>' + location.join(', ') + '</span>'
+                  + '</p>';
+        }
+
+        if (event.recurring) {
+            html += '<p class="lrob-cal-popup-meta lrob-cal-popup-recurring">'
+                  + (this.icons.recurring || '')
+                  + '<span>' + this.escapeHtml(this.i18n.recurring || 'Recurring') + '</span>'
+                  + '</p>';
+        }
+
+        if (event.isFree) {
+            html += '<p class="lrob-cal-popup-meta lrob-cal-popup-cost lrob-cal-popup-cost--free">'
+                  + (this.icons.ticket || '')
+                  + '<span>' + this.escapeHtml(this.i18n.free || 'Free') + '</span>'
+                  + '</p>';
+        } else if (event.cost) {
+            html += '<p class="lrob-cal-popup-meta lrob-cal-popup-cost">'
+                  + (this.icons.ticket || '')
+                  + '<span>' + this.escapeHtml(event.cost) + '</span>'
+                  + '</p>';
+        }
+        html += '</div>';  // meta list
+
+        if (event.excerpt) {
+            html += '<p class="lrob-cal-popup-excerpt">' + this.escapeHtml(event.excerpt) + '</p>';
+        }
+
+        // Featured image moved BELOW the meta. Treated as supporting content,
+        // not the hero — the date block is the visual anchor instead.
         if (event.thumbnail && this.popupShowImage) {
             if (this.popupImageLightbox) {
                 html += '<button class="lrob-cal-popup-thumb" type="button" '
@@ -524,57 +954,19 @@
             }
         }
 
-        html += '<div class="lrob-cal-popup-body">';
-        if (this.publicPagesEnabled) {
-            html += '<h4 class="lrob-cal-popup-title"><a href="' + event.url + '">' + this.escapeHtml(event.title) + '</a></h4>';
-        } else {
-            html += '<h4 class="lrob-cal-popup-title">' + this.escapeHtml(event.title) + '</h4>';
-        }
-        html += '<p class="lrob-cal-popup-meta lrob-cal-popup-date">'
-            + (this.icons.calendar || '')
-            + '<span>' + this.escapeHtml(formatted) + '</span>'
-            + '</p>';
-
-        if (event.venue || event.city) {
-            var location = [];
-            if (event.venue) location.push(this.escapeHtml(event.venue));
-            if (event.city)  location.push(this.escapeHtml(event.city));
-            html += '<p class="lrob-cal-popup-meta lrob-cal-popup-location">'
-                + (this.icons.location || '')
-                + '<span>' + location.join(', ') + '</span>'
-                + '</p>';
-        }
-
-        if (event.recurring) {
-            html += '<p class="lrob-cal-popup-meta lrob-cal-popup-recurring">'
-                + (this.icons.recurring || '')
-                + '<span>' + this.escapeHtml(this.i18n.recurring || 'Recurring') + '</span>'
-                + '</p>';
-        }
-
-        if (event.isFree) {
-            html += '<p class="lrob-cal-popup-meta lrob-cal-popup-cost lrob-cal-popup-cost--free">'
-                + (this.icons.ticket || '')
-                + '<span>' + this.escapeHtml(this.i18n.free || 'Free') + '</span>'
-                + '</p>';
-        } else if (event.cost) {
-            html += '<p class="lrob-cal-popup-meta lrob-cal-popup-cost">'
-                + (this.icons.ticket || '')
-                + '<span>' + this.escapeHtml(event.cost) + '</span>'
-                + '</p>';
-        }
-
-        if (event.excerpt) {
-            html += '<p class="lrob-cal-popup-excerpt">' + this.escapeHtml(event.excerpt) + '</p>';
-        }
-
+        // CTA row — bottom of the body. Ticket link is the secondary button
+        // (when set); the primary CTA is the "view event" link.
+        html += '<div class="lrob-cal-popup-cta">';
         if (event.ticketUrl) {
             html += '<a href="' + event.ticketUrl + '" class="lrob-cal-popup-link lrob-cal-popup-link--ticket" target="_blank" rel="noopener">'
-                + this.escapeHtml(this.i18n.getTickets || 'Get tickets') + ' &rarr;</a>';
+                  + this.escapeHtml(this.i18n.getTickets || 'Get tickets') + '</a>';
         }
         if (this.publicPagesEnabled) {
-            html += '<a href="' + event.url + '" class="lrob-cal-popup-link">' + this.escapeHtml(this.linkText) + ' &rarr;</a>';
+            html += '<a href="' + event.url + '" class="lrob-cal-popup-link">'
+                  + this.escapeHtml(this.linkText) + arrowIcon + '</a>';
         }
+        html += '</div>';
+
         html += '</div>';  // body
         html += '</div>';  // content
         return html;
@@ -587,12 +979,12 @@
         this.currentPopupEventId = eventId;
         var siblings = this.getSortedEventsAroundId(eventId);
 
-        // Build the full popup body: arrows (outside the card) + stage holding
-        // the single card. The stage is the container responsible for clipping
-        // sliding cards during navigation — see .lrob-cal-popup-stage CSS.
-        var html = this.buildArrowsHtml(siblings)
-                 + '<div class="lrob-cal-popup-stage">'
-                 + this.buildCardHtml(event)
+        // Build the popup body: just a stage holding the single card. Arrows
+        // and the close button now live INSIDE the card header — no more
+        // floating buttons outside the popup. The stage stays so two cards
+        // can briefly coexist during a slide transition (see navigatePopupTo).
+        var html = '<div class="lrob-cal-popup-stage">'
+                 + this.buildCardHtml(event, siblings)
                  + '</div>';
 
         var $popup = this.$container.find('.lrob-cal-popup');
@@ -675,6 +1067,21 @@
             var targetId = parseInt($btn.attr('data-target-id'), 10);
             var dir = $btn.hasClass('lrob-cal-popup-nav--next') ? 'left' : 'right';
             self.navigatePopupTo(targetId, dir);
+        });
+
+        // Day-list row → open the full event card popup. We MUST stop the
+        // click from bubbling up: showPopup() rebuilds $popup.html(), which
+        // detaches this item from the DOM. By the time the document-level
+        // outside-click handler runs, e.target.closest('.lrob-cal-popup')
+        // returns null (the detached node has no popup ancestor), so the
+        // outside-click handler fires hidePopup() and immediately closes the
+        // popup that just opened.
+        $popup.on('click', '.lrob-cal-day-list-item', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var targetId = parseInt($(this).attr('data-event-id'), 10);
+            if (!targetId) return;
+            self.showPopup(targetId, self.$container, null);
         });
 
         // Mobile swipe nav.
@@ -775,27 +1182,28 @@
             direction = targetIdx > currIdx ? 'left' : 'right';
         }
 
-        var d = new Date(ev.start);
-        var sameMonth = d.getMonth() === this.currentMonth && d.getFullYear() === this.currentYear;
-
-        // Cross-month: re-render the grid + fall back to a single-card fade-in
-        // via showPopup. The two-card slide doesn't make sense when the whole
-        // calendar layout is also changing.
-        if (!sameMonth) {
-            this.currentMonth = d.getMonth();
-            this.currentYear  = d.getFullYear();
-            this.pendingPopupId = targetId;
-            this.showPopup(targetId, this.$container, null);
-            this.checkAndLoadEvents();
-            return;
-        }
-
         var $stage = $popup.find('.lrob-cal-popup-stage');
         if (!$stage.length) {
             // Defensive: stage missing means popup wasn't built by the current
-            // showPopup. Fall back to a full rebuild.
+            // showPopup. Fall back to a full rebuild (no slide).
             this.showPopup(targetId, this.$container, null);
             return;
+        }
+
+        // Cross-month navigation: kick off the grid re-render in the
+        // BACKGROUND so the popup's two-card slide animation isn't sacrificed.
+        // ensureShell() preserves the popup element across renders, and the
+        // grid lives behind it visually, so the user sees a smooth card
+        // transition while the month grid updates underneath.
+        var d = new Date(ev.start);
+        var sameMonth = d.getMonth() === this.currentMonth && d.getFullYear() === this.currentYear;
+        if (!sameMonth) {
+            this.currentMonth = d.getMonth();
+            this.currentYear  = d.getFullYear();
+            // Skip pendingPopupId — we're handling the popup ourselves with the
+            // two-card slide, so consumePendingPopup() must NOT try to reopen.
+            this.pendingPopupId = null;
+            this.checkAndLoadEvents();
         }
 
         // Two-card slide: insert the new card as a SIBLING of the outgoing
@@ -803,16 +1211,12 @@
         // so the user never sees an empty popup — that gap was the source of
         // the "blinking to black" flash.
         var siblings = this.getSortedEventsAroundId(targetId);
-        var $newCard = $(this.buildCardHtml(ev)).addClass('is-incoming');
+        var $newCard = $(this.buildCardHtml(ev, siblings)).addClass('is-incoming');
         $stage.append($newCard);
-
-        // Refresh arrows for the NEW event's siblings (the outgoing arrows
-        // were keyed to the previous event).
-        $popup.find('.lrob-cal-popup-nav').remove();
-        var arrowsHtml = this.buildArrowsHtml(siblings);
-        if (arrowsHtml) {
-            $popup.prepend(arrowsHtml);
-        }
+        // The outgoing card's header still has arrows pointing at the OLD
+        // siblings. Disable them during the slide so a stray double-tap
+        // doesn't navigate again mid-transition.
+        $stage.find('.lrob-cal-popup-content:not(.is-incoming) .lrob-cal-popup-nav').attr('disabled', 'disabled');
 
         // Force reflow so both cards' initial transforms are committed before
         // the animation classes fire — otherwise the browser might collapse
@@ -840,8 +1244,54 @@
     };
 
     /**
-     * Format an event's "when" line for the popup, mirroring PHP Event::format_when().
-     * Handles instant (start only), all-day (date only), and multi-day (range) cases.
+     * Format an event's date + time as TWO separate strings so the popup can
+     * stack them on two lines (date on top, time below, no "at" / "à").
+     * Returns { date, time }. Time is '' for all-day events.
+     */
+    LRobCalendar.prototype.formatEventDateAndTime = function(event) {
+        var start = new Date(event.start);
+        var end   = event.end ? new Date(event.end) : null;
+        var dateOpts = { day: 'numeric', month: 'long', year: 'numeric' };
+        var timeOpts = { hour: '2-digit', minute: '2-digit' };
+        var dateFmt = new Intl.DateTimeFormat(this.siteLocale, dateOpts);
+        var timeFmt = new Intl.DateTimeFormat(this.siteLocale, timeOpts);
+
+        // Instant — start only
+        if (event.instant || !end) {
+            return {
+                date: dateFmt.format(start),
+                time: event.allDay ? '' : timeFmt.format(start),
+            };
+        }
+
+        var sameDay = start.getFullYear() === end.getFullYear()
+            && start.getMonth() === end.getMonth()
+            && start.getDate() === end.getDate();
+
+        if (event.allDay) {
+            return {
+                date: sameDay ? dateFmt.format(start) : dateFmt.format(start) + ' – ' + dateFmt.format(end),
+                time: '',
+            };
+        }
+
+        if (sameDay) {
+            return {
+                date: dateFmt.format(start),
+                time: timeFmt.format(start) + ' – ' + timeFmt.format(end),
+            };
+        }
+        return {
+            // Multi-day non-all-day: keep the date range on the first line and
+            // the start-time on the second (most useful piece of info).
+            date: dateFmt.format(start) + ' – ' + dateFmt.format(end),
+            time: timeFmt.format(start) + ' – ' + timeFmt.format(end),
+        };
+    };
+
+    /**
+     * Legacy single-line formatter — still used by the agenda view and any
+     * older call sites. Internally just joins date+time with an en-dash.
      */
     LRobCalendar.prototype.formatEventWhen = function(event) {
         var start = new Date(event.start);

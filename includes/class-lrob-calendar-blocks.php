@@ -61,6 +61,20 @@ class LRob_Calendar_Blocks {
 
         // CSS — tokens are the root, every other stylesheet declares it as a dep.
         wp_register_style('lrob-calendar-tokens',           $url . 'assets/css/tokens.css',            [],                              $ver);
+
+        // Admin-configurable brand colors override the default token values.
+        // wp_add_inline_style is queued on a registered handle; it prints
+        // only if/when the handle is actually enqueued, so this stays
+        // conditional with the per-block asset loading.
+        $primary   = (string) get_option('lrob_calendar_primary_color', '');
+        $secondary = (string) get_option('lrob_calendar_secondary_color', '');
+        if ($primary !== '' || $secondary !== '') {
+            $css = ':root {';
+            if ($primary !== '')   { $css .= '--lrob-cal-primary:' . sanitize_hex_color($primary) . ';'; }
+            if ($secondary !== '') { $css .= '--lrob-cal-secondary:' . sanitize_hex_color($secondary) . ';'; }
+            $css .= '}';
+            wp_add_inline_style('lrob-calendar-tokens', $css);
+        }
         wp_register_style('lrob-calendar-event-card',       $url . 'assets/css/event-card.css',        ['lrob-calendar-tokens'],        $ver);
         wp_register_style('lrob-calendar-lightbox',         $url . 'assets/css/lightbox.css',          [],                              $ver);
         wp_register_style('lrob-calendar-single-event-page', $url . 'assets/css/single-event-page.css', ['lrob-calendar-tokens'],        $ver);
@@ -127,6 +141,17 @@ class LRob_Calendar_Blocks {
             true
         );
 
+        // Events-list "View details" → popup card module. Conditionally
+        // enqueued by blocks/events-list/render.php only when at least one
+        // event in the rendered page uses descriptionMode = 'button'.
+        wp_register_script(
+            'lrob-calendar-event-list-popup',
+            $url . 'assets/js/event-list-popup.js',
+            [],
+            $ver,
+            true
+        );
+
         // Intercepts pagination clicks on the events-list block and swaps the
         // wrapper innerHTML without a full page reload. Depends on the lightbox
         // module so it can re-bind handlers on the swapped event cards, and
@@ -185,22 +210,33 @@ class LRob_Calendar_Blocks {
             'siteLocale'         => str_replace('_', '-', get_locale()),
             'publicPagesEnabled' => LRob_Calendar::public_pages_enabled(),
             'i18n' => [
-                'close'       => __('Close', 'lrob-calendar'),
-                'viewImage'   => __('View image', 'lrob-calendar'),
-                'prevEvent'   => __('Previous event', 'lrob-calendar'),
-                'nextEvent'   => __('Next event', 'lrob-calendar'),
-                'noUpcoming'  => __('No upcoming events.', 'lrob-calendar'),
-                'recurring'   => __('Recurring', 'lrob-calendar'),
-                'free'        => __('Free', 'lrob-calendar'),
-                'getTickets'  => __('Get tickets', 'lrob-calendar'),
+                'close'        => __('Close', 'lrob-calendar'),
+                'viewImage'    => __('View image', 'lrob-calendar'),
+                'prevEvent'    => __('Previous event', 'lrob-calendar'),
+                'nextEvent'    => __('Next event', 'lrob-calendar'),
+                'prevMonth'    => __('Previous month', 'lrob-calendar'),
+                'nextMonth'    => __('Next month', 'lrob-calendar'),
+                'today'        => __('Today', 'lrob-calendar'),
+                'monthView'    => __('Month', 'lrob-calendar'),
+                'weekView'     => __('Week', 'lrob-calendar'),
+                'noUpcoming'   => __('No upcoming events.', 'lrob-calendar'),
+                'recurring'    => __('Recurring', 'lrob-calendar'),
+                'free'         => __('Free', 'lrob-calendar'),
+                'getTickets'   => __('Get tickets', 'lrob-calendar'),
+                /* translators: %s = formatted date like "Tuesday, May 18" */
+                'eventsOn'     => __('Events on %s', 'lrob-calendar'),
             ],
             // SVG markup for the popup's inline pictograms — single source of truth (LRob_Calendar_Icons).
             'icons' => [
-                'calendar'  => LRob_Calendar_Icons::get('calendar'),
-                'clock'     => LRob_Calendar_Icons::get('clock'),
-                'location'  => LRob_Calendar_Icons::get('location'),
-                'recurring' => LRob_Calendar_Icons::get('recurring'),
-                'ticket'    => LRob_Calendar_Icons::get('ticket'),
+                'calendar'      => LRob_Calendar_Icons::get('calendar'),
+                'clock'         => LRob_Calendar_Icons::get('clock'),
+                'location'      => LRob_Calendar_Icons::get('location'),
+                'recurring'     => LRob_Calendar_Icons::get('recurring'),
+                'ticket'        => LRob_Calendar_Icons::get('ticket'),
+                'chevronLeft'   => LRob_Calendar_Icons::get('chevron-left'),
+                'chevronRight'  => LRob_Calendar_Icons::get('chevron-right'),
+                'close'         => LRob_Calendar_Icons::get('x'),
+                'arrowRight'    => LRob_Calendar_Icons::get('arrow-right'),
             ],
         ]);
     }

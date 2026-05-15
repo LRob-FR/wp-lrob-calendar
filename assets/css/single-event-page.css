@@ -5,19 +5,22 @@
  */
 
 .lrob-event-single {
-    margin: 0 0 2em;
+    margin: 0 0 var(--lrob-cal-space-6);
     font-size: 0.95em;
+    color: var(--lrob-cal-text);
+    line-height: var(--lrob-cal-line-comfortable);
 }
 
 .lrob-event-single-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 1em 1.5em;
-    padding: 1.25em 1.5em;
-    background: var(--lrob-bg);
-    border: 1px solid var(--lrob-border);
-    border-radius: 6px;
-    margin-bottom: 1.5em;
+    gap: var(--lrob-cal-space-4) var(--lrob-cal-space-5);
+    padding: var(--lrob-cal-space-5);
+    background: var(--lrob-cal-surface);
+    border: 1px solid var(--lrob-cal-border);
+    border-radius: var(--lrob-cal-radius-lg);
+    box-shadow: var(--lrob-cal-shadow-card);
+    margin-bottom: var(--lrob-cal-space-5);
 }
 
 .lrob-event-block {
@@ -25,111 +28,136 @@
 }
 
 .lrob-event-block-title {
-    margin: 0 0 0.4em;
-    font-size: 0.75em;
-    font-weight: 600;
+    margin: 0 0 var(--lrob-cal-space-2);
+    font-size: 0.72em;
+    font-weight: var(--lrob-cal-font-weight-semibold);
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: var(--lrob-text-light);
+    color: var(--lrob-cal-text-subtle);
     display: flex;
     align-items: center;
-    gap: 0.4em;
+    gap: var(--lrob-cal-space-2);
 }
 
 .lrob-event-block-title .lrob-icon {
+    width: 16px;
+    height: 16px;
     flex: none;
+    color: var(--lrob-cal-text-subtle);
 }
 
 .lrob-event-contact p {
     display: flex;
     align-items: center;
-    gap: 0.5em;
-    margin: 0 0 0.2em;
+    gap: var(--lrob-cal-space-2);
+    margin: 0 0 var(--lrob-cal-space-1);
     word-break: break-word;
 }
 
+.lrob-event-contact p .lrob-icon {
+    width: 16px;
+    height: 16px;
+    color: var(--lrob-cal-text-subtle);
+    flex: none;
+}
+
+.lrob-event-contact a {
+    color: var(--lrob-cal-primary);
+    text-decoration: none;
+}
+
+.lrob-event-contact a:hover {
+    text-decoration: underline;
+}
+
 .lrob-event-recurring-note .lrob-icon {
+    width: 14px;
+    height: 14px;
     vertical-align: -2px;
-    margin-right: 0.3em;
+    margin-right: var(--lrob-cal-space-1);
 }
 
 .lrob-event-when-main {
     margin: 0;
-    font-weight: 500;
-    color: var(--lrob-text);
+    font-weight: var(--lrob-cal-font-weight-medium);
+    color: var(--lrob-cal-text);
 }
 
 .lrob-event-recurring-note {
-    margin: 0.4em 0 0.3em;
-    font-size: 0.85em;
-    color: var(--lrob-text-light);
+    margin: var(--lrob-cal-space-2) 0 var(--lrob-cal-space-1);
+    font-size: 0.88em;
+    color: var(--lrob-cal-text-muted);
     font-style: italic;
 }
 
 .lrob-event-next-dates {
     list-style: none;
     padding: 0;
-    margin: 0.3em 0 0;
+    margin: var(--lrob-cal-space-1) 0 0;
     font-size: 0.88em;
-    color: var(--lrob-text-light);
+    color: var(--lrob-cal-text-muted);
 }
 
 .lrob-event-next-dates li {
-    padding: 0.15em 0;
+    padding: 2px 0;
 }
 
 .lrob-event-venue {
-    margin: 0 0 0.3em;
-    font-weight: 500;
+    margin: 0 0 var(--lrob-cal-space-1);
+    font-weight: var(--lrob-cal-font-weight-medium);
 }
 
 .lrob-event-address {
     margin: 0;
     font-style: normal;
-    color: var(--lrob-text-light);
+    color: var(--lrob-cal-text-muted);
     line-height: 1.45;
 }
 
 .lrob-event-coords {
-    margin: 0.4em 0 0;
+    margin: var(--lrob-cal-space-2) 0 0;
     font-size: 0.82em;
-    color: var(--lrob-text-light);
+    color: var(--lrob-cal-text-subtle);
     font-family: ui-monospace, SFMono-Regular, monospace;
 }
 
 .lrob-event-cost-value {
-    margin: 0 0 0.4em;
+    margin: 0 0 var(--lrob-cal-space-2);
     font-size: 1.05em;
-    font-weight: 500;
+    font-weight: var(--lrob-cal-font-weight-medium);
 }
 
 .lrob-event-ticket-link {
-    display: inline-block;
-    margin-top: 0.2em;
-    padding: 6px 12px;
-    background: var(--lrob-primary);
-    color: var(--lrob-white);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--lrob-cal-space-2);
+    margin-top: var(--lrob-cal-space-1);
+    padding: var(--lrob-cal-space-2) var(--lrob-cal-space-4);
+    background: var(--lrob-cal-primary);
+    color: var(--lrob-cal-primary-fg);
     text-decoration: none;
-    border-radius: 4px;
-    font-size: 0.88em;
-    font-weight: 500;
+    border-radius: var(--lrob-cal-radius-md);
+    font-size: 0.92em;
+    font-weight: var(--lrob-cal-font-weight-medium);
+    transition: background-color var(--lrob-cal-duration) var(--lrob-cal-ease);
 }
 
 .lrob-event-ticket-link:hover {
-    background: var(--lrob-primary-dark);
-    color: var(--lrob-white);
+    background: var(--lrob-cal-primary-hover);
+    color: var(--lrob-cal-primary-fg);
 }
 
 .lrob-event-contact-name {
-    margin: 0 0 0.3em;
-    font-weight: 500;
+    margin: 0 0 var(--lrob-cal-space-1);
+    font-weight: var(--lrob-cal-font-weight-medium);
 }
 
 .lrob-event-map {
-    margin: 0 0 1.5em;
-    border-radius: 6px;
+    margin: 0 0 var(--lrob-cal-space-5);
+    border-radius: var(--lrob-cal-radius-lg);
     overflow: hidden;
-    border: 1px solid var(--lrob-border);
+    border: 1px solid var(--lrob-cal-border);
+    box-shadow: var(--lrob-cal-shadow-card);
 }
 
 .lrob-event-map iframe {
@@ -138,14 +166,15 @@
 
 .lrob-event-map-link {
     margin: 0;
-    padding: 0.6em 1em;
-    background: var(--lrob-bg);
-    border-top: 1px solid var(--lrob-border);
-    font-size: 0.85em;
+    padding: var(--lrob-cal-space-2) var(--lrob-cal-space-4);
+    background: var(--lrob-cal-surface-muted);
+    border-top: 1px solid var(--lrob-cal-border);
+    font-size: 0.88em;
+    color: var(--lrob-cal-text-muted);
 }
 
 .lrob-event-map-link a {
-    color: var(--lrob-primary);
+    color: var(--lrob-cal-primary);
     text-decoration: none;
 }
 

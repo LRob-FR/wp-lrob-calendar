@@ -1,23 +1,27 @@
 /**
- * Calendar block — month grid, popup, lightbox, multi-day bars.
+ * Calendar block — month grid, popup card, day-list, lightbox, multi-day bars.
  * Registered as `lrob-calendar-block-calendar` (deps: lrob-calendar-tokens).
+ *
+ * Design language: flat / modern / breathable. Uses the design tokens from
+ * assets/css/tokens.css. Grid lines are crisp and light, events are
+ * dot + title pills, today is a small primary circle behind the day number.
  */
 
+/* ─── Block wrapper + alignments ─────────────────────────────────────────── */
+
 .lrob-calendar {
-    background: var(--lrob-white);
-    border: 1px solid var(--lrob-border);
-    border-radius: 4px;
-    padding: 15px;
+    background: var(--lrob-cal-surface);
+    border: 1px solid var(--lrob-cal-border);
+    border-radius: var(--lrob-cal-radius-lg);
+    padding: var(--lrob-cal-space-4);
     position: relative;
     box-sizing: border-box;
-    /* overflow:visible so the popup's external prev/next arrows aren't clipped
-       at the calendar edge. The table inside is naturally width-bounded so
-       multi-day bars stay contained without this clipping. */
+    color: var(--lrob-cal-text);
+    line-height: var(--lrob-cal-line-comfortable);
 }
 
-/* WordPress alignment support — default to content width */
 .wp-block-lrob-calendar-calendar {
-    max-width: var(--wp--style--global--content-size, 650px);
+    max-width: var(--wp--style--global--content-size, 720px);
     margin-left: auto;
     margin-right: auto;
 }
@@ -32,33 +36,137 @@
     margin-right: 0;
 }
 
+/* ─── Header ─────────────────────────────────────────────────────────────
+   Title on the left (large, bold), controls on the right: grouped prev/next
+   chevrons, a "Today" button, then the Month/Week pill switcher. */
+
 .lrob-cal-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
+    margin-bottom: var(--lrob-cal-space-4);
+    gap: var(--lrob-cal-space-3);
+    flex-wrap: wrap;
 }
 
 .lrob-cal-title {
-    font-size: 1.2em;
-    font-weight: bold;
+    margin: 0;
+    font-size: 1.5em;
+    line-height: var(--lrob-cal-line-tight);
+    font-weight: var(--lrob-cal-font-weight-bold);
+    color: var(--lrob-cal-text);
+    letter-spacing: -0.015em;
+    text-transform: capitalize;
+}
+
+.lrob-cal-header-controls {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--lrob-cal-space-2);
+    flex-wrap: wrap;
+}
+
+/* Grouped prev/next chevrons — single rounded pill */
+.lrob-cal-nav-group {
+    display: inline-flex;
+    align-items: center;
+    background: var(--lrob-cal-surface-muted);
+    border: 1px solid var(--lrob-cal-border);
+    border-radius: var(--lrob-cal-radius-md);
+    overflow: hidden;
 }
 
 .lrob-cal-prev,
 .lrob-cal-next {
-    background: var(--lrob-white);
-    border: 1px solid var(--lrob-border);
-    padding: 8px 14px;
+    background: transparent;
+    border: 0;
+    width: 36px;
+    height: 36px;
     cursor: pointer;
-    border-radius: 4px;
+    color: var(--lrob-cal-text-muted);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: background-color var(--lrob-cal-duration) var(--lrob-cal-ease),
+                color var(--lrob-cal-duration) var(--lrob-cal-ease);
 }
 
 .lrob-cal-prev:hover,
 .lrob-cal-next:hover {
-    background: var(--lrob-bg);
+    background: var(--lrob-cal-surface-hover);
+    color: var(--lrob-cal-text);
 }
 
-/* Grid */
+.lrob-cal-prev:disabled,
+.lrob-cal-next:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.lrob-cal-prev .lrob-icon,
+.lrob-cal-next .lrob-icon {
+    width: 18px;
+    height: 18px;
+}
+
+/* Today button — secondary style (white bg, 1px neutral border). */
+.lrob-cal-today {
+    height: 36px;
+    padding: 0 var(--lrob-cal-space-3);
+    background: var(--lrob-cal-surface);
+    border: 1px solid var(--lrob-cal-border);
+    border-radius: var(--lrob-cal-radius-md);
+    color: var(--lrob-cal-text);
+    font: inherit;
+    font-size: 0.9em;
+    font-weight: var(--lrob-cal-font-weight-medium);
+    cursor: pointer;
+    transition: background-color var(--lrob-cal-duration) var(--lrob-cal-ease),
+                border-color var(--lrob-cal-duration) var(--lrob-cal-ease);
+}
+
+.lrob-cal-today:hover {
+    background: var(--lrob-cal-surface-hover);
+    border-color: var(--lrob-cal-border-strong);
+}
+
+/* Month/Week pill — segmented control */
+.lrob-cal-view-switcher {
+    display: inline-flex;
+    background: var(--lrob-cal-surface-muted);
+    border: 1px solid var(--lrob-cal-border);
+    border-radius: var(--lrob-cal-radius-md);
+    padding: 2px;
+}
+
+.lrob-cal-view-btn {
+    height: 30px;
+    padding: 0 var(--lrob-cal-space-3);
+    background: transparent;
+    border: 0;
+    border-radius: calc(var(--lrob-cal-radius-md) - 3px);
+    color: var(--lrob-cal-text-muted);
+    font: inherit;
+    font-size: 0.85em;
+    font-weight: var(--lrob-cal-font-weight-medium);
+    cursor: pointer;
+    transition: background-color var(--lrob-cal-duration) var(--lrob-cal-ease),
+                color var(--lrob-cal-duration) var(--lrob-cal-ease);
+}
+
+.lrob-cal-view-btn:hover {
+    color: var(--lrob-cal-text);
+}
+
+.lrob-cal-view-btn.is-active {
+    background: var(--lrob-cal-surface);
+    color: var(--lrob-cal-primary);
+    box-shadow: var(--lrob-cal-shadow-card);
+}
+
+/* ─── Month grid ─────────────────────────────────────────────────────────── */
+
 .lrob-cal-table {
     width: 100%;
     table-layout: fixed;
@@ -71,99 +179,308 @@
 }
 
 .lrob-cal-table th {
-    overflow: hidden;
-}
-
-.lrob-cal-table th {
-    padding: 8px 2px;
+    padding: var(--lrob-cal-space-2) var(--lrob-cal-space-1);
     text-align: center;
-    font-weight: 600;
-    font-size: 0.8em;
-    color: var(--lrob-text-light);
-    border-bottom: 2px solid var(--lrob-border);
+    font-weight: var(--lrob-cal-font-weight-bold);
+    font-size: 0.85em;
+    text-transform: lowercase;
+    letter-spacing: 0;
+    color: var(--lrob-cal-text);
+    border: 0;
+    border-bottom: 1px solid var(--lrob-cal-border);
 }
 
 .lrob-cal-table td {
-    padding: 4px;
+    padding: var(--lrob-cal-space-1);
     vertical-align: top;
-    border: 1px solid #eee;
-    height: 80px;
+    border: 1px solid var(--lrob-cal-border);
+    height: 96px;
     position: relative;
-    /* `overflow: visible` so multi-day bars and overflowing titles extend across
-       adjacent cells. NOT `visible hidden` — the CSS spec says mixing visible
-       with hidden computes the visible axis to `auto`, which creates scrollbars.
-       Vertical bleed isn't a concern in practice: JS caps the cell at 2 events
-       (~47px content) which fits inside the 80px row. */
     overflow: visible;
+    cursor: pointer;
+    text-align: center;     /* centers the day-num pill at the top of the cell */
+    transition: background-color var(--lrob-cal-duration) var(--lrob-cal-ease);
 }
 
+.lrob-cal-table td:hover {
+    background: var(--lrob-cal-surface-hover);
+}
+
+/* Out-of-month days: visible (so the user sees which weekday the month
+   starts/ends on), but muted. No hover affordance, no click action. */
+.lrob-cal-day--out-of-month {
+    cursor: default;
+}
+
+.lrob-cal-day--out-of-month .lrob-cal-day-num {
+    color: var(--lrob-cal-text-subtle);
+    opacity: 0.55;
+}
+
+.lrob-cal-day--out-of-month:hover {
+    background: transparent;
+}
+
+/* Legacy class — kept for any cell that still renders as empty padding. */
 .lrob-cal-empty {
-    background: #fafafa;
+    background: transparent;
+    cursor: default;
 }
 
+.lrob-cal-empty:hover {
+    background: transparent;
+}
+
+/* Day number — centered horizontally at the top of the cell, bold. Becomes
+   the today indicator (filled primary pill) when this cell is today. */
 .lrob-cal-day-num {
-    display: block;
-    font-weight: 600;
-    font-size: 0.85em;
-    margin-bottom: 2px;
-}
-
-.lrob-cal-today {
-    background: #fffde7;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    height: 28px;
+    padding: 0 var(--lrob-cal-space-1);
+    margin-top: var(--lrob-cal-space-1);
+    font-weight: var(--lrob-cal-font-weight-bold);
+    font-size: 0.95em;
+    color: var(--lrob-cal-text);
+    border-radius: var(--lrob-cal-radius-pill);
+    font-variant-numeric: tabular-nums;
 }
 
 .lrob-cal-today .lrob-cal-day-num {
-    background: var(--lrob-primary);
-    color: white;
-    width: 22px;
-    height: 22px;
-    line-height: 22px;
-    text-align: center;
-    border-radius: 50%;
-    display: inline-block;
+    background: var(--lrob-cal-primary);
+    color: var(--lrob-cal-primary-fg);
+    font-weight: var(--lrob-cal-font-weight-semibold);
 }
 
-.lrob-cal-has-events {
-    background: #f0f7ff;
+/* No bg tint for has-events / today cells — the indicators carry the meaning */
+.lrob-cal-has-events,
+.lrob-cal-today {
+    background: transparent;
 }
+
+/* ─── Event pills in cells ───────────────────────────────────────────────── */
 
 .lrob-cal-events {
-    font-size: 0.7em;
-    /* Visible so multi-day bars and long titles can extend across adjacent cells. */
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 0 var(--lrob-cal-space-1) var(--lrob-cal-space-1);
+    margin-top: var(--lrob-cal-space-1);
+    font-size: 0.78em;
     overflow: visible;
+    text-align: left;
 }
 
 .lrob-cal-event-item {
-    display: block;
-    padding: 1px 4px;
-    margin-bottom: 1px;
-    background: var(--lrob-primary);
-    color: var(--lrob-white);
-    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 6px;
+    margin: 0;
+    background: transparent;
+    color: var(--lrob-cal-text);
+    border-radius: var(--lrob-cal-radius-sm);
     cursor: pointer;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 100%;
+    line-height: 1.3;
+    transition: background-color var(--lrob-cal-duration) var(--lrob-cal-ease);
 }
 
 .lrob-cal-event-item:hover {
-    background: var(--lrob-primary-dark);
+    background: var(--lrob-cal-surface-hover);
 }
 
-/* Agenda layout — chronological list, no month grid. */
+.lrob-cal-event-dot {
+    flex: 0 0 auto;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--lrob-cal-event-color, var(--lrob-cal-primary));
+}
+
+.lrob-cal-event-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Multi-day continuous bar: a soft connected pill spanning N cells via the
+   inline min-width: calc(N * 100% + ...). Opacity-shaded primary so it reads
+   as a span rather than competing visually with point events. */
+.lrob-cal-event-multiday {
+    position: relative;
+    z-index: 2;
+    overflow: visible;
+    max-width: none;
+    text-overflow: clip;
+    background: var(--lrob-cal-event-color, var(--lrob-cal-primary-soft));
+    color: var(--lrob-cal-text);
+    padding: 3px 8px;
+    border-radius: var(--lrob-cal-radius-sm);
+}
+
+.lrob-cal-event-multiday .lrob-cal-event-dot {
+    display: none;
+}
+
+.lrob-cal-event-multiday .lrob-cal-event-title {
+    font-weight: var(--lrob-cal-font-weight-medium);
+}
+
+.lrob-cal-event-placeholder {
+    visibility: hidden;
+    pointer-events: none;
+    background: transparent;
+}
+
+/* "+N more" — clickable pill that opens the day-list popup. */
+.lrob-cal-more {
+    display: inline-block;
+    margin: 0 var(--lrob-cal-space-1);
+    padding: 1px var(--lrob-cal-space-2);
+    background: transparent;
+    border: 0;
+    color: var(--lrob-cal-primary);
+    font: inherit;
+    font-size: 0.85em;
+    font-weight: var(--lrob-cal-font-weight-medium);
+    cursor: pointer;
+    border-radius: var(--lrob-cal-radius-sm);
+    transition: background-color var(--lrob-cal-duration) var(--lrob-cal-ease);
+}
+
+.lrob-cal-more:hover {
+    background: var(--lrob-cal-primary-soft);
+}
+
+/* ─── Week view (7-day vertical agenda) ──────────────────────────────────── */
+
+.lrob-cal-week {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--lrob-cal-border);
+    border-radius: var(--lrob-cal-radius-lg);
+    overflow: hidden;
+}
+
+.lrob-cal-week-day {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: var(--lrob-cal-space-3);
+    align-items: start;
+    padding: var(--lrob-cal-space-3) var(--lrob-cal-space-4);
+    border-bottom: 1px solid var(--lrob-cal-border);
+    background: var(--lrob-cal-surface);
+    transition: background-color var(--lrob-cal-duration) var(--lrob-cal-ease);
+}
+
+.lrob-cal-week-day:last-child {
+    border-bottom: 0;
+}
+
+.lrob-cal-week-day--today {
+    background: var(--lrob-cal-primary-soft);
+}
+
+.lrob-cal-week-day-header {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-variant-numeric: tabular-nums;
+}
+
+.lrob-cal-week-day-name {
+    font-size: 0.78em;
+    font-weight: var(--lrob-cal-font-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--lrob-cal-text-subtle);
+}
+
+.lrob-cal-week-day--today .lrob-cal-week-day-name {
+    color: var(--lrob-cal-primary);
+}
+
+.lrob-cal-week-day-date {
+    font-size: 1.05em;
+    font-weight: var(--lrob-cal-font-weight-semibold);
+    color: var(--lrob-cal-text);
+}
+
+.lrob-cal-week-day-empty {
+    color: var(--lrob-cal-text-subtle);
+    padding: var(--lrob-cal-space-1) 0;
+}
+
+.lrob-cal-week-events {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.lrob-cal-week-event {
+    display: flex;
+    align-items: center;
+    gap: var(--lrob-cal-space-2);
+    width: 100%;
+    padding: var(--lrob-cal-space-2) var(--lrob-cal-space-3);
+    background: transparent;
+    border: 0;
+    border-radius: var(--lrob-cal-radius-md);
+    text-align: left;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+    line-height: 1.3;
+    transition: background-color var(--lrob-cal-duration) var(--lrob-cal-ease);
+}
+
+.lrob-cal-week-event:hover {
+    background: var(--lrob-cal-surface-hover);
+}
+
+.lrob-cal-week-event-time {
+    color: var(--lrob-cal-text-muted);
+    font-variant-numeric: tabular-nums;
+    font-size: 0.88em;
+    min-width: 48px;
+}
+
+.lrob-cal-week-event .lrob-cal-event-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+    .lrob-cal-week-day {
+        grid-template-columns: 1fr;
+        gap: var(--lrob-cal-space-2);
+    }
+}
+
+/* ─── Agenda view (linear list of events) ────────────────────────────────── */
+
 .lrob-cal-agenda {
     display: flex;
     flex-direction: column;
+    gap: var(--lrob-cal-space-1);
 }
 
 .lrob-cal-agenda-date {
-    margin: 1em 0 0.4em;
-    padding-bottom: 0.3em;
-    border-bottom: 1px solid var(--lrob-border);
+    margin: var(--lrob-cal-space-4) 0 var(--lrob-cal-space-2);
+    padding-bottom: var(--lrob-cal-space-2);
+    border-bottom: 1px solid var(--lrob-cal-border);
     font-size: 0.95em;
-    font-weight: 600;
-    color: var(--lrob-text);
+    font-weight: var(--lrob-cal-font-weight-semibold);
+    color: var(--lrob-cal-text);
     text-transform: capitalize;
 }
 
@@ -174,104 +491,74 @@
 .lrob-cal-agenda-item {
     display: grid;
     grid-template-columns: 64px 1fr auto;
-    gap: 8px 12px;
+    gap: var(--lrob-cal-space-2) var(--lrob-cal-space-3);
     align-items: baseline;
-    padding: 10px 12px;
-    margin: 0 0 4px;
+    padding: var(--lrob-cal-space-3);
+    margin: 0;
     background: transparent;
     border: 0;
-    border-radius: 4px;
+    border-radius: var(--lrob-cal-radius-md);
     text-align: left;
     cursor: pointer;
     font: inherit;
     color: inherit;
     width: 100%;
-    /* Reset the .lrob-cal-event-item primary-blue background — agenda uses neutral rows */
-    background-color: transparent;
+    transition: background-color var(--lrob-cal-duration) var(--lrob-cal-ease);
 }
 
 .lrob-cal-agenda-item:hover {
-    background: var(--lrob-bg);
+    background: var(--lrob-cal-surface-hover);
 }
 
 .lrob-cal-agenda-time {
-    font-weight: 600;
-    color: var(--lrob-primary);
+    font-weight: var(--lrob-cal-font-weight-semibold);
+    color: var(--lrob-cal-primary);
     font-variant-numeric: tabular-nums;
 }
 
 .lrob-cal-agenda-title {
-    font-weight: 500;
-    color: var(--lrob-text);
+    font-weight: var(--lrob-cal-font-weight-medium);
+    color: var(--lrob-cal-text);
 }
 
 .lrob-cal-agenda-location {
     font-size: 0.85em;
-    color: var(--lrob-text-light);
+    color: var(--lrob-cal-text-muted);
     grid-column: 2 / -1;
 }
 
 .lrob-cal-agenda-empty {
-    padding: 30px;
+    padding: var(--lrob-cal-space-6);
     text-align: center;
-    color: var(--lrob-text-light);
-    background: var(--lrob-bg);
-    border-radius: 4px;
+    color: var(--lrob-cal-text-muted);
+    background: var(--lrob-cal-surface-muted);
+    border-radius: var(--lrob-cal-radius-lg);
 }
 
-@media (max-width: 480px) {
-    .lrob-cal-agenda-item {
-        grid-template-columns: 1fr;
-    }
-}
+/* ─── Popup (event detail card) ──────────────────────────────────────────── */
 
-/* Multi-day event: rendered ONCE in its start cell (or week-start after a wrap)
-   with an inline `min-width: calc(N * 100% + ...)` that visually spans the cells
-   it occupies. Long titles overflow into adjacent cells too — the parent <td>
-   uses `overflow: visible hidden` so the bar isn't clipped horizontally.
-   Z-index keeps the bar above neighbouring cells' single-day events when they
-   visually overlap. */
-.lrob-cal-event-multiday {
-    position: relative;
-    z-index: 2;
-    /* Override `.lrob-cal-event-item` defaults so the inline `min-width: N00%`
-       inline-style actually expands the bar. */
-    overflow: visible;
-    max-width: none;
-    text-overflow: clip;
-}
+/* Width preset (set by JS via class on the calendar container) */
+.lrob-calendar.lrob-cal-popup-size-compact  { --lrob-cal-popup-width: 340px; }
+.lrob-calendar.lrob-cal-popup-size-standard { --lrob-cal-popup-width: 400px; }
+.lrob-calendar.lrob-cal-popup-size-spacious { --lrob-cal-popup-width: 460px; }
 
-/* Continuation cells get an invisible row that reserves the multi-day bar's
-   vertical slot. Without this, a single-day event starting on a day the
-   multi-day passes through would render at the top and overlap the bar's
-   visual extension into that cell. */
-.lrob-cal-event-placeholder {
-    visibility: hidden;
-    pointer-events: none;
-    background: transparent;
-    /* keep block-level layout from .lrob-cal-event-item so the height matches */
-}
+/* Featured image height presets — image is now a SUPPORTING element below
+   the meta block, not the hero. */
+.lrob-calendar.lrob-cal-popup-imgh-small  { --lrob-cal-popup-img-height: 140px; }
+.lrob-calendar.lrob-cal-popup-imgh-medium { --lrob-cal-popup-img-height: 200px; }
+.lrob-calendar.lrob-cal-popup-imgh-large  { --lrob-cal-popup-img-height: 280px; }
 
-.lrob-cal-more {
-    display: block;
-    color: var(--lrob-text-light);
-    font-size: 0.9em;
-}
+.lrob-calendar.lrob-cal-popup-img-cover   .lrob-cal-popup-thumb img { object-fit: cover; }
+.lrob-calendar.lrob-cal-popup-img-contain .lrob-cal-popup-thumb img { object-fit: contain; }
 
-/* Popup
-   Width is driven by a class on the calendar container — three presets that
-   the editor exposes as Compact / Standard / Spacious. Image height is a
-   separate setting. */
 .lrob-cal-popup {
     position: absolute;
     z-index: 1000;
-    width: var(--lrob-popup-width, 360px);
-    max-width: calc(100% - 20px);
+    width: var(--lrob-cal-popup-width, 400px);
+    max-width: calc(100% - var(--lrob-cal-space-4));
     display: none;
-    /* Fade in/out — JS toggles `is-shown` on the next frame after display:block,
-       and removes it ~200ms before display:none on hide. */
     opacity: 0;
-    transition: opacity 0.18s ease-out;
+    transition: opacity var(--lrob-cal-duration) var(--lrob-cal-ease);
 }
 
 .lrob-cal-popup.is-shown {
@@ -282,47 +569,118 @@
     .lrob-cal-popup { transition: none; }
 }
 
-/* Popup-size presets (set CSS var on the calendar container) */
-.lrob-calendar.lrob-cal-popup-size-compact  { --lrob-popup-width: 300px; --lrob-popup-img-height: 150px; }
-.lrob-calendar.lrob-cal-popup-size-standard { --lrob-popup-width: 360px; --lrob-popup-img-height: 200px; }
-.lrob-calendar.lrob-cal-popup-size-spacious { --lrob-popup-width: 440px; --lrob-popup-img-height: 260px; }
+/* ─── Events-list popup (reuses the .lrob-cal-popup card visuals) ────────
+   The events-list block renders each event's full card as a hidden
+   .lrob-events-list-popup sibling; event-list-popup.js toggles is-shown.
+   Always a centered modal overlay — events-list rows don't have the
+   per-event anchor coordinates the calendar uses. */
+.lrob-events-list-popup {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: auto;
+    height: auto;
+    max-width: none;
+    max-height: none;
+    background: rgba(15, 23, 42, 0.45);
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    z-index: 100001;
+    padding: var(--lrob-cal-space-4);
+}
 
-/* Image-height overrides (independent from popup-size) */
-.lrob-calendar.lrob-cal-popup-imgh-small  { --lrob-popup-img-height: 140px; }
-.lrob-calendar.lrob-cal-popup-imgh-medium { --lrob-popup-img-height: 200px; }
-.lrob-calendar.lrob-cal-popup-imgh-large  { --lrob-popup-img-height: 280px; }
+.lrob-events-list-popup.is-shown {
+    display: flex !important;
+}
 
-/* Image-display override */
-.lrob-calendar.lrob-cal-popup-img-cover   .lrob-cal-popup-thumb img { object-fit: cover; }
-.lrob-calendar.lrob-cal-popup-img-contain .lrob-cal-popup-thumb img { object-fit: contain; }
+.lrob-events-list-popup .lrob-cal-popup-stage {
+    width: min(560px, 100%);
+    max-height: 90vh;
+}
+
+.lrob-events-list-popup .lrob-cal-popup-content {
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+/* Events-list popup image: respect the natural aspect ratio. The calendar
+   popup uses a fixed --lrob-cal-popup-img-height because images are the
+   hero-ish area; the events-list popup is the "full detail" view where a
+   cropped thumb feels wrong. */
+.lrob-events-list-popup .lrob-cal-popup-thumb {
+    height: auto;
+    max-height: 60vh;
+    background: transparent;
+}
+
+.lrob-events-list-popup .lrob-cal-popup-thumb img {
+    height: auto;
+    max-height: 60vh;
+    object-fit: contain;
+}
+
+/* Full description (full post content) inside the popup — uses comfortable
+   body styles. Distinct from the trimmed excerpt used in the row. */
+.lrob-cal-popup-description {
+    margin: 0 0 var(--lrob-cal-space-4);
+    color: var(--lrob-cal-text);
+    line-height: var(--lrob-cal-line-comfortable);
+}
+
+.lrob-cal-popup-description > :first-child { margin-top: 0; }
+.lrob-cal-popup-description > :last-child  { margin-bottom: 0; }
+
+.lrob-cal-popup-description p {
+    margin: 0 0 var(--lrob-cal-space-3);
+}
+
+.lrob-cal-popup-description img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--lrob-cal-radius-md);
+}
+
+@media (max-width: 640px) {
+    .lrob-events-list-popup {
+        padding: 0;
+    }
+    .lrob-events-list-popup .lrob-cal-popup-stage {
+        width: 100%;
+        max-height: 100vh;
+        border-radius: 0;
+    }
+    .lrob-events-list-popup .lrob-cal-popup-content {
+        max-height: 100vh;
+        height: 100%;
+        border-radius: 0;
+        box-shadow: none;
+        border: 0;
+    }
+}
 
 /* Stage holds the popup card(s). During navigation it briefly contains TWO
-   cards (the outgoing one + the incoming `.is-incoming`) so they can cross-fade
-   in opposite directions without a "no-content" gap. overflow:hidden clips the
-   cards as they translate off-screen. */
+   cards (outgoing + incoming) so they animate in opposite directions without
+   a no-content gap. overflow:hidden clips translated-off-screen content. */
 .lrob-cal-popup-stage {
     position: relative;
     overflow: hidden;
-    border-radius: 6px;
+    border-radius: var(--lrob-cal-radius-lg);
 }
 
 .lrob-cal-popup-content {
-    background: var(--lrob-white);
-    border: 1px solid var(--lrob-border);
-    border-radius: 6px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+    background: var(--lrob-cal-surface);
+    border: 1px solid var(--lrob-cal-border);
+    border-radius: var(--lrob-cal-radius-lg);
+    box-shadow: var(--lrob-cal-shadow-elevated);
     position: relative;
     overflow: hidden;
-    /* No per-card entrance animation — the popup wrapper's opacity transition
-       handles the initial fade-in, and navigation slides are driven by the
-       .is-navigating-* classes on the stage. Avoiding a default animation
-       here prevents an unintended fade-in flicker when .is-incoming is
-       removed from the newly-arrived card after a slide. */
+    color: var(--lrob-cal-text);
+    line-height: var(--lrob-cal-line-comfortable);
 }
 
-/* During navigation, the new card is inserted as a SIBLING of the outgoing
-   card, with `.is-incoming` to overlay it. Both then animate simultaneously
-   so the user sees one card sliding off while the other slides in. */
 .lrob-cal-popup-content.is-incoming {
     position: absolute;
     top: 0;
@@ -330,10 +688,6 @@
     width: 100%;
 }
 
-/* Navigation animations: `.is-navigating-{left,right}` is added to the stage
-   for the duration of the slide. The outgoing card (no `.is-incoming`) slides
-   off in the gesture direction; the incoming card slides in from the opposite
-   edge. */
 .lrob-cal-popup-stage.is-navigating-left .lrob-cal-popup-content:not(.is-incoming) {
     animation: lrob-cal-popup-slide-out-left 0.24s ease-in-out forwards;
 }
@@ -347,22 +701,10 @@
     animation: lrob-cal-popup-slide-in-from-left 0.24s ease-in-out;
 }
 
-@keyframes lrob-cal-popup-slide-out-left {
-    from { transform: translateX(0); }
-    to   { transform: translateX(-100%); }
-}
-@keyframes lrob-cal-popup-slide-out-right {
-    from { transform: translateX(0); }
-    to   { transform: translateX(100%); }
-}
-@keyframes lrob-cal-popup-slide-in-from-right {
-    from { transform: translateX(100%); }
-    to   { transform: translateX(0); }
-}
-@keyframes lrob-cal-popup-slide-in-from-left {
-    from { transform: translateX(-100%); }
-    to   { transform: translateX(0); }
-}
+@keyframes lrob-cal-popup-slide-out-left  { from { transform: translateX(0); } to { transform: translateX(-100%); } }
+@keyframes lrob-cal-popup-slide-out-right { from { transform: translateX(0); } to { transform: translateX(100%); } }
+@keyframes lrob-cal-popup-slide-in-from-right { from { transform: translateX(100%); } to { transform: translateX(0); } }
+@keyframes lrob-cal-popup-slide-in-from-left  { from { transform: translateX(-100%); } to { transform: translateX(0); } }
 
 @media (prefers-reduced-motion: reduce) {
     .lrob-cal-popup-content,
@@ -373,74 +715,186 @@
     }
 }
 
-.lrob-cal-popup-close {
-    position: absolute;
-    top: 6px;
-    right: 6px;
-    width: 28px;
-    height: 28px;
-    background: rgba(255,255,255,0.92);
-    border: none;
-    border-radius: 50%;
-    font-size: 20px;
+/* ─ Popup header: date block + title + prev/next/close ─ */
+
+.lrob-cal-popup-header {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: var(--lrob-cal-space-3);
+    align-items: start;
+    padding: var(--lrob-cal-space-4) var(--lrob-cal-space-4) var(--lrob-cal-space-3);
+}
+
+/* The popup date block — big day number stacked over uppercase short month.
+   Background + text are set as INLINE STYLE from the per-event pillBg/pillText
+   color pair (PHP-computed via Block_Helpers::date_pill_colors so the popup
+   and the events-list row use the same color logic). Children use
+   color:inherit so the inline color carries through. The values below are
+   fallbacks when no pillBg/pillText is provided. */
+.lrob-cal-date-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 56px;
+    padding: var(--lrob-cal-space-2) var(--lrob-cal-space-3);
+    background: var(--lrob-cal-primary-soft);
+    color: var(--lrob-cal-primary);
+    border-radius: var(--lrob-cal-radius-md);
     line-height: 1;
-    cursor: pointer;
-    color: var(--lrob-text);
+    font-variant-numeric: tabular-nums;
+}
+
+.lrob-cal-date-block-day {
+    font-size: 1.5em;
+    font-weight: var(--lrob-cal-font-weight-bold);
+    letter-spacing: -0.02em;
+    color: inherit;
+}
+
+.lrob-cal-date-block-month {
+    font-size: 0.7em;
+    font-weight: var(--lrob-cal-font-weight-bold);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 2px;
+    color: inherit;
+}
+
+.lrob-cal-popup-title {
+    margin: 0;
     padding: 0;
-    z-index: 2;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    font-size: 1.15em;
+    line-height: var(--lrob-cal-line-tight);
+    font-weight: var(--lrob-cal-font-weight-bold);
+    color: var(--lrob-cal-text);
+    align-self: center;
+    letter-spacing: -0.01em;
 }
 
-.lrob-cal-popup-close:hover {
-    background: #fff;
+.lrob-cal-popup-title a {
+    color: inherit;
+    text-decoration: none;
 }
 
-/* Prev/next event navigation arrows — visible on the popup's left/right edges */
+.lrob-cal-popup-title a:hover {
+    color: var(--lrob-cal-primary);
+}
+
+.lrob-cal-popup-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--lrob-cal-space-1);
+}
+
+/* Ghost icon button — used for close + (desktop) inline prev/next. */
+.lrob-cal-popup-close,
 .lrob-cal-popup-nav {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 36px;
-    height: 36px;
-    background: rgba(255,255,255,0.92);
-    border: none;
-    border-radius: 50%;
-    font-size: 24px;
-    line-height: 1;
-    color: var(--lrob-text);
+    background: transparent;
+    border: 1px solid transparent;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--lrob-cal-radius-md);
     cursor: pointer;
+    color: var(--lrob-cal-text-muted);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     padding: 0;
-    z-index: 3;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.18);
+    transition: background-color var(--lrob-cal-duration) var(--lrob-cal-ease),
+                color var(--lrob-cal-duration) var(--lrob-cal-ease);
 }
 
+.lrob-cal-popup-close:hover,
 .lrob-cal-popup-nav:hover {
-    background: #fff;
+    background: var(--lrob-cal-surface-hover);
+    color: var(--lrob-cal-text);
 }
 
-/* Sit fully outside the popup card with a small visual gap.
-   36px button width + 8px gap = -44px from the popup edge. */
-.lrob-cal-popup-nav--prev {
-    left: -44px;
+.lrob-cal-popup-close .lrob-icon,
+.lrob-cal-popup-nav .lrob-icon {
+    width: 18px;
+    height: 18px;
 }
 
-.lrob-cal-popup-nav--next {
-    right: -44px;
+/* ─ Popup body: meta rows, excerpt, image (supporting), CTA ─ */
+
+.lrob-cal-popup-body {
+    padding: 0 var(--lrob-cal-space-4) var(--lrob-cal-space-4);
 }
 
-/* (Mobile arrow positioning is handled by the consolidated mobile media query
-   at the bottom of this file — they're pinned to viewport edges there.) */
+.lrob-cal-popup-meta-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--lrob-cal-space-2);
+    margin: 0 0 var(--lrob-cal-space-3);
+}
 
+.lrob-cal-popup-meta {
+    margin: 0;
+    padding: 0;
+    font-size: 0.92em;
+    color: var(--lrob-cal-text-muted);
+    line-height: 1.4;
+    display: flex;
+    align-items: center;
+    gap: var(--lrob-cal-space-2);
+}
+
+.lrob-cal-popup-meta .lrob-icon {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    color: var(--lrob-cal-primary);
+}
+
+.lrob-cal-popup-date {
+    color: var(--lrob-cal-text);
+    font-weight: var(--lrob-cal-font-weight-medium);
+    align-items: flex-start;
+}
+
+.lrob-cal-popup-meta-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    line-height: var(--lrob-cal-line-tight);
+}
+
+.lrob-cal-popup-date-date {
+    color: var(--lrob-cal-text);
+    font-weight: var(--lrob-cal-font-weight-medium);
+}
+
+.lrob-cal-popup-date-time {
+    color: var(--lrob-cal-text-muted);
+    font-size: 0.92em;
+    font-variant-numeric: tabular-nums;
+}
+
+.lrob-cal-popup-excerpt {
+    margin: 0 0 var(--lrob-cal-space-4);
+    font-size: 0.95em;
+    line-height: var(--lrob-cal-line-comfortable);
+    color: var(--lrob-cal-text);
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Featured image — now SUPPORTING content. Rounded, modest height. */
 .lrob-cal-popup-thumb {
     display: block;
     width: 100%;
-    height: var(--lrob-popup-img-height, 200px);
+    height: var(--lrob-cal-popup-img-height, 200px);
+    margin-bottom: var(--lrob-cal-space-4);
     overflow: hidden;
-    background: #f3f4f6;
+    background: var(--lrob-cal-surface-muted);
     border: 0;
     padding: 0;
-    margin: 0;
     cursor: zoom-in;
+    border-radius: var(--lrob-cal-radius-md);
 }
 
 .lrob-cal-popup-thumb img {
@@ -455,7 +909,6 @@
     opacity: 0.92;
 }
 
-/* Non-clickable variant — when popupImageLightbox is off. */
 .lrob-cal-popup-thumb--static {
     cursor: default;
 }
@@ -464,132 +917,175 @@
     opacity: 1;
 }
 
-.lrob-cal-popup-body {
-    padding: 14px 16px 16px;
-}
-
-.lrob-cal-popup-title {
-    margin: 0 0 8px;
-    padding-right: 28px;
-    font-size: 1.05em;
-    line-height: 1.3;
-    font-weight: 600;
-}
-
-.lrob-cal-popup-title a {
-    color: inherit;
-    text-decoration: none;
-}
-
-.lrob-cal-popup-title a:hover {
-    text-decoration: underline;
-}
-
-.lrob-cal-popup-meta {
-    margin: 0 0 6px;
-    font-size: 0.85em;
-    color: var(--lrob-text-light);
-    line-height: 1.4;
+/* CTA row: primary button on the right, optional ticket button to its left. */
+.lrob-cal-popup-cta {
     display: flex;
+    gap: var(--lrob-cal-space-2);
+    justify-content: flex-end;
     align-items: center;
-    gap: 6px;
-}
-
-.lrob-cal-popup-meta .lrob-icon {
-    flex: none;
-}
-
-.lrob-cal-popup-date {
-    color: var(--lrob-text);
-    font-weight: 500;
-}
-
-.lrob-cal-popup-excerpt {
-    margin: 10px 0 12px;
-    font-size: 0.88em;
-    line-height: 1.45;
-    color: var(--lrob-text);
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    flex-wrap: wrap;
 }
 
 .lrob-cal-popup-link {
-    display: inline-block;
-    margin-top: 4px;
-    padding: 7px 14px;
-    background: var(--lrob-primary);
-    color: var(--lrob-white);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--lrob-cal-space-2);
+    padding: var(--lrob-cal-space-2) var(--lrob-cal-space-4);
+    background: var(--lrob-cal-primary);
+    color: var(--lrob-cal-primary-fg);
     text-decoration: none;
-    border-radius: 4px;
-    font-size: 0.85em;
-    font-weight: 500;
+    border-radius: var(--lrob-cal-radius-md);
+    font-size: 0.92em;
+    font-weight: var(--lrob-cal-font-weight-medium);
+    border: 0;
+    cursor: pointer;
+    transition: background-color var(--lrob-cal-duration) var(--lrob-cal-ease);
 }
 
 .lrob-cal-popup-link:hover {
-    background: var(--lrob-primary-dark);
-    color: var(--lrob-white);
+    background: var(--lrob-cal-primary-hover);
+    color: var(--lrob-cal-primary-fg);
+}
+
+.lrob-cal-popup-link .lrob-icon {
+    width: 16px;
+    height: 16px;
 }
 
 .lrob-cal-popup-link--ticket {
-    background: transparent;
-    color: var(--lrob-primary);
-    border: 1px solid var(--lrob-primary);
-    margin-right: 6px;
+    background: var(--lrob-cal-surface);
+    color: var(--lrob-cal-text);
+    border: 1px solid var(--lrob-cal-border-strong);
 }
 
 .lrob-cal-popup-link--ticket:hover {
-    background: var(--lrob-primary);
-    color: var(--lrob-white);
+    background: var(--lrob-cal-surface-hover);
+    color: var(--lrob-cal-text);
 }
 
 .lrob-cal-popup-cost--free span {
-    color: var(--lrob-primary);
-    font-weight: 600;
+    color: var(--lrob-cal-primary);
+    font-weight: var(--lrob-cal-font-weight-semibold);
+}
+
+/* ─── Day-list popup (mobile tap on a day with events) ───────────────────── */
+
+.lrob-cal-day-list-title {
+    margin: 0;
+    padding: var(--lrob-cal-space-4);
+    font-size: 1.05em;
+    font-weight: var(--lrob-cal-font-weight-semibold);
+    color: var(--lrob-cal-text);
+    border-bottom: 1px solid var(--lrob-cal-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--lrob-cal-space-3);
+}
+
+.lrob-cal-day-list {
+    list-style: none;
+    margin: 0;
+    padding: var(--lrob-cal-space-2);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.lrob-cal-day-list-item {
+    width: 100%;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: var(--lrob-cal-space-3);
+    align-items: center;
+    padding: var(--lrob-cal-space-3);
+    background: transparent;
+    border: 0;
+    border-radius: var(--lrob-cal-radius-md);
+    text-align: left;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+    min-height: 44px;
+    transition: background-color var(--lrob-cal-duration) var(--lrob-cal-ease);
+}
+
+.lrob-cal-day-list-item:hover {
+    background: var(--lrob-cal-surface-hover);
+}
+
+.lrob-cal-day-list-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--lrob-cal-event-color, var(--lrob-cal-primary));
+}
+
+.lrob-cal-day-list-title-text {
+    font-weight: var(--lrob-cal-font-weight-medium);
+    color: var(--lrob-cal-text);
+}
+
+.lrob-cal-day-list-time {
+    font-size: 0.85em;
+    color: var(--lrob-cal-text-muted);
+    font-variant-numeric: tabular-nums;
 }
 
 /* Lightbox styles live in assets/css/lightbox.css (shared) */
 
-@media (max-width: 600px) {
-    /* Clip horizontal overflow at mobile widths. Multi-day bars with inline
-       min-width: calc(N * 100% + ...px) can exceed the table width by a few
-       pixels (the +Npx accounts for cell padding/border), and on a narrow
-       viewport that becomes a visible horizontal scrollbar. */
-    .lrob-calendar,
-    .lrob-cal-grid {
-        overflow-x: hidden;
-    }
-    /* Extra safety: cap the bar's visual width to viewport-minus-padding. */
-    .lrob-cal-event-multiday {
-        max-inline-size: calc(100vw - 30px);
-    }
+/* ─── Mobile: full-screen modal ──────────────────────────────────────────── */
 
-    .lrob-cal-table td {
-        height: 60px;
-        padding: 2px;
-    }
-    .lrob-cal-day-num {
-        font-size: 0.75em;
-    }
-    .lrob-cal-events {
-        font-size: 0.6em;
-    }
-
-    /* Body scroll lock while the popup is open — toggled from JS via the
-       .lrob-cal-popup-open class on <body>. Scoped to mobile only so desktop
-       users keep their normal page scroll behaviour. */
+@media (max-width: 640px) {
     body.lrob-cal-popup-open {
         overflow: hidden;
     }
 
-    /* Popup becomes a fullscreen flex overlay. No transform on the popup
-       itself (only on its descendants), so `position: fixed` children — namely
-       the prev/next arrows — resolve to VIEWPORT coordinates instead of being
-       trapped inside a transformed ancestor.
-       Individual `top/right/bottom/left: 0 !important` (rather than `inset`)
-       so they always beat any inline `top/left` jQuery may have set during a
-       previous DESKTOP open of this same popup element. */
+    .lrob-calendar {
+        padding: var(--lrob-cal-space-2);
+    }
+
+    /* Clip horizontal overflow at mobile widths — multi-day bars' inline
+       min-width may exceed table width by a few pixels. */
+    .lrob-calendar,
+    .lrob-cal-grid {
+        overflow-x: hidden;
+    }
+    .lrob-cal-event-multiday {
+        max-inline-size: calc(100vw - 16px);
+    }
+
+    /* Compress dimensions only — keep colors and the dot+title pill layout
+       identical to desktop. Tapping the cell still opens the day-list. */
+    .lrob-cal-table th {
+        font-size: 0.72em;
+    }
+    .lrob-cal-table td {
+        height: 72px;
+        padding: 2px;
+    }
+    .lrob-cal-day-num {
+        font-size: 0.85em;
+        min-width: 24px;
+        height: 24px;
+        margin-top: 3px;
+    }
+    .lrob-cal-events {
+        font-size: 0.62em;
+        padding: 0 2px 2px;
+    }
+    .lrob-cal-event-item {
+        padding: 2px 4px;
+        gap: 4px;
+    }
+    .lrob-cal-event-dot {
+        width: 6px;
+        height: 6px;
+    }
+
+    /* Popup: edge-to-edge fullscreen sheet. Drops the centered-card stage so
+       the card fills the viewport. Close X stays fixed top-right; CTA sticks
+       to the bottom with safe-area-inset respected. */
     .lrob-cal-popup {
         position: fixed !important;
         top: 0 !important;
@@ -600,50 +1096,110 @@
         height: auto !important;
         max-width: none !important;
         max-height: none !important;
-        background: rgba(0, 0, 0, 0.55);
-        align-items: center;
-        justify-content: center;
+        background: var(--lrob-cal-surface);
         overflow: hidden;
         z-index: 100001;
     }
 
-    /* Override jQuery's inline `display: block` (from `.show()`) so the popup
-       lays out as a flex container — required for the centered card. */
     .lrob-cal-popup.is-shown {
         display: flex !important;
+        flex-direction: column;
     }
 
-    /* The card area inside the popup. Explicit size so flex has something
-       concrete to center; cards inside fill this stage. */
+    /* Stage takes the full viewport. Cards inside fill it. */
     .lrob-cal-popup-stage {
-        width: 84vw;
-        max-width: 84vw;
-        max-height: 86vh;
+        flex: 1 1 auto;
+        width: 100%;
+        max-width: 100%;
+        max-height: none;
+        height: 100%;
+        border-radius: 0;
     }
 
-    /* Card on mobile: no border (shadow handles edge separation), prominent
-       shadow that no longer gets clipped by the popup container. */
     .lrob-cal-popup-content {
         width: 100%;
-        max-height: 86vh;
+        height: 100%;
+        max-height: none;
         overflow-y: auto;
-        border: none;
-        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+        display: flex;
+        flex-direction: column;
+        /* Bottom padding leaves room for the sticky CTA inside the card body. */
+        padding-bottom: 0;
     }
 
-    /* Nav arrows pinned to VIEWPORT edges. Because the popup no longer has a
-       transform, `position: fixed` on these children resolves to the viewport
-       — they sit just inside the screen edges, OUTSIDE the popup card. */
-    .lrob-cal-popup-nav {
-        position: fixed;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 38px;
-        height: 38px;
-        font-size: 24px;
-        z-index: 100002;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.35);
+    .lrob-cal-popup-header {
+        position: sticky;
+        top: 0;
+        background: var(--lrob-cal-surface);
+        border-bottom: 1px solid var(--lrob-cal-border);
+        z-index: 2;
+        padding: var(--lrob-cal-space-3) var(--lrob-cal-space-4);
     }
-    .lrob-cal-popup-nav--prev { left: 4px; right: auto; }
-    .lrob-cal-popup-nav--next { right: 4px; left: auto; }
+
+    .lrob-cal-popup-body {
+        flex: 1 1 auto;
+        padding: var(--lrob-cal-space-4);
+        padding-bottom: calc(var(--lrob-cal-space-6) + env(safe-area-inset-bottom, 0px));
+        /* Lay the body out as a flex column so the featured image can grow
+           into the empty middle space. Excerpt / meta sit at the top, image
+           expands to fill, CTA sticks to the bottom. */
+        display: flex;
+        flex-direction: column;
+        gap: var(--lrob-cal-space-3);
+    }
+
+    /* When a featured image is present, let it absorb the empty space between
+       meta/excerpt and the sticky CTA. Way nicer than a tall blank area on
+       short events. */
+    .lrob-cal-popup-body .lrob-cal-popup-thumb {
+        flex: 1 1 auto;
+        min-height: 200px;
+        margin-bottom: 0;
+    }
+    .lrob-cal-popup-body .lrob-cal-popup-thumb img {
+        height: 100%;
+        object-fit: cover;
+    }
+    /* When the user explicitly chose "contain", keep the aspect ratio
+       (no upscaling crop on portrait images that don't fill the space). */
+    .lrob-calendar.lrob-cal-popup-img-contain .lrob-cal-popup-body .lrob-cal-popup-thumb img {
+        object-fit: contain;
+    }
+
+    /* CTA sticks to the bottom of the viewport on mobile. Inside .lrob-cal-popup-cta
+       so a single rule covers both the live popup and the day-list mode. */
+    .lrob-cal-popup-cta {
+        position: sticky;
+        bottom: 0;
+        margin: 0 calc(var(--lrob-cal-space-4) * -1) calc(var(--lrob-cal-space-4) * -1);
+        padding: var(--lrob-cal-space-3) var(--lrob-cal-space-4)
+                 calc(var(--lrob-cal-space-3) + env(safe-area-inset-bottom, 0px));
+        background: var(--lrob-cal-surface);
+        border-top: 1px solid var(--lrob-cal-border);
+        z-index: 2;
+    }
+
+    .lrob-cal-popup-link {
+        flex: 1 1 auto;
+        justify-content: center;
+        padding: var(--lrob-cal-space-3) var(--lrob-cal-space-4);
+    }
+
+    /* The dedicated mobile prev/next arrows that floated at viewport edges
+       in v1.0.1 have been removed in favour of inline header arrows that
+       come along on the sticky header. Swipe gestures still work. */
+    .lrob-cal-popup-nav {
+        position: static;
+    }
+
+    /* Day-list mode reuses the popup structure; title gets a sticky bar too. */
+    .lrob-cal-day-list-title {
+        position: sticky;
+        top: 0;
+        background: var(--lrob-cal-surface);
+        z-index: 2;
+    }
 }

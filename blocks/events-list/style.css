@@ -1,5 +1,6 @@
 /**
- * Events-list block — list/grid layouts. Card visuals live in event-card.css.
+ * Events-list block — list/grid container + pagination.
+ * Card visuals live in event-card.css.
  * Registered as `lrob-calendar-block-events-list` (deps: lrob-calendar-event-card).
  */
 
@@ -17,49 +18,61 @@
 .lrob-events-list {
     display: flex;
     flex-direction: column;
-    gap: 20px;
 }
 
+/* List + Full templates: rows are line-separated, no gap. */
+.lrob-template-list,
+.lrob-template-full {
+    border-top: 1px solid var(--lrob-cal-border);
+    /* Border-top + the bottom border on each event card = a clean ruled list.
+       The wrapper border-top fills the leading edge so the first row has a
+       rule above it. */
+}
+
+/* Grid template: keep the proper card-grid gap. */
 .lrob-template-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
+    gap: var(--lrob-cal-space-4);
 }
 
-.lrob-template-grid .lrob-event-card {
-    flex-direction: column;
+/* Minimal template list spacing is tighter than list/full */
+.lrob-template-minimal {
+    gap: var(--lrob-cal-space-1);
 }
 
-/* Pagination — two styles share the same container; the modifier class on
-   the <nav> picks which gets shown. */
+/* ─── Pagination ─────────────────────────────────────────────────────────── */
+
 .lrob-cal-events-pagination {
-    margin: 1.5em 0 0;
+    margin: var(--lrob-cal-space-5) 0 0;
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 8px;
+    gap: var(--lrob-cal-space-2);
 }
 
-/* Arrows + "Page X / Y" indicator */
+/* Arrows + "Page X / Y" — ghost style. No filled circle background, no
+   heavy border. Hover gets the subtle surface-hover tint. */
 .lrob-cal-page-arrow {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
-    border: 1px solid var(--lrob-border);
-    border-radius: 50%;
-    background: var(--lrob-white);
-    color: var(--lrob-text);
+    width: 40px;
+    height: 40px;
+    border: 1px solid transparent;
+    border-radius: var(--lrob-cal-radius-md);
+    background: transparent;
+    color: var(--lrob-cal-text-muted);
     text-decoration: none;
-    font-size: 1.4em;
+    font-size: 1.2em;
     line-height: 1;
+    transition: background-color var(--lrob-cal-duration) var(--lrob-cal-ease),
+                color var(--lrob-cal-duration) var(--lrob-cal-ease);
 }
 
 .lrob-cal-page-arrow:hover {
-    background: var(--lrob-bg);
-    border-color: var(--lrob-primary);
-    color: var(--lrob-primary);
+    background: var(--lrob-cal-surface-hover);
+    color: var(--lrob-cal-text);
 }
 
 .lrob-cal-page-arrow--disabled {
@@ -69,39 +82,46 @@
 
 .lrob-cal-page-indicator {
     font-size: 0.9em;
-    color: var(--lrob-text-light);
+    color: var(--lrob-cal-text-muted);
     min-width: 80px;
     text-align: center;
     font-variant-numeric: tabular-nums;
 }
 
-/* Numbered style — wraps paginate_links() output */
+/* Numbered style — wraps paginate_links() output. Same ghost feel. */
 .lrob-cal-events-pagination--numbered {
     flex-wrap: wrap;
-    gap: 4px;
+    gap: var(--lrob-cal-space-1);
 }
 
 .lrob-cal-events-pagination--numbered .page-numbers {
-    display: inline-block;
-    padding: 6px 12px;
-    border: 1px solid var(--lrob-border);
-    border-radius: 4px;
-    background: var(--lrob-white);
-    color: var(--lrob-text);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 var(--lrob-cal-space-3);
+    border: 1px solid transparent;
+    border-radius: var(--lrob-cal-radius-md);
+    background: transparent;
+    color: var(--lrob-cal-text-muted);
     text-decoration: none;
-    font-size: 0.9em;
+    font-size: 0.92em;
     line-height: 1;
+    transition: background-color var(--lrob-cal-duration) var(--lrob-cal-ease),
+                color var(--lrob-cal-duration) var(--lrob-cal-ease);
 }
 
 .lrob-cal-events-pagination--numbered a.page-numbers:hover {
-    background: var(--lrob-bg);
+    background: var(--lrob-cal-surface-hover);
+    color: var(--lrob-cal-text);
 }
 
 .lrob-cal-events-pagination--numbered .page-numbers.current {
-    background: var(--lrob-primary);
-    border-color: var(--lrob-primary);
-    color: var(--lrob-white);
-    font-weight: 500;
+    background: var(--lrob-cal-primary);
+    border-color: var(--lrob-cal-primary);
+    color: var(--lrob-cal-primary-fg);
+    font-weight: var(--lrob-cal-font-weight-medium);
 }
 
 .lrob-cal-events-pagination--numbered .page-numbers.dots {
