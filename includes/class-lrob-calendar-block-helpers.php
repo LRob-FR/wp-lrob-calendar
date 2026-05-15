@@ -136,19 +136,52 @@ class LRob_Calendar_Block_Helpers {
      * Returns ['bg' => 'hsl(...)', 'text' => 'hsl(...)'].
      */
     public static function date_pill_colors(?string $category_color, int $event_id): array {
+        // 1. Category color always wins, regardless of admin settings.
         if ($category_color && preg_match('/^#([0-9a-f]{6})$/i', $category_color, $m)) {
-            [$h, $s, $_l] = self::hex_to_hsl($m[1]);
-            $sat = max(45, $s);
-            return [
-                'bg'   => 'hsl(' . $h . ', ' . $sat . '%, 92%)',
-                'text' => 'hsl(' . $h . ', ' . $sat . '%, 28%)',
-            ];
+            return self::pill_pair_from_hex($m[1]);
         }
-        // Deterministic hue from event id (137° golden-ish step spreads well).
+
+        // 2. Uncategorized events: admin chooses random / primary / custom.
+        $mode = (string) get_option('lrob_calendar_uncategorized_pill_mode', 'random');
+
+        if ($mode === 'primary') {
+            $primary = (string) get_option('lrob_calendar_primary_color', '');
+            if ($primary === '') $primary = '#3b82f6'; // default brand blue
+            if (preg_match('/^#([0-9a-f]{6})$/i', $primary, $m)) {
+                return self::pill_pair_from_hex($m[1]);
+            }
+        }
+
+        if ($mode === 'custom') {
+            $custom = (string) get_option('lrob_calendar_uncategorized_pill_color', '');
+            if (preg_match('/^#([0-9a-f]{6})$/i', $custom, $m)) {
+                return self::pill_pair_from_hex($m[1]);
+            }
+            // Fall through to random if the custom color isn't set / invalid.
+        }
+
+        // 3. Random per-event (default). Deterministic hue from event id — same
+        // event always gets the same color, but a page of mixed events gets
+        // visual variety. 137° steps spread well across the circle.
         $hue = ($event_id * 137) % 360;
         return [
             'bg'   => 'hsl(' . $hue . ', 65%, 92%)',
             'text' => 'hsl(' . $hue . ', 55%, 28%)',
+        ];
+    }
+
+    /**
+     * Given a 6-char hex (no `#`), return the soft-tint / deep-text HSL pair
+     * used by every date pill in the plugin. Single source of truth — both
+     * the category-color path and the admin-configurable uncategorized
+     * paths run through this.
+     */
+    private static function pill_pair_from_hex(string $hex): array {
+        [$h, $s, $_l] = self::hex_to_hsl($hex);
+        $sat = max(45, $s);
+        return [
+            'bg'   => 'hsl(' . $h . ', ' . $sat . '%, 92%)',
+            'text' => 'hsl(' . $h . ', ' . $sat . '%, 28%)',
         ];
     }
 
@@ -249,18 +282,13 @@ class LRob_Calendar_Block_Helpers {
         //   below           — full-width below the content (the classic banner)
         // Grid template ignores this (image is always on top with date badge overlay).
         $image_position  = in_array($atts['imagePosition'] ?? 'right', ['right', 'left', 'below'], true) ? $atts['imagePosition'] : 'right';
-        // Thumbnail click → fullscreen lightbox. Always disabled in
-        // "natural" height mode (the full image is already in-card).
-        $allow_lightbox  = ($atts['imageLightbox'] ?? true) && $image_height !== 'auto';
 
         $date_format   = get_option('date_format');
         $time_format   = get_option('time_format');
         $pages_enabled = LRob_Calendar::public_pages_enabled();
         $permalink     = $pages_enabled ? get_permalink($post->ID) : '';
 
-        $thumb_id   = get_post_thumbnail_id($post->ID);
-        $full_url   = $thumb_id ? wp_get_attachment_image_url($thumb_id, 'large') : '';
-        $has_thumb  = $show_images && has_post_thumbnail($post->ID);
+        $has_thumb     = $show_images && has_post_thumbnail($post->ID);
 
         // Date block: large day number stacked over uppercase short month.
         // wp_date() respects the site locale so "JUN" becomes "JUIN" on a
@@ -338,22 +366,22 @@ class LRob_Calendar_Block_Helpers {
         }
 
         // Thumbnail block — emitted once, positioned per-template via CSS.
-        // When descriptionMode = button AND the row has an image, we tag the
-        // thumb with data-mobile-popup-for so that on mobile a tap on the
-        // image opens the details popup instead of the lightbox. The
-        // separate "View details" button is hidden in that case (CSS) — the
-        // image becomes the affordance.
-        $mobile_popup_attr = ($show_details_btn && $has_thumb)
-            ? ' data-mobile-popup-for="' . (int) $post->ID . '"'
+        // When descriptionMode = button AND the row has an image, the image
+        // itself BECOMES the popup trigger: it carries data-popup-for +
+        // data-event so a click opens the shared popup (same as the
+        // "View details" button). Otherwise it's a static <div>.
+        $event_json_attr   = esc_attr(wp_json_encode(self::event_for_popup_json($event)));
+        $image_is_trigger  = $show_details_btn && $has_thumb;
+        $image_trigger_attr = $image_is_trigger
+            ? ' data-popup-for="' . (int) $post->ID . '" data-event="' . $event_json_attr . '"'
             : '';
         ob_start();
         if ($has_thumb) {
             $thumb_attrs = ['alt' => esc_attr($post->post_title), 'loading' => 'lazy'];
-            if ($full_url && $allow_lightbox) {
+            if ($image_is_trigger) {
                 ?>
                 <button class="lrob-event-thumbnail lrob-event-thumbnail--clickable"
-                        type="button"
-                        data-full-url="<?php echo esc_url($full_url); ?>"<?php echo $mobile_popup_attr; ?>>
+                        type="button"<?php echo $image_trigger_attr; ?>>
                     <?php echo get_the_post_thumbnail($post->ID, 'medium', $thumb_attrs); ?>
                     <?php if ($template === 'grid'): /* Grid template overlays the date block on the image */ ?>
                         <span class="lrob-event-card__date-badge" aria-hidden="true"<?php echo $pill_style; ?>>
@@ -365,7 +393,7 @@ class LRob_Calendar_Block_Helpers {
                 <?php
             } else {
                 ?>
-                <div class="lrob-event-thumbnail"<?php echo $mobile_popup_attr; ?>>
+                <div class="lrob-event-thumbnail">
                     <?php echo get_the_post_thumbnail($post->ID, 'medium', $thumb_attrs); ?>
                     <?php if ($template === 'grid'): ?>
                         <span class="lrob-event-card__date-badge" aria-hidden="true"<?php echo $pill_style; ?>>
@@ -377,14 +405,14 @@ class LRob_Calendar_Block_Helpers {
                 <?php
             }
         } elseif ($template === 'grid') {
-            // Grid template with no thumbnail — render a date-only block
-            // where the image would have been so the layout doesn't collapse.
+            // Grid template with no thumbnail — turn the image area INTO the
+            // date display rather than floating a small badge in the middle.
+            // The placeholder uses the per-event pill colors so it reads as
+            // an intentional "no image, here's a colorful date card" layout.
             ?>
-            <div class="lrob-event-thumbnail lrob-event-thumbnail--placeholder">
-                <span class="lrob-event-card__date-badge lrob-event-card__date-badge--standalone" aria-hidden="true"<?php echo $pill_style; ?>>
-                    <span class="lrob-event-card__date-day"><?php echo esc_html($date_day); ?></span>
-                    <span class="lrob-event-card__date-month"><?php echo esc_html($date_month); ?></span>
-                </span>
+            <div class="lrob-event-thumbnail lrob-event-thumbnail--placeholder" aria-hidden="true"<?php echo $pill_style; ?>>
+                <span class="lrob-event-card__date-day"><?php echo esc_html($date_day); ?></span>
+                <span class="lrob-event-card__date-month"><?php echo esc_html($date_month); ?></span>
             </div>
             <?php
         }
@@ -468,13 +496,17 @@ class LRob_Calendar_Block_Helpers {
                 // Grid template: button goes inside the content column (the
                 // card stacks vertically, so a right-edge button has nothing
                 // sensible to sit beside). List/full emit it as a row-level
-                // sibling below — see after </article>.
+                // sibling below — see after </article>. Both variants carry
+                // the full event JSON in data-event so the shared popup
+                // module can render the card with zero extra fetches.
                 if ($show_details_btn && $template === 'grid'):
-                    $details_label = __('View details', 'lrob-calendar');
+                    $details_label   = __('View details', 'lrob-calendar');
+                    $event_json_attr = esc_attr(wp_json_encode(self::event_for_popup_json($event)));
                     ?>
                     <button class="lrob-event-btn lrob-event-btn--ghost lrob-event-details-btn"
                             type="button"
                             data-popup-for="<?php echo (int) $post->ID; ?>"
+                            data-event="<?php echo $event_json_attr; ?>"
                             aria-expanded="false">
                         <?php echo LRob_Calendar_Icons::get('info'); ?>
                         <span class="lrob-event-details-btn__label"><?php echo esc_html($details_label); ?></span>
@@ -543,14 +575,16 @@ class LRob_Calendar_Block_Helpers {
 
             // Row-level action: the "View details" trigger lives on the right
             // edge of the row (sibling of content / image), vertically centered.
-            // This is cleaner than parking it inside the content column — the
-            // button was getting orphaned space below the meta block.
+            // Cleaner than parking it inside the content column — the button
+            // was getting orphaned space below the meta block.
             if ($show_details_btn && $template !== 'grid'):
-                $details_label = __('View details', 'lrob-calendar');
+                $details_label   = __('View details', 'lrob-calendar');
+                $event_json_attr = esc_attr(wp_json_encode(self::event_for_popup_json($event)));
                 ?>
                 <button class="lrob-event-btn lrob-event-btn--ghost lrob-event-details-btn"
                         type="button"
                         data-popup-for="<?php echo (int) $post->ID; ?>"
+                        data-event="<?php echo $event_json_attr; ?>"
                         aria-expanded="false"
                         aria-label="<?php echo esc_attr($details_label); ?>">
                     <?php echo LRob_Calendar_Icons::get('info'); ?>
@@ -561,117 +595,22 @@ class LRob_Calendar_Block_Helpers {
             ?>
         </article>
         <?php
-        // When descriptionMode = button, render the popup card right after
-        // the row. JS toggles its `.is-shown` class on click of the matching
-        // "View details" button (same data-popup-for / data-popup-id pair).
-        if ($show_details_btn) {
-            $full_description = '';
-            if (!empty($post->post_content)) {
-                $full_description = apply_filters('the_content', $post->post_content);
-            }
-            $close_label = esc_attr__('Close', 'lrob-calendar');
-            $close_icon  = LRob_Calendar_Icons::get('x');
-            $cal_icon    = LRob_Calendar_Icons::get('calendar');
-            $loc_icon    = LRob_Calendar_Icons::get('location');
-            $rec_icon    = LRob_Calendar_Icons::get('recurring');
-            $tic_icon    = LRob_Calendar_Icons::get('ticket');
-            $arrow_icon  = LRob_Calendar_Icons::get('arrow-right');
-            ?>
-            <div class="lrob-cal-popup lrob-events-list-popup"
-                 data-popup-id="<?php echo (int) $post->ID; ?>"
-                 role="dialog"
-                 aria-modal="true"
-                 aria-hidden="true">
-                <div class="lrob-cal-popup-stage">
-                    <div class="lrob-cal-popup-content">
-                        <div class="lrob-cal-popup-header">
-                            <div class="lrob-cal-date-block" aria-hidden="true"<?php echo $pill_style; ?>>
-                                <span class="lrob-cal-date-block-day"><?php echo esc_html($date_day); ?></span>
-                                <span class="lrob-cal-date-block-month"><?php echo esc_html($date_month); ?></span>
-                            </div>
-                            <h4 class="lrob-cal-popup-title"><?php echo esc_html($post->post_title); ?></h4>
-                            <div class="lrob-cal-popup-actions">
-                                <button class="lrob-cal-popup-close" type="button" aria-label="<?php echo $close_label; ?>"><?php echo $close_icon; ?></button>
-                            </div>
-                        </div>
-                        <div class="lrob-cal-popup-body">
-                            <div class="lrob-cal-popup-meta-list">
-                                <p class="lrob-cal-popup-meta lrob-cal-popup-date">
-                                    <?php echo $cal_icon; ?>
-                                    <span class="lrob-cal-popup-meta-stack">
-                                        <span class="lrob-cal-popup-date-date"><?php echo esc_html($event->format_when(get_option('date_format'), '', ' – ')); ?></span>
-                                        <?php if (!$event->is_allday() && !$event->is_instant()): ?>
-                                            <span class="lrob-cal-popup-date-time"><?php echo esc_html(wp_date(get_option('time_format'), $start_ts)); ?></span>
-                                        <?php endif; ?>
-                                    </span>
-                                </p>
-                                <?php if ($event->has_location()):
-                                    $loc_parts = array_filter([$event->get('venue'), $event->get('city')]); ?>
-                                    <p class="lrob-cal-popup-meta lrob-cal-popup-location">
-                                        <?php echo $loc_icon; ?>
-                                        <span><?php echo esc_html(implode(', ', $loc_parts)); ?></span>
-                                    </p>
-                                <?php endif; ?>
-                                <?php if ($event->is_recurring()): ?>
-                                    <p class="lrob-cal-popup-meta lrob-cal-popup-recurring">
-                                        <?php echo $rec_icon; ?>
-                                        <span><?php esc_html_e('Recurring', 'lrob-calendar'); ?></span>
-                                    </p>
-                                <?php endif; ?>
-                                <?php if ($event->is_free()): ?>
-                                    <p class="lrob-cal-popup-meta lrob-cal-popup-cost lrob-cal-popup-cost--free">
-                                        <?php echo $tic_icon; ?>
-                                        <span><?php esc_html_e('Free', 'lrob-calendar'); ?></span>
-                                    </p>
-                                <?php elseif ($event->get('cost')): ?>
-                                    <p class="lrob-cal-popup-meta lrob-cal-popup-cost">
-                                        <?php echo $tic_icon; ?>
-                                        <span><?php echo esc_html($event->get('cost')); ?></span>
-                                    </p>
-                                <?php endif; ?>
-                            </div>
-
-                            <?php if ($full_description): ?>
-                                <div class="lrob-cal-popup-description">
-                                    <?php echo $full_description; ?>
-                                </div>
-                            <?php endif; ?>
-
-                            <?php
-                            // Popup ALWAYS shows the featured image when the
-                            // event has one — independent of the block's "Show
-                            // images" toggle (which only affects the row). The
-                            // popup is the "full details" view, so the image
-                            // belongs there even when rows are image-free.
-                            if (has_post_thumbnail($post->ID)): ?>
-                                <div class="lrob-cal-popup-thumb lrob-cal-popup-thumb--static">
-                                    <?php echo get_the_post_thumbnail($post->ID, 'large', ['alt' => esc_attr($post->post_title), 'loading' => 'lazy']); ?>
-                                </div>
-                            <?php endif; ?>
-
-                            <?php if ($pages_enabled || $ticket_url): ?>
-                                <div class="lrob-cal-popup-cta">
-                                    <?php if ($ticket_url): ?>
-                                        <a href="<?php echo esc_url($ticket_url); ?>"
-                                           class="lrob-cal-popup-link lrob-cal-popup-link--ticket"
-                                           target="_blank" rel="noopener">
-                                            <?php esc_html_e('Get tickets', 'lrob-calendar'); ?>
-                                        </a>
-                                    <?php endif; ?>
-                                    <?php if ($pages_enabled): ?>
-                                        <a href="<?php echo esc_url($permalink); ?>" class="lrob-cal-popup-link">
-                                            <?php esc_html_e('View event', 'lrob-calendar'); ?>
-                                            <?php echo $arrow_icon; ?>
-                                        </a>
-                                    <?php endif; ?>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <?php
-        }
         return (string) ob_get_clean();
+    }
+
+    /**
+     * Serialize an event into the JSON shape consumed by the shared
+     * event-popup module (assets/js/event-popup.js). Mirrors
+     * format_event_for_client() but adds `descriptionHtml` (the full
+     * post content, filtered) so the events-list popup can show the full
+     * detail view.
+     */
+    public static function event_for_popup_json(LRob_Calendar_Event $event): array {
+        $data = self::format_event_for_client($event);
+        $post = $event->get_post();
+        if ($post && !empty($post->post_content)) {
+            $data['descriptionHtml'] = apply_filters('the_content', $post->post_content);
+        }
+        return $data;
     }
 }

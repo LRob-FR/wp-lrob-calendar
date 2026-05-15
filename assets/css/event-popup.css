@@ -1,0 +1,471 @@
+/**
+ * Shared event-popup styles — used by the calendar block AND the events-list
+ * block. Owns the .lrob-cal-popup, .lrob-cal-popup-stage, .lrob-cal-popup-content
+ * trees plus their slide animations.
+ *
+ * Registered as `lrob-calendar-event-popup` (deps: lrob-calendar-tokens).
+ *
+ * Architecture: ALWAYS a centered modal (desktop AND mobile), edge-to-edge
+ * fullscreen on mobile. The previous "anchored-near-cell" desktop variant for
+ * the calendar block was removed in v1.1.0 — both blocks now share the same
+ * popup look.
+ */
+
+/* ─── Outer popup container (the modal overlay) ──────────────────────────── */
+
+.lrob-cal-popup {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 100001;
+    display: none;
+    /* Top-anchored, not vertically centered: the popup's top edge stays put
+       across prev/next navigation, regardless of how tall each event's card
+       is. Without this, switching from a tall card to a short one moved the
+       whole modal upward and the user had to chase the nav buttons. */
+    align-items: flex-start;
+    justify-content: center;
+    padding: 5vh var(--lrob-cal-space-4) var(--lrob-cal-space-4);
+    background: rgba(15, 23, 42, 0.45);
+    opacity: 0;
+    overflow: hidden;
+    transition: opacity var(--lrob-cal-duration) var(--lrob-cal-ease);
+}
+
+.lrob-cal-popup.is-shown {
+    display: flex;
+    opacity: 1;
+}
+
+body.lrob-cal-popup-open {
+    overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .lrob-cal-popup { transition: none; }
+}
+
+/* ─── Stage (holds 1 or 2 cards during navigation) ───────────────────────── */
+
+.lrob-cal-popup-stage {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--lrob-cal-radius-lg);
+    width: min(560px, 100%);
+    max-height: 90vh;
+}
+
+.lrob-cal-popup-content {
+    background: var(--lrob-cal-surface);
+    border: 1px solid var(--lrob-cal-border);
+    border-radius: var(--lrob-cal-radius-lg);
+    box-shadow: var(--lrob-cal-shadow-elevated);
+    position: relative;
+    overflow-y: auto;
+    max-height: 90vh;
+    color: var(--lrob-cal-text);
+    line-height: var(--lrob-cal-line-comfortable);
+}
+
+.lrob-cal-popup-content.is-incoming {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+}
+
+/* Slide animations for prev/next navigation */
+.lrob-cal-popup-stage.is-navigating-left .lrob-cal-popup-content:not(.is-incoming) {
+    animation: lrob-cal-popup-slide-out-left 0.24s ease-in-out forwards;
+}
+.lrob-cal-popup-stage.is-navigating-left .lrob-cal-popup-content.is-incoming {
+    animation: lrob-cal-popup-slide-in-from-right 0.24s ease-in-out;
+}
+.lrob-cal-popup-stage.is-navigating-right .lrob-cal-popup-content:not(.is-incoming) {
+    animation: lrob-cal-popup-slide-out-right 0.24s ease-in-out forwards;
+}
+.lrob-cal-popup-stage.is-navigating-right .lrob-cal-popup-content.is-incoming {
+    animation: lrob-cal-popup-slide-in-from-left 0.24s ease-in-out;
+}
+
+@keyframes lrob-cal-popup-slide-out-left      { from { transform: translateX(0); }    to { transform: translateX(-100%); } }
+@keyframes lrob-cal-popup-slide-out-right     { from { transform: translateX(0); }    to { transform: translateX(100%); } }
+@keyframes lrob-cal-popup-slide-in-from-right { from { transform: translateX(100%); } to { transform: translateX(0); } }
+@keyframes lrob-cal-popup-slide-in-from-left  { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+
+@media (prefers-reduced-motion: reduce) {
+    .lrob-cal-popup-content,
+    .lrob-cal-popup-content.is-incoming,
+    .lrob-cal-popup-stage.is-navigating-left .lrob-cal-popup-content,
+    .lrob-cal-popup-stage.is-navigating-right .lrob-cal-popup-content {
+        animation: none;
+    }
+}
+
+/* ─── Card header: date block + title + nav/close ────────────────────────── */
+
+.lrob-cal-popup-header {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: var(--lrob-cal-space-3);
+    align-items: start;
+    padding: var(--lrob-cal-space-4) var(--lrob-cal-space-4) var(--lrob-cal-space-3);
+}
+
+/* Date block — big day number stacked over uppercase short month. bg + text
+   colors come from inline `style="..."` set by PHP (per-event pair). Children
+   use color:inherit so the inline color flows through. */
+.lrob-cal-date-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 56px;
+    padding: var(--lrob-cal-space-2) var(--lrob-cal-space-3);
+    background: var(--lrob-cal-primary-soft);
+    color: var(--lrob-cal-primary);
+    border-radius: var(--lrob-cal-radius-md);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+}
+
+.lrob-cal-date-block-day {
+    font-size: 1.5em;
+    font-weight: var(--lrob-cal-font-weight-bold);
+    letter-spacing: -0.02em;
+    color: inherit;
+}
+
+.lrob-cal-date-block-month {
+    font-size: 0.7em;
+    font-weight: var(--lrob-cal-font-weight-bold);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: 2px;
+    color: inherit;
+}
+
+.lrob-cal-popup-title {
+    margin: 0;
+    padding: 0;
+    font-size: 1.15em;
+    line-height: var(--lrob-cal-line-tight);
+    font-weight: var(--lrob-cal-font-weight-bold);
+    color: var(--lrob-cal-text);
+    align-self: center;
+    letter-spacing: -0.01em;
+}
+
+.lrob-cal-popup-title a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.lrob-cal-popup-title a:hover {
+    color: var(--lrob-cal-primary);
+}
+
+.lrob-cal-popup-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--lrob-cal-space-1);
+}
+
+/* Ghost icon button — close + prev/next */
+.lrob-cal-popup-close,
+.lrob-cal-popup-nav {
+    background: transparent;
+    border: 1px solid transparent;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--lrob-cal-radius-md);
+    cursor: pointer;
+    color: var(--lrob-cal-text-muted);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: background-color var(--lrob-cal-duration) var(--lrob-cal-ease),
+                color var(--lrob-cal-duration) var(--lrob-cal-ease);
+}
+
+.lrob-cal-popup-close:hover,
+.lrob-cal-popup-nav:hover {
+    background: var(--lrob-cal-surface-hover);
+    color: var(--lrob-cal-text);
+}
+
+.lrob-cal-popup-close:disabled,
+.lrob-cal-popup-nav:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.lrob-cal-popup-close .lrob-icon,
+.lrob-cal-popup-nav .lrob-icon {
+    width: 18px;
+    height: 18px;
+}
+
+/* ─── Card body: meta, description, image, CTA ───────────────────────────── */
+
+.lrob-cal-popup-body {
+    padding: 0 var(--lrob-cal-space-4) var(--lrob-cal-space-4);
+}
+
+.lrob-cal-popup-meta-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--lrob-cal-space-2);
+    margin: 0 0 var(--lrob-cal-space-3);
+}
+
+.lrob-cal-popup-meta {
+    margin: 0;
+    padding: 0;
+    font-size: 0.92em;
+    color: var(--lrob-cal-text-muted);
+    line-height: 1.4;
+    display: flex;
+    align-items: center;
+    gap: var(--lrob-cal-space-2);
+}
+
+.lrob-cal-popup-meta .lrob-icon {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    color: var(--lrob-cal-primary);
+}
+
+.lrob-cal-popup-date {
+    color: var(--lrob-cal-text);
+    font-weight: var(--lrob-cal-font-weight-medium);
+    align-items: flex-start;
+}
+
+.lrob-cal-popup-meta-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    line-height: var(--lrob-cal-line-tight);
+}
+
+.lrob-cal-popup-date-date {
+    color: var(--lrob-cal-text);
+    font-weight: var(--lrob-cal-font-weight-medium);
+}
+
+.lrob-cal-popup-date-time {
+    color: var(--lrob-cal-text-muted);
+    font-size: 0.92em;
+    font-variant-numeric: tabular-nums;
+}
+
+.lrob-cal-popup-cost--free span {
+    color: var(--lrob-cal-primary);
+    font-weight: var(--lrob-cal-font-weight-semibold);
+}
+
+/* Excerpt (short clamped text for the calendar's quick-look variant) */
+.lrob-cal-popup-excerpt {
+    margin: 0 0 var(--lrob-cal-space-4);
+    font-size: 0.95em;
+    line-height: var(--lrob-cal-line-comfortable);
+    color: var(--lrob-cal-text);
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Full description (post content) — used by events-list popup. */
+.lrob-cal-popup-description {
+    margin: 0 0 var(--lrob-cal-space-4);
+    color: var(--lrob-cal-text);
+    line-height: var(--lrob-cal-line-comfortable);
+}
+
+.lrob-cal-popup-description > :first-child { margin-top: 0; }
+.lrob-cal-popup-description > :last-child  { margin-bottom: 0; }
+
+.lrob-cal-popup-description p {
+    margin: 0 0 var(--lrob-cal-space-3);
+}
+
+.lrob-cal-popup-description img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--lrob-cal-radius-md);
+}
+
+/* Featured image — natural aspect ratio, capped height. Replaces the old
+   fixed-height popup-img-height/popup-img-display per-block presets. */
+.lrob-cal-popup-thumb {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 60vh;
+    margin-bottom: var(--lrob-cal-space-4);
+    overflow: hidden;
+    background: transparent;
+    border: 0;
+    padding: 0;
+    border-radius: var(--lrob-cal-radius-md);
+}
+
+.lrob-cal-popup-thumb img {
+    width: 100%;
+    height: auto;
+    max-height: 60vh;
+    object-fit: contain;
+    display: block;
+}
+
+/* Global image-fit override (admin setting). Default = contain (above). */
+.lrob-cal-popup-thumb--fit-cover img {
+    object-fit: cover;
+    /* When the user chose cover, give the image a working height so the
+       crop has something to crop against. */
+    height: 320px;
+    max-height: 60vh;
+}
+
+.lrob-cal-popup-thumb--static {
+    cursor: default;
+}
+
+/* ─── CTA row ────────────────────────────────────────────────────────────── */
+
+.lrob-cal-popup-cta {
+    display: flex;
+    gap: var(--lrob-cal-space-2);
+    justify-content: flex-end;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.lrob-cal-popup-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--lrob-cal-space-2);
+    padding: var(--lrob-cal-space-2) var(--lrob-cal-space-4);
+    background: var(--lrob-cal-primary);
+    color: var(--lrob-cal-primary-fg);
+    text-decoration: none;
+    border-radius: var(--lrob-cal-radius-md);
+    font-size: 0.92em;
+    font-weight: var(--lrob-cal-font-weight-medium);
+    border: 0;
+    cursor: pointer;
+    transition: background-color var(--lrob-cal-duration) var(--lrob-cal-ease);
+}
+
+.lrob-cal-popup-link:hover {
+    background: var(--lrob-cal-primary-hover);
+    color: var(--lrob-cal-primary-fg);
+}
+
+.lrob-cal-popup-link .lrob-icon {
+    width: 16px;
+    height: 16px;
+}
+
+.lrob-cal-popup-link--ticket {
+    background: var(--lrob-cal-surface);
+    color: var(--lrob-cal-text);
+    border: 1px solid var(--lrob-cal-border-strong);
+}
+
+.lrob-cal-popup-link--ticket:hover {
+    background: var(--lrob-cal-surface-hover);
+    color: var(--lrob-cal-text);
+}
+
+/* ─── Mobile: edge-to-edge fullscreen modal ──────────────────────────────── */
+
+@media (max-width: 640px) {
+    .lrob-cal-popup {
+        padding: 0;
+        background: var(--lrob-cal-surface);
+    }
+
+    .lrob-cal-popup.is-shown {
+        flex-direction: column;
+    }
+
+    .lrob-cal-popup-stage {
+        flex: 1 1 auto;
+        width: 100%;
+        max-height: none;
+        height: 100%;
+        border-radius: 0;
+    }
+
+    .lrob-cal-popup-content {
+        width: 100%;
+        height: 100%;
+        max-height: none;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+        display: flex;
+        flex-direction: column;
+        padding-bottom: 0;
+    }
+
+    .lrob-cal-popup-header {
+        position: sticky;
+        top: 0;
+        background: var(--lrob-cal-surface);
+        border-bottom: 1px solid var(--lrob-cal-border);
+        z-index: 2;
+        padding: var(--lrob-cal-space-3) var(--lrob-cal-space-4);
+    }
+
+    .lrob-cal-popup-body {
+        flex: 1 1 auto;
+        padding: var(--lrob-cal-space-4);
+        padding-bottom: calc(var(--lrob-cal-space-6) + env(safe-area-inset-bottom, 0px));
+        display: flex;
+        flex-direction: column;
+        gap: var(--lrob-cal-space-3);
+    }
+
+    /* Image grows to fill empty space between meta and sticky CTA. */
+    .lrob-cal-popup-body .lrob-cal-popup-thumb {
+        flex: 1 1 auto;
+        min-height: 200px;
+        max-height: none;
+        margin-bottom: 0;
+    }
+    .lrob-cal-popup-body .lrob-cal-popup-thumb img {
+        height: 100%;
+        max-height: none;
+        object-fit: cover;
+    }
+    .lrob-cal-popup-thumb--fit-contain img,
+    .lrob-cal-popup-body .lrob-cal-popup-thumb--fit-contain img {
+        object-fit: contain;
+    }
+
+    /* Sticky bottom CTA */
+    .lrob-cal-popup-cta {
+        position: sticky;
+        bottom: 0;
+        margin: 0 calc(var(--lrob-cal-space-4) * -1) calc(var(--lrob-cal-space-4) * -1);
+        padding: var(--lrob-cal-space-3) var(--lrob-cal-space-4)
+                 calc(var(--lrob-cal-space-3) + env(safe-area-inset-bottom, 0px));
+        background: var(--lrob-cal-surface);
+        border-top: 1px solid var(--lrob-cal-border);
+        z-index: 2;
+    }
+
+    .lrob-cal-popup-link {
+        flex: 1 1 auto;
+        justify-content: center;
+        padding: var(--lrob-cal-space-3) var(--lrob-cal-space-4);
+    }
+}

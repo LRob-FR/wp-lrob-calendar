@@ -8,16 +8,15 @@
     "icon": "calendar",
     "textdomain": "lrob-calendar",
     "attributes": {
-        "eventId":      { "type": "number", "default": 0 },
-        "template":     { "type": "string", "default": "full" },
-        "imageDisplay":  { "type": "string",  "default": "contain" },
-        "imageHeight":   { "type": "string",  "default": "medium" },
-        "imagePosition": { "type": "string",  "default": "right" },
-        "imageLightbox": { "type": "boolean", "default": true }
+        "eventId":       { "type": "number", "default": 0 },
+        "template":      { "type": "string", "default": "full" },
+        "imageDisplay":  { "type": "string", "default": "contain" },
+        "imageHeight":   { "type": "string", "default": "medium" },
+        "imagePosition": { "type": "string", "default": "right" }
     },
     "editorScript": "lrob-calendar-block-single-event-edit",
     "editorStyle":  "lrob-calendar-blocks-editor",
-    "viewScript":   ["lrob-calendar-event-card-lightbox", "lrob-calendar-event-card-expand"],
-    "style":        ["lrob-calendar-event-card", "lrob-calendar-lightbox"],
+    "viewScript":   ["lrob-calendar-event-card-expand"],
+    "style":        ["lrob-calendar-event-card"],
     "render":       "file:./render.php"
 }

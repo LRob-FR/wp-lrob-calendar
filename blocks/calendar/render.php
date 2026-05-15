@@ -25,16 +25,11 @@ if (!empty($attributes['align'])) {
 }
 
 $config = [
-    'category'            => $attributes['category'] ?: 0,
-    'tag'                 => $attributes['tag'] ?: 0,
+    'category'    => $attributes['category'] ?: 0,
+    'tag'         => $attributes['tag'] ?: 0,
     // loadedStart=0 / loadedEnd=0 signals view.js to do an initial REST fetch.
-    'loadedStart'         => 0,
-    'loadedEnd'           => 0,
-    'popupSize'           => in_array($attributes['popupSize'] ?? 'standard', ['compact', 'standard', 'spacious'], true) ? $attributes['popupSize'] : 'standard',
-    'popupImageDisplay'   => in_array($attributes['popupImageDisplay'] ?? 'contain', ['contain', 'cover'], true) ? $attributes['popupImageDisplay'] : 'contain',
-    'popupImageHeight'    => in_array($attributes['popupImageHeight'] ?? 'medium', ['small', 'medium', 'large'], true) ? $attributes['popupImageHeight'] : 'medium',
-    'popupShowImage'      => !empty($attributes['popupShowImage']),
-    'popupImageLightbox'  => !isset($attributes['popupImageLightbox']) || !empty($attributes['popupImageLightbox']),
+    'loadedStart' => 0,
+    'loadedEnd'   => 0,
 ];
 ?>
 <div class="<?php echo esc_attr(implode(' ', $wrapper_classes)); ?>">

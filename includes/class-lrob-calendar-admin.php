@@ -267,6 +267,25 @@ class LRob_Calendar_Admin {
             update_option('lrob_calendar_primary_color',   $primary_color   ?: '');
             update_option('lrob_calendar_secondary_color', $secondary_color ?: '');
 
+            // Date pill color mode for events that have no category color.
+            $uncat_mode = sanitize_text_field($_POST['uncategorized_pill_mode'] ?? 'random');
+            if (!in_array($uncat_mode, ['random', 'primary', 'custom'], true)) {
+                $uncat_mode = 'random';
+            }
+            $uncat_color = sanitize_hex_color($_POST['uncategorized_pill_color'] ?? '');
+            update_option('lrob_calendar_uncategorized_pill_mode',  $uncat_mode);
+            update_option('lrob_calendar_uncategorized_pill_color', $uncat_color ?: '');
+
+            // Popup image settings (global, used by both blocks via the
+            // shared event-popup module).
+            $popup_show_image = !empty($_POST['popup_show_image']);
+            $popup_image_fit  = sanitize_text_field($_POST['popup_image_fit'] ?? 'contain');
+            if (!in_array($popup_image_fit, ['contain', 'cover'], true)) {
+                $popup_image_fit = 'contain';
+            }
+            update_option('lrob_calendar_popup_show_image', $popup_show_image ? 1 : 0);
+            update_option('lrob_calendar_popup_image_fit',  $popup_image_fit);
+
             echo '<div class="notice notice-success"><p>' . __('Settings saved.', 'lrob-calendar') . '</p></div>';
         }
 
@@ -278,6 +297,10 @@ class LRob_Calendar_Admin {
         $max_years        = (int) get_option('lrob_calendar_max_recurrence_years', 5);
         $primary_color    = (string) get_option('lrob_calendar_primary_color', '');
         $secondary_color  = (string) get_option('lrob_calendar_secondary_color', '');
+        $uncat_mode       = (string) get_option('lrob_calendar_uncategorized_pill_mode', 'random');
+        $uncat_color      = (string) get_option('lrob_calendar_uncategorized_pill_color', '');
+        $popup_show_image = (bool)   get_option('lrob_calendar_popup_show_image', true);
+        $popup_image_fit  = (string) get_option('lrob_calendar_popup_image_fit', 'contain');
         $effective_start_of_week = LRob_Calendar::get_start_of_week();
         $day_labels = [
             0 => __('Sunday', 'lrob-calendar'),
@@ -396,6 +419,57 @@ class LRob_Calendar_Admin {
                                    data-default-color="#64748b">
                             <p class="description">
                                 <?php esc_html_e('Optional. Used sparingly for secondary accents. Default: neutral slate.', 'lrob-calendar'); ?>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label for="uncategorized_pill_mode"><?php esc_html_e('Date pill color (uncategorized events)', 'lrob-calendar'); ?></label>
+                        </th>
+                        <td>
+                            <select name="uncategorized_pill_mode" id="uncategorized_pill_mode">
+                                <option value="random"  <?php selected($uncat_mode, 'random');  ?>><?php esc_html_e('Random per-event color',          'lrob-calendar'); ?></option>
+                                <option value="primary" <?php selected($uncat_mode, 'primary'); ?>><?php esc_html_e('Primary color',                    'lrob-calendar'); ?></option>
+                                <option value="custom"  <?php selected($uncat_mode, 'custom');  ?>><?php esc_html_e('Use a specific color (below)',     'lrob-calendar'); ?></option>
+                            </select>
+                            <p class="description">
+                                <?php esc_html_e('Background tint and text color for the date block on events that have no category set. Events WITH a category always use that category color.', 'lrob-calendar'); ?>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="uncategorized_pill_color"><?php esc_html_e('Custom uncategorized color', 'lrob-calendar'); ?></label></th>
+                        <td>
+                            <input type="text" id="uncategorized_pill_color" name="uncategorized_pill_color"
+                                   value="<?php echo esc_attr($uncat_color); ?>"
+                                   class="lrob-color-field"
+                                   data-default-color="#3b82f6">
+                            <p class="description">
+                                <?php esc_html_e('Only used when the mode above is set to “Use a specific color”.', 'lrob-calendar'); ?>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><?php esc_html_e('Popup featured image', 'lrob-calendar'); ?></th>
+                        <td>
+                            <label>
+                                <input type="checkbox" name="popup_show_image" value="1" <?php checked($popup_show_image); ?>>
+                                <?php esc_html_e('Show the event\'s featured image in the popup card', 'lrob-calendar'); ?>
+                            </label>
+                            <p class="description">
+                                <?php esc_html_e('Applies to both the calendar popup and the events-list "View details" popup. Off = no image in the popup.', 'lrob-calendar'); ?>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><label for="popup_image_fit"><?php esc_html_e('Popup image fit', 'lrob-calendar'); ?></label></th>
+                        <td>
+                            <select name="popup_image_fit" id="popup_image_fit">
+                                <option value="contain" <?php selected($popup_image_fit, 'contain'); ?>><?php esc_html_e('Show whole image (natural aspect)', 'lrob-calendar'); ?></option>
+                                <option value="cover"   <?php selected($popup_image_fit, 'cover');   ?>><?php esc_html_e('Crop to fill',                       'lrob-calendar'); ?></option>
+                            </select>
+                            <p class="description">
+                                <?php esc_html_e('How images render inside the popup. "Show whole image" preserves the original aspect ratio.', 'lrob-calendar'); ?>
                             </p>
                         </td>
                     </tr>

@@ -11,20 +11,15 @@
         "align": ["wide", "full"]
     },
     "attributes": {
-        "view":              { "type": "string",  "default": "month" },
-        "category":          { "type": "number",  "default": 0 },
-        "tag":               { "type": "number",  "default": 0 },
-        "linkText":          { "type": "string",  "default": "" },
-        "align":             { "type": "string",  "default": "" },
-        "popupSize":          { "type": "string",  "default": "standard" },
-        "popupImageDisplay":  { "type": "string",  "default": "contain" },
-        "popupImageHeight":   { "type": "string",  "default": "medium" },
-        "popupShowImage":     { "type": "boolean", "default": true },
-        "popupImageLightbox": { "type": "boolean", "default": true }
+        "view":     { "type": "string", "default": "month" },
+        "category": { "type": "number", "default": 0 },
+        "tag":      { "type": "number", "default": 0 },
+        "linkText": { "type": "string", "default": "" },
+        "align":    { "type": "string", "default": "" }
     },
     "editorScript": "lrob-calendar-block-calendar-edit",
     "editorStyle":  "lrob-calendar-blocks-editor",
     "viewScript":   "lrob-calendar-view",
-    "style":        ["lrob-calendar-block-calendar", "lrob-calendar-lightbox"],
+    "style":        ["lrob-calendar-block-calendar"],
     "render":       "file:./render.php"
 }

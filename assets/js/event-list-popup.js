@@ -1,100 +1,95 @@
 /**
- * Events-list "View details" → inline popup card.
+ * Events-list "View details" trigger.
  *
- * Each event row optionally has a `.lrob-event-details-btn` button followed
- * by a `<div class="lrob-cal-popup lrob-events-list-popup" data-popup-id="N">`
- * sibling holding the full event card. Clicking the button toggles its
- * matching popup; ESC / backdrop / close button hide it.
+ * Each row's trigger (the .lrob-event-details-btn ghost button AND/OR the
+ * clickable thumbnail) carries the full event JSON in its `data-event`
+ * attribute plus a `data-popup-for` event-id. Clicking it hands the JSON
+ * off to the shared event-popup module (assets/js/event-popup.js), which
+ * renders the card and owns the rest of the UX.
  *
- * Independent of the calendar block's view.js — the events-list block doesn't
- * have access to that runtime. Re-uses the .lrob-cal-popup CSS classes for a
- * visually identical popup card.
+ * Sibling navigation (prev/next inside the popup) walks the trigger
+ * elements in DOM order — i.e. the order of events as they appear in the
+ * list. Bounded by the events on the current page (pagination doesn't
+ * cross page boundaries).
+ *
+ * Depends on event-popup.js exposing window.LRobEventPopup.
  */
 (function () {
     'use strict';
 
-    var openPopup = null;
-
-    function findPopupFor(id) {
-        return document.querySelector(
-            '.lrob-events-list-popup[data-popup-id="' + id + '"]'
-        );
+    function getPopupContainer(triggerEl) {
+        // Each events-list block has its own shared popup container at the
+        // wrapper level (rendered server-side, see events-list/render.php).
+        var wrapper = triggerEl.closest('.lrob-cal-events-list-wrapper');
+        if (!wrapper) return null;
+        return wrapper.querySelector('.lrob-events-list-popup');
     }
 
-    function show($popup) {
-        if (!$popup) return;
-        // Close any other one first — only one popup open at a time.
-        if (openPopup && openPopup !== $popup) hide(openPopup);
-        $popup.style.display = 'flex';
-        // Force a reflow so the opacity transition triggers.
-        // eslint-disable-next-line no-unused-expressions
-        $popup.offsetHeight;
-        $popup.classList.add('is-shown');
-        $popup.setAttribute('aria-hidden', 'false');
-        document.body.classList.add('lrob-cal-popup-open');
-        openPopup = $popup;
+    function parseEvent(triggerEl) {
+        var raw = triggerEl.getAttribute('data-event');
+        if (!raw) return null;
+        try { return JSON.parse(raw); } catch (_e) { return null; }
     }
 
-    function hide($popup) {
-        if (!$popup) return;
-        $popup.classList.remove('is-shown');
-        $popup.setAttribute('aria-hidden', 'true');
-        // Match the CSS opacity transition before display:none.
-        setTimeout(function () {
-            if (!$popup.classList.contains('is-shown')) {
-                $popup.style.display = 'none';
-            }
-        }, 200);
-        document.body.classList.remove('lrob-cal-popup-open');
-        if (openPopup === $popup) openPopup = null;
+    /**
+     * All trigger elements (buttons OR clickable thumbs) in the list,
+     * in DOM order. Used to compute prev/next siblings.
+     */
+    function siblingsAroundId(triggerEl, eventId) {
+        var wrapper = triggerEl.closest('.lrob-cal-events-list-wrapper');
+        if (!wrapper) return { prev: null, next: null };
+        // Use only the row-level details buttons as the canonical sibling
+        // sequence (the image trigger is a duplicate of the same event, so
+        // counting both would double-count).
+        var triggers = wrapper.querySelectorAll('.lrob-event-details-btn[data-event]');
+        var sorted = [];
+        for (var i = 0; i < triggers.length; i++) {
+            var ev = parseEvent(triggers[i]);
+            if (ev) sorted.push(ev);
+        }
+        var idx = -1;
+        for (var j = 0; j < sorted.length; j++) {
+            if (sorted[j].id === eventId) { idx = j; break; }
+        }
+        if (idx === -1) return { prev: null, next: null };
+        return {
+            prev: idx > 0 ? sorted[idx - 1] : null,
+            next: idx < sorted.length - 1 ? sorted[idx + 1] : null,
+        };
     }
 
-    function isMobile() {
-        return !!(window.matchMedia && window.matchMedia('(max-width: 640px)').matches);
+    function openFromTrigger(triggerEl) {
+        if (!window.LRobEventPopup) return;
+        var event = parseEvent(triggerEl);
+        var container = getPopupContainer(triggerEl);
+        if (!event || !container) return;
+        var siblings = siblingsAroundId(triggerEl, event.id);
+        window.LRobEventPopup.open(container, event, {
+            siblings: siblings,
+            onNavigate: function (targetId, direction) {
+                // Find the trigger whose data-event id matches targetId, then
+                // navigate to its event. Walks the same canonical button list.
+                var wrapper = container.closest('.lrob-cal-events-list-wrapper');
+                if (!wrapper) return;
+                var triggers = wrapper.querySelectorAll('.lrob-event-details-btn[data-event]');
+                for (var i = 0; i < triggers.length; i++) {
+                    var ev = parseEvent(triggers[i]);
+                    if (ev && ev.id === targetId) {
+                        var newSiblings = siblingsAroundId(triggers[i], targetId);
+                        window.LRobEventPopup.navigateTo(container, ev, newSiblings, direction);
+                        return;
+                    }
+                }
+            },
+        });
     }
 
     function init() {
-        // Capture-phase listener for the image-as-trigger on mobile. Runs
-        // BEFORE the bubble-phase lightbox handler from event-card-lightbox.js,
-        // and uses stopImmediatePropagation() to suppress the lightbox so the
-        // image opens the details popup instead.
         document.addEventListener('click', function (e) {
-            var thumb = e.target.closest('[data-mobile-popup-for]');
-            if (!thumb || !isMobile()) return;
+            var trigger = e.target.closest('[data-popup-for][data-event]');
+            if (!trigger) return;
             e.preventDefault();
-            e.stopImmediatePropagation();
-            show(findPopupFor(thumb.getAttribute('data-mobile-popup-for')));
-        }, true);
-
-        // Open: any click on a "View details" button.
-        document.addEventListener('click', function (e) {
-            var btn = e.target.closest('.lrob-event-details-btn');
-            if (btn) {
-                e.preventDefault();
-                var id = btn.getAttribute('data-popup-for');
-                show(findPopupFor(id));
-                return;
-            }
-
-            // Close: click on the close X (delegated, since each popup has its own).
-            var closeBtn = e.target.closest('.lrob-events-list-popup .lrob-cal-popup-close');
-            if (closeBtn) {
-                e.preventDefault();
-                hide(closeBtn.closest('.lrob-events-list-popup'));
-                return;
-            }
-
-            // Close: click outside the popup card (on the backdrop area).
-            if (openPopup
-                && e.target.closest('.lrob-events-list-popup') === openPopup
-                && !e.target.closest('.lrob-cal-popup-content')) {
-                hide(openPopup);
-            }
-        });
-
-        // ESC closes whichever popup is open.
-        document.addEventListener('keyup', function (e) {
-            if (e.key === 'Escape' && openPopup) hide(openPopup);
+            openFromTrigger(trigger);
         });
     }
 

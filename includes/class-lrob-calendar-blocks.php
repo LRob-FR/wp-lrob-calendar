@@ -75,20 +75,14 @@ class LRob_Calendar_Blocks {
             $css .= '}';
             wp_add_inline_style('lrob-calendar-tokens', $css);
         }
-        wp_register_style('lrob-calendar-event-card',       $url . 'assets/css/event-card.css',        ['lrob-calendar-tokens'],        $ver);
-        wp_register_style('lrob-calendar-lightbox',         $url . 'assets/css/lightbox.css',          [],                              $ver);
-        wp_register_style('lrob-calendar-single-event-page', $url . 'assets/css/single-event-page.css', ['lrob-calendar-tokens'],        $ver);
-        wp_register_style('lrob-calendar-blocks-editor',    $url . 'assets/css/blocks-editor.css',     [],                              $ver);
+        wp_register_style('lrob-calendar-event-card',        $url . 'assets/css/event-card.css',         ['lrob-calendar-tokens'],          $ver);
+        wp_register_style('lrob-calendar-event-popup',       $url . 'assets/css/event-popup.css',        ['lrob-calendar-tokens'],          $ver);
+        wp_register_style('lrob-calendar-single-event-page', $url . 'assets/css/single-event-page.css',  ['lrob-calendar-tokens'],          $ver);
+        wp_register_style('lrob-calendar-blocks-editor',     $url . 'assets/css/blocks-editor.css',      [],                                $ver);
 
         // Per-block styles referenced by handle in block.json's `style` field.
-        wp_register_style('lrob-calendar-block-calendar',    $url . 'blocks/calendar/style.css',    ['lrob-calendar-tokens'],     $ver);
-        wp_register_style('lrob-calendar-block-events-list', $url . 'blocks/events-list/style.css', ['lrob-calendar-event-card'], $ver);
-
-        // JS — shared lightbox, editor data, calendar viewScript, event-card lightbox wirer.
-        wp_register_script('lrob-calendar-lightbox', $url . 'assets/js/lightbox.js', [], $ver, true);
-        wp_localize_script('lrob-calendar-lightbox', 'lrobLightboxI18n', [
-            'close' => __('Close', 'lrob-calendar'),
-        ]);
+        wp_register_style('lrob-calendar-block-calendar',    $url . 'blocks/calendar/style.css',    ['lrob-calendar-event-popup'], $ver);
+        wp_register_style('lrob-calendar-block-events-list', $url . 'blocks/events-list/style.css', ['lrob-calendar-event-card'],  $ver);
 
         wp_register_script(
             'lrob-calendar-blocks-shared',
@@ -114,19 +108,21 @@ class LRob_Calendar_Blocks {
             wp_set_script_translations($handle, 'lrob-calendar', LROB_CALENDAR_PATH . 'languages');
         }
 
+        // Shared event-popup module. Owns the popup card rendering + UX
+        // (open/close, prev/next nav with two-card slide, ESC, swipe).
+        // Both the calendar block and the events-list block depend on it.
         wp_register_script(
-            'lrob-calendar-view',
-            $url . 'blocks/calendar/view.js',
-            ['jquery', 'lrob-calendar-lightbox'],
+            'lrob-calendar-event-popup',
+            $url . 'assets/js/event-popup.js',
+            [],
             $ver,
             true
         );
 
-        // Auto-wires click handlers on `.lrob-event-thumbnail--clickable` to the shared lightbox.
         wp_register_script(
-            'lrob-calendar-event-card-lightbox',
-            $url . 'assets/js/event-card-lightbox.js',
-            ['lrob-calendar-lightbox'],
+            'lrob-calendar-view',
+            $url . 'blocks/calendar/view.js',
+            ['jquery', 'lrob-calendar-event-popup'],
             $ver,
             true
         );
@@ -141,25 +137,25 @@ class LRob_Calendar_Blocks {
             true
         );
 
-        // Events-list "View details" → popup card module. Conditionally
-        // enqueued by blocks/events-list/render.php only when at least one
-        // event in the rendered page uses descriptionMode = 'button'.
+        // Events-list "View details" → popup card trigger. Reads event JSON
+        // off the trigger element and hands it to the shared event-popup
+        // module. Conditionally enqueued by blocks/events-list/render.php
+        // only when at least one row uses descriptionMode = 'button'.
         wp_register_script(
             'lrob-calendar-event-list-popup',
             $url . 'assets/js/event-list-popup.js',
-            [],
+            ['lrob-calendar-event-popup'],
             $ver,
             true
         );
 
         // Intercepts pagination clicks on the events-list block and swaps the
-        // wrapper innerHTML without a full page reload. Depends on the lightbox
-        // module so it can re-bind handlers on the swapped event cards, and
-        // on the expand module so the toggle re-binds too.
+        // wrapper innerHTML without a full page reload. Depends on the expand
+        // module so the toggle re-binds on the swapped cards.
         wp_register_script(
             'lrob-calendar-events-list-pagination',
             $url . 'assets/js/events-list-pagination.js',
-            ['lrob-calendar-lightbox', 'lrob-calendar-event-card-expand'],
+            ['lrob-calendar-event-card-expand'],
             $ver,
             true
         );
@@ -178,13 +174,59 @@ class LRob_Calendar_Blocks {
             'tags'       => $this->get_terms_for_blocks(LRob_Calendar_Post_Types::TAX_TAG),
         ]);
 
-        // Calendar viewScript runtime config (month/day names, locale, icons, etc.).
+        // Shared event-popup module config (icons, i18n, image settings).
+        $this->localize_event_popup();
+
+        // Calendar viewScript runtime config (month/day names, locale, etc.).
         $this->localize_view_script();
 
         // Card expand/collapse labels (used by event-card-expand.js).
         wp_localize_script('lrob-calendar-event-card-expand', 'lrobCalCardI18n', [
             'showMore' => __('Show more', 'lrob-calendar'),
             'showLess' => __('Show less', 'lrob-calendar'),
+        ]);
+    }
+
+    /**
+     * Configuration for the shared event-popup module. Read by event-popup.js
+     * on first use and merged into its internal config object. Both the
+     * calendar block and the events-list block pull from this single bag.
+     */
+    private function localize_event_popup(): void {
+        global $wp_locale;
+        $month_names = [];
+        for ($i = 1; $i <= 12; $i++) {
+            $month_names[] = $wp_locale->get_month($i);
+        }
+        wp_localize_script('lrob-calendar-event-popup', 'lrobCalEventPopup', [
+            'siteLocale'         => str_replace('_', '-', get_locale()),
+            'monthNames'         => $month_names,
+            'publicPagesEnabled' => LRob_Calendar::public_pages_enabled(),
+            // Admin-configurable popup image controls (global, not per-block).
+            'showImage'          => (bool) get_option('lrob_calendar_popup_show_image', true),
+            'imageFit'           => (string) get_option('lrob_calendar_popup_image_fit', 'contain'),
+            'linkText'           => '', // calendar block can override per-instance
+            'i18n' => [
+                'close'      => __('Close', 'lrob-calendar'),
+                'viewImage'  => __('View image', 'lrob-calendar'),
+                'prevEvent'  => __('Previous event', 'lrob-calendar'),
+                'nextEvent'  => __('Next event', 'lrob-calendar'),
+                'recurring'  => __('Recurring', 'lrob-calendar'),
+                'free'       => __('Free', 'lrob-calendar'),
+                'getTickets' => __('Get tickets', 'lrob-calendar'),
+                'viewEvent'  => __('View event', 'lrob-calendar'),
+            ],
+            'icons' => [
+                'calendar'     => LRob_Calendar_Icons::get('calendar'),
+                'clock'        => LRob_Calendar_Icons::get('clock'),
+                'location'     => LRob_Calendar_Icons::get('location'),
+                'recurring'    => LRob_Calendar_Icons::get('recurring'),
+                'ticket'       => LRob_Calendar_Icons::get('ticket'),
+                'chevronLeft'  => LRob_Calendar_Icons::get('chevron-left'),
+                'chevronRight' => LRob_Calendar_Icons::get('chevron-right'),
+                'close'        => LRob_Calendar_Icons::get('x'),
+                'arrowRight'   => LRob_Calendar_Icons::get('arrow-right'),
+            ],
         ]);
     }
 

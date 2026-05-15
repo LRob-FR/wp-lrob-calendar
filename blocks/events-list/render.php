@@ -66,12 +66,12 @@ if ($pagination) {
 
 $events = LRob_Calendar_Event::get_events($args);
 
-// "View details" popup mode requires the popup CSS (defined in the calendar
-// block's stylesheet) + the events-list popup-trigger JS. Both are
-// registered globally; enqueue conditionally here so vanilla list pages
-// don't pay the cost.
-if (($attributes['descriptionMode'] ?? 'inline') === 'button') {
-    wp_enqueue_style('lrob-calendar-block-calendar');
+// "View details" popup mode requires the shared event-popup CSS + JS
+// module plus the events-list trigger script. Enqueued conditionally
+// so vanilla list pages don't pay the cost.
+$popup_mode = (($attributes['descriptionMode'] ?? 'inline') === 'button');
+if ($popup_mode) {
+    wp_enqueue_style('lrob-calendar-event-popup');
     wp_enqueue_script('lrob-calendar-event-list-popup');
 }
 ?>
@@ -130,5 +130,12 @@ if ($pagination && !empty($events) && $total_pages > 1):
             ]);
         endif; ?>
     </nav>
+<?php endif; ?>
+<?php if ($popup_mode && !empty($events)): ?>
+    <div class="lrob-cal-popup lrob-events-list-popup"
+         role="dialog"
+         aria-modal="true"
+         aria-hidden="true"
+         style="display: none;"></div>
 <?php endif; ?>
 </div>

@@ -378,13 +378,44 @@
     margin: 0;
 }
 
+/* No-image grid card: the placeholder IS the date display. The
+   inline-style pill colors flow through (`color: inherit` on the day/month
+   spans), so the area gets the per-event hue + a big legible date. Height
+   tracks the chosen image-height preset so the grid stays uniform whether
+   cards have images or not. */
 .lrob-event-card.lrob-event-grid .lrob-event-thumbnail--placeholder {
-    height: 200px;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 4px;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+    /* Fallback colors if the inline style is somehow missing. */
     background: var(--lrob-cal-primary-soft);
+    color: var(--lrob-cal-primary);
 }
+
+.lrob-event-card.lrob-event-grid .lrob-event-thumbnail--placeholder .lrob-event-card__date-day {
+    font-size: 3em;
+    font-weight: var(--lrob-cal-font-weight-bold);
+    letter-spacing: -0.03em;
+    color: inherit;
+}
+
+.lrob-event-card.lrob-event-grid .lrob-event-thumbnail--placeholder .lrob-event-card__date-month {
+    font-size: 0.85em;
+    font-weight: var(--lrob-cal-font-weight-bold);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: inherit;
+}
+
+.lrob-event-card--image-height-small.lrob-event-grid  .lrob-event-thumbnail--placeholder { height: 100px; }
+.lrob-event-card--image-height-medium.lrob-event-grid .lrob-event-thumbnail--placeholder { height: 140px; }
+.lrob-event-card--image-height-large.lrob-event-grid  .lrob-event-thumbnail--placeholder { height: 220px; }
+.lrob-event-card--image-height-auto.lrob-event-grid   .lrob-event-thumbnail--placeholder { height: 140px; }
 
 /* Date badge overlay on grid template (corner of the image) */
 .lrob-event-card__date-badge {

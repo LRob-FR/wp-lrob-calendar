@@ -119,13 +119,8 @@
                                 { value: 'large',  label: __('Large',   'lrob-calendar') },
                                 { value: 'auto',   label: __('Natural', 'lrob-calendar') }
                             ],
-                            help: __('Natural fills the card width at the image\'s own aspect ratio and disables click-to-enlarge.', 'lrob-calendar'),
+                            help: __('Natural fills the card width at the image\'s own aspect ratio.', 'lrob-calendar'),
                             onChange: (value) => setAttributes({ imageHeight: value })
-                        }),
-                        attributes.showImages && attributes.imageHeight !== 'auto' && el(ToggleControl, {
-                            label: __('Click image to enlarge', 'lrob-calendar'),
-                            checked: attributes.imageLightbox,
-                            onChange: (value) => setAttributes({ imageLightbox: value })
                         }),
                         el(SelectControl, {
                             label: __('Event description', 'lrob-calendar'),

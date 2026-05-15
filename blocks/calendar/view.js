@@ -33,18 +33,12 @@
         this.loadedEnd = config.loadedEnd || 0;
         this.loading = false;
 
-        // Display options (from block.json attributes)
-        this.popupSize = config.popupSize || 'standard';
-        this.popupImageDisplay = config.popupImageDisplay || 'contain';
-        this.popupImageHeight = config.popupImageHeight || 'medium';
-        this.popupShowImage = config.popupShowImage !== false;
-        this.popupImageLightbox = config.popupImageLightbox !== false;
+        // The popup is now owned by the shared event-popup module — its
+        // size, image fit and image visibility are global plugin settings
+        // (read by event-popup.js from window.lrobCalEventPopup) rather
+        // than per-block attributes.
 
-        // Mirror as CSS classes on the container so styles can react.
-        this.$container.addClass('lrob-cal-popup-size-' + this.popupSize);
-        this.$container.addClass('lrob-cal-popup-img-' + this.popupImageDisplay);
-        this.$container.addClass('lrob-cal-popup-imgh-' + this.popupImageHeight);
-        
+
         this.currentDate = new Date();
         this.currentMonth = this.currentDate.getMonth();
         this.currentYear = this.currentDate.getFullYear();
@@ -768,373 +762,39 @@
     };
 
     /**
-     * Open the popup in day-list mode for the given date string.
-     * Tapping an event in the list re-opens the popup as a regular event card
-     * (handled by the delegated `.lrob-cal-day-list-item` click in
-     * bindPopupHandlers).
+     * Open the popup in day-list mode for the given date string. The day-list
+     * is calendar-specific (a list of multiple events on a single date) and
+     * doesn't fit the shared module's event-card schema, so we pass it raw
+     * HTML via openHtml(). The container's standard show/close/swipe/ESC
+     * handlers still apply.
+     *
+     * One event in the day → skip the list, go straight to the full card.
      */
     LRobCalendar.prototype.showDayList = function(dateStr, $trigger) {
         var events = this.getEventsForDate(dateStr);
         if (!events.length) return;
-
-        // If exactly one event, skip the intermediate list and go straight
-        // to the full card — a one-item list is just friction.
         if (events.length === 1) {
             this.showPopup(events[0].id, $trigger || this.$container, null);
             return;
         }
 
         this.currentPopupEventId = null;
-        this.currentDayListDate = dateStr;
-
-        var html = '<div class="lrob-cal-popup-stage">'
-                 + this.buildDayListHtml(dateStr)
-                 + '</div>';
+        this.currentDayListDate  = dateStr;
 
         var $popup = this.$container.find('.lrob-cal-popup');
-        $popup.html(html).show();
-        $popup[0].offsetHeight; // reflow
-        $popup.addClass('is-shown');
-        document.body.classList.add('lrob-cal-popup-open');
-
-        // Position only matters on desktop; mobile is fullscreen via CSS.
-        if (!this.isMobileViewport()) {
-            this.positionPopupNearTrigger($popup, $trigger || this.$container);
-        }
+        window.LRobEventPopup.openHtml($popup[0], this.buildDayListHtml(dateStr));
     };
+
+    /* ─── Popup rendering moved to assets/js/event-popup.js ──────────────
+       The card markup, prev/next arrows, slide animation, swipe handling
+       and close/ESC behaviour now live in the shared LRobEventPopup module.
+       view.js just owns the calendar-specific logic: computing siblings
+       across the loaded events, handling cross-month navigation, and the
+       day-list mode (multi-event-on-one-day view). */
 
     /**
-     * Build the HTML for prev/next arrow buttons. Returns '' if neither
-     * sibling exists. Buttons carry `data-target-id` so the click handler
-     * (delegated on $popup in bindPopupHandlers) knows where to go.
-     * In v1.1.0 the arrows live INSIDE the popup header alongside the
-     * close button — no longer floated outside the card.
-     */
-    LRobCalendar.prototype.buildArrowsHtml = function(siblings) {
-        var prevLabel = this.i18n.prevEvent || 'Previous event';
-        var nextLabel = this.i18n.nextEvent || 'Next event';
-        var chevLeft  = this.icons.chevronLeft  || '&lsaquo;';
-        var chevRight = this.icons.chevronRight || '&rsaquo;';
-        var html = '';
-        if (siblings.prev) {
-            html += '<button class="lrob-cal-popup-nav lrob-cal-popup-nav--prev" type="button" '
-                  + 'aria-label="' + this.escapeHtml(prevLabel) + '" '
-                  + 'data-target-id="' + siblings.prev.id + '">' + chevLeft + '</button>';
-        }
-        if (siblings.next) {
-            html += '<button class="lrob-cal-popup-nav lrob-cal-popup-nav--next" type="button" '
-                  + 'aria-label="' + this.escapeHtml(nextLabel) + '" '
-                  + 'data-target-id="' + siblings.next.id + '">' + chevRight + '</button>';
-        }
-        return html;
-    };
-
-    /**
-     * Short uppercase month name for the date block (e.g. "JUIN", "JUN").
-     * Pulled from the localized monthNames array, truncated to 3 chars.
-     */
-    LRobCalendar.prototype.shortMonthName = function(monthIndex) {
-        var name = (this.monthNames && this.monthNames[monthIndex]) || '';
-        return name.substring(0, 3).toUpperCase();
-    };
-
-    /**
-     * Build the .lrob-cal-popup-content card HTML for a single event.
-     * No event handlers attached here — clicks are delegated on the popup
-     * (see bindPopupHandlers). The lightbox URL travels as `data-full-url`
-     * on the thumbnail button so the delegated handler can read it without
-     * re-binding per card.
-     */
-    LRobCalendar.prototype.buildCardHtml = function(event, siblings) {
-        siblings = siblings || { prev: null, next: null };
-        var when           = this.formatEventDateAndTime(event);
-        var closeLabel     = this.i18n.close     || 'Close';
-        var viewImageLabel = this.i18n.viewImage || 'View image';
-        var fullUrl        = event.thumbnailFull || event.thumbnail || '';
-        var closeIcon      = this.icons.close || '&times;';
-        var arrowIcon      = this.icons.arrowRight || '&rarr;';
-
-        var startDate = new Date(event.start);
-        var dayNum    = startDate.getDate();
-        var monthStr  = this.shortMonthName(startDate.getMonth());
-
-        // Date-block color pair — same per-event hashed-or-category pastel
-        // pair the events-list cards use (PHP-computed, shipped with the
-        // event payload). Falls back to the primary-soft pair if absent.
-        var pillStyle = '';
-        if (event.pillBg || event.pillText) {
-            pillStyle = ' style="background-color: ' + this.escapeHtml(event.pillBg || '')
-                      + '; color: ' + this.escapeHtml(event.pillText || '') + '"';
-        }
-
-        var html = '<div class="lrob-cal-popup-content" data-event-id="' + event.id + '">';
-
-        // Header: date block (left) + title (center) + nav/close (right).
-        html += '<div class="lrob-cal-popup-header">';
-        html += '<div class="lrob-cal-date-block" aria-hidden="true"' + pillStyle + '>';
-        html += '<span class="lrob-cal-date-block-day">' + dayNum + '</span>';
-        html += '<span class="lrob-cal-date-block-month">' + this.escapeHtml(monthStr) + '</span>';
-        html += '</div>';
-
-        if (this.publicPagesEnabled) {
-            html += '<h4 class="lrob-cal-popup-title"><a href="' + event.url + '">' + this.escapeHtml(event.title) + '</a></h4>';
-        } else {
-            html += '<h4 class="lrob-cal-popup-title">' + this.escapeHtml(event.title) + '</h4>';
-        }
-
-        html += '<div class="lrob-cal-popup-actions">';
-        html += this.buildArrowsHtml(siblings);
-        html += '<button class="lrob-cal-popup-close" type="button" aria-label="' + this.escapeHtml(closeLabel) + '">' + closeIcon + '</button>';
-        html += '</div>';
-        html += '</div>';  // header
-
-        // Body
-        html += '<div class="lrob-cal-popup-body">';
-
-        // Meta rows. Date and time stacked on two lines (no preposition).
-        html += '<div class="lrob-cal-popup-meta-list">';
-        html += '<p class="lrob-cal-popup-meta lrob-cal-popup-date">'
-              + (this.icons.calendar || '')
-              + '<span class="lrob-cal-popup-meta-stack">'
-              + '<span class="lrob-cal-popup-date-date">' + this.escapeHtml(when.date) + '</span>'
-              + (when.time
-                  ? '<span class="lrob-cal-popup-date-time">' + this.escapeHtml(when.time) + '</span>'
-                  : '')
-              + '</span>'
-              + '</p>';
-
-        if (event.venue || event.city) {
-            var location = [];
-            if (event.venue) location.push(this.escapeHtml(event.venue));
-            if (event.city)  location.push(this.escapeHtml(event.city));
-            html += '<p class="lrob-cal-popup-meta lrob-cal-popup-location">'
-                  + (this.icons.location || '')
-                  + '<span>' + location.join(', ') + '</span>'
-                  + '</p>';
-        }
-
-        if (event.recurring) {
-            html += '<p class="lrob-cal-popup-meta lrob-cal-popup-recurring">'
-                  + (this.icons.recurring || '')
-                  + '<span>' + this.escapeHtml(this.i18n.recurring || 'Recurring') + '</span>'
-                  + '</p>';
-        }
-
-        if (event.isFree) {
-            html += '<p class="lrob-cal-popup-meta lrob-cal-popup-cost lrob-cal-popup-cost--free">'
-                  + (this.icons.ticket || '')
-                  + '<span>' + this.escapeHtml(this.i18n.free || 'Free') + '</span>'
-                  + '</p>';
-        } else if (event.cost) {
-            html += '<p class="lrob-cal-popup-meta lrob-cal-popup-cost">'
-                  + (this.icons.ticket || '')
-                  + '<span>' + this.escapeHtml(event.cost) + '</span>'
-                  + '</p>';
-        }
-        html += '</div>';  // meta list
-
-        if (event.excerpt) {
-            html += '<p class="lrob-cal-popup-excerpt">' + this.escapeHtml(event.excerpt) + '</p>';
-        }
-
-        // Featured image moved BELOW the meta. Treated as supporting content,
-        // not the hero — the date block is the visual anchor instead.
-        if (event.thumbnail && this.popupShowImage) {
-            if (this.popupImageLightbox) {
-                html += '<button class="lrob-cal-popup-thumb" type="button" '
-                      + 'aria-label="' + this.escapeHtml(viewImageLabel) + '" '
-                      + 'data-full-url="' + this.escapeHtml(fullUrl) + '" '
-                      + 'data-event-title="' + this.escapeHtml(event.title || '') + '">';
-                html += '<img src="' + event.thumbnail + '" alt="" loading="lazy">';
-                html += '</button>';
-            } else {
-                html += '<div class="lrob-cal-popup-thumb lrob-cal-popup-thumb--static">';
-                html += '<img src="' + event.thumbnail + '" alt="" loading="lazy">';
-                html += '</div>';
-            }
-        }
-
-        // CTA row — bottom of the body. Ticket link is the secondary button
-        // (when set); the primary CTA is the "view event" link.
-        html += '<div class="lrob-cal-popup-cta">';
-        if (event.ticketUrl) {
-            html += '<a href="' + event.ticketUrl + '" class="lrob-cal-popup-link lrob-cal-popup-link--ticket" target="_blank" rel="noopener">'
-                  + this.escapeHtml(this.i18n.getTickets || 'Get tickets') + '</a>';
-        }
-        if (this.publicPagesEnabled) {
-            html += '<a href="' + event.url + '" class="lrob-cal-popup-link">'
-                  + this.escapeHtml(this.linkText) + arrowIcon + '</a>';
-        }
-        html += '</div>';
-
-        html += '</div>';  // body
-        html += '</div>';  // content
-        return html;
-    };
-
-    LRobCalendar.prototype.showPopup = function(eventId, $trigger, clickEvent) {
-        var event = this.events.find(function(e) { return e.id === eventId; });
-        if (!event) return;
-
-        this.currentPopupEventId = eventId;
-        var siblings = this.getSortedEventsAroundId(eventId);
-
-        // Build the popup body: just a stage holding the single card. Arrows
-        // and the close button now live INSIDE the card header — no more
-        // floating buttons outside the popup. The stage stays so two cards
-        // can briefly coexist during a slide transition (see navigatePopupTo).
-        var html = '<div class="lrob-cal-popup-stage">'
-                 + this.buildCardHtml(event, siblings)
-                 + '</div>';
-
-        var $popup = this.$container.find('.lrob-cal-popup');
-        $popup.html(html).show();
-        // Force a reflow so the opacity transition picks up the display change.
-        $popup[0].offsetHeight; // eslint-disable-line no-unused-expressions
-        $popup.addClass('is-shown');
-
-        // Body scroll lock on mobile (the CSS rule is scoped to ≤600px).
-        document.body.classList.add('lrob-cal-popup-open');
-
-        // Preload prev/next thumbnails so navigation feels instant.
-        if (siblings.prev && siblings.prev.thumbnail) { (new Image()).src = siblings.prev.thumbnail; }
-        if (siblings.next && siblings.next.thumbnail) { (new Image()).src = siblings.next.thumbnail; }
-
-        // Desktop only: position the popup near the clicked cell. Mobile uses
-        // CSS flex centering — overriding inline top/left via !important.
-        if (!window.matchMedia || !window.matchMedia('(max-width: 600px)').matches) {
-            this.positionPopupNearTrigger($popup, $trigger);
-        }
-    };
-
-    /**
-     * Desktop popup positioning: anchor the card to the clicked cell, then
-     * adjust to keep it inside the calendar container. No-op on mobile.
-     */
-    LRobCalendar.prototype.positionPopupNearTrigger = function($popup, $trigger) {
-        var containerOffset = this.$container.offset();
-        var containerWidth  = this.$container.outerWidth();
-        var containerHeight = this.$container.outerHeight();
-        var triggerOffset   = $trigger.offset();
-        var popupWidth      = $popup.outerWidth()  || 360;
-        var popupHeight     = $popup.outerHeight() || 200;
-
-        var top  = triggerOffset.top  - containerOffset.top  + $trigger.outerHeight() + 5;
-        var left = triggerOffset.left - containerOffset.left;
-        if (left + popupWidth > containerWidth - 10) left = containerWidth - popupWidth - 10;
-        if (left < 10) left = 10;
-        if (top + popupHeight > containerHeight - 10) {
-            top = triggerOffset.top - containerOffset.top - popupHeight - 5;
-        }
-        if (top < 10) top = 10;
-
-        $popup.css({ top: top, left: left });
-    };
-
-    /**
-     * One-time popup-level handlers bound on the persistent .lrob-cal-popup
-     * element. $popup.html() replaces inner content but keeps these listeners
-     * alive — re-binding in showPopup would stack handlers and fire navigation
-     * multiple times after a few opens. All click handlers use jQuery event
-     * delegation so they survive content swaps (initial open AND two-card
-     * navigation swap).
-     */
-    LRobCalendar.prototype.bindPopupHandlers = function() {
-        var self = this;
-        var $popup = this.$container.find('.lrob-cal-popup');
-
-        // Close button — delegated.
-        $popup.on('click', '.lrob-cal-popup-close', function (e) {
-            e.preventDefault();
-            self.hidePopup();
-        });
-
-        // Thumbnail → lightbox. Bound ONLY to the <button> variant; the
-        // static <div> shares the class but should not be clickable.
-        $popup.on('click', 'button.lrob-cal-popup-thumb', function (e) {
-            e.preventDefault();
-            var $btn  = $(this);
-            var url   = $btn.attr('data-full-url')    || '';
-            var title = $btn.attr('data-event-title') || '';
-            self.openLightbox(url, title);
-        });
-
-        // Prev/next nav arrows — delegated; direction is derived from class.
-        $popup.on('click', '.lrob-cal-popup-nav', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            var $btn = $(this);
-            var targetId = parseInt($btn.attr('data-target-id'), 10);
-            var dir = $btn.hasClass('lrob-cal-popup-nav--next') ? 'left' : 'right';
-            self.navigatePopupTo(targetId, dir);
-        });
-
-        // Day-list row → open the full event card popup. We MUST stop the
-        // click from bubbling up: showPopup() rebuilds $popup.html(), which
-        // detaches this item from the DOM. By the time the document-level
-        // outside-click handler runs, e.target.closest('.lrob-cal-popup')
-        // returns null (the detached node has no popup ancestor), so the
-        // outside-click handler fires hidePopup() and immediately closes the
-        // popup that just opened.
-        $popup.on('click', '.lrob-cal-day-list-item', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            var targetId = parseInt($(this).attr('data-event-id'), 10);
-            if (!targetId) return;
-            self.showPopup(targetId, self.$container, null);
-        });
-
-        // Mobile swipe nav.
-        var swipeStartX = 0;
-        var swipeStartY = 0;
-        var swipeTracking = false;
-
-        $popup.on('touchstart.lrobSwipe', function (e) {
-            if (!e.originalEvent.touches || e.originalEvent.touches.length !== 1) {
-                swipeTracking = false;
-                return;
-            }
-            var t = e.originalEvent.touches[0];
-            swipeStartX = t.clientX;
-            swipeStartY = t.clientY;
-            swipeTracking = true;
-        });
-        $popup.on('touchend.lrobSwipe', function (e) {
-            if (!swipeTracking) return;
-            swipeTracking = false;
-            var t = e.originalEvent.changedTouches[0];
-            var dx = t.clientX - swipeStartX;
-            var dy = t.clientY - swipeStartY;
-            // Lower threshold + reject mostly-vertical motion.
-            if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.3) {
-                var siblings = self.getSortedEventsAroundId(self.currentPopupEventId);
-                var target = dx < 0 ? siblings.next : siblings.prev;
-                if (target) self.navigatePopupTo(target.id, dx < 0 ? 'left' : 'right');
-            }
-        });
-    };
-
-    LRobCalendar.prototype.hidePopup = function() {
-        this.currentPopupEventId = null;
-        var $popup = this.$container.find('.lrob-cal-popup');
-        if (!$popup.hasClass('is-shown')) {
-            $popup.hide();
-            document.body.classList.remove('lrob-cal-popup-open');
-            return;
-        }
-        $popup.removeClass('is-shown');
-        // Match the CSS transition duration before fully hiding.
-        setTimeout(function () {
-            // Skip hide() if a new popup opened in the meantime (re-added .is-shown).
-            if (!$popup.hasClass('is-shown')) {
-                $popup.hide();
-                document.body.classList.remove('lrob-cal-popup-open');
-            }
-        }, 200);
-    };
-
-    /**
-     * All loaded events sorted by start date, plus the prev/next neighbours of `id`.
+     * Sorted-by-start neighbours of `id` across the loaded events.
+     * Used both for the popup's prev/next arrows and for swipe nav.
      */
     LRobCalendar.prototype.getSortedEventsAroundId = function(id) {
         var sorted = this.events.slice().sort(function (a, b) {
@@ -1151,25 +811,46 @@
         };
     };
 
+    LRobCalendar.prototype.showPopup = function(eventId) {
+        var event = this.events.find(function(e) { return e.id === eventId; });
+        if (!event) return;
+        this.currentPopupEventId = eventId;
+
+        var siblings = this.getSortedEventsAroundId(eventId);
+        // Preload sibling thumbs so navigation feels instant.
+        if (siblings.prev && siblings.prev.thumbnail) { (new Image()).src = siblings.prev.thumbnail; }
+        if (siblings.next && siblings.next.thumbnail) { (new Image()).src = siblings.next.thumbnail; }
+
+        var self = this;
+        var popupEl = this.$container.find('.lrob-cal-popup')[0];
+        window.LRobEventPopup.open(popupEl, event, {
+            siblings: siblings,
+            linkText: self.linkText,
+            onNavigate: function (targetId, direction) {
+                self.navigatePopupTo(targetId, direction);
+            },
+            onClose: function () {
+                self.currentPopupEventId = null;
+            },
+        });
+    };
+
+    LRobCalendar.prototype.hidePopup = function() {
+        this.currentPopupEventId = null;
+        var popupEl = this.$container.find('.lrob-cal-popup')[0];
+        if (popupEl) window.LRobEventPopup.close(popupEl);
+    };
+
     /**
-     * Open the popup for `targetId`. If the event's start date is outside the
-     * currently rendered month, navigate the calendar to that month first.
-     *
-     * Cross-month case: set this.pendingPopupId; render()'s consumePendingPopup()
-     * will reopen the popup after the grid has been (re)rendered — including
-     * after an async loadEvents fetch. The popup element itself persists across
-     * renders thanks to ensureShell(), so the existing popup just gets new content.
+     * Move the popup to a different event with the two-card slide. Handles
+     * cross-month transitions by kicking off the grid re-render in the
+     * background — the popup lives above the grid and isn't affected.
      */
     LRobCalendar.prototype.navigatePopupTo = function(targetId, direction) {
         var ev = this.events.find(function (e) { return e.id === targetId; });
         if (!ev) return;
 
-        var self = this;
-        var $popup = this.$container.find('.lrob-cal-popup');
-
-        // direction: 'left' → NEXT (current slides off left, new in from right).
-        //            'right' → PREV (current slides off right, new in from left).
-        // Fallback when callers don't pass a direction: derive from index order.
+        // Derive direction if not given (used by programmatic nav).
         if (!direction) {
             var sorted = this.events.slice().sort(function (a, b) {
                 return new Date(a.start) - new Date(b.start);
@@ -1182,160 +863,37 @@
             direction = targetIdx > currIdx ? 'left' : 'right';
         }
 
-        var $stage = $popup.find('.lrob-cal-popup-stage');
-        if (!$stage.length) {
-            // Defensive: stage missing means popup wasn't built by the current
-            // showPopup. Fall back to a full rebuild (no slide).
-            this.showPopup(targetId, this.$container, null);
-            return;
-        }
-
-        // Cross-month navigation: kick off the grid re-render in the
-        // BACKGROUND so the popup's two-card slide animation isn't sacrificed.
-        // ensureShell() preserves the popup element across renders, and the
-        // grid lives behind it visually, so the user sees a smooth card
-        // transition while the month grid updates underneath.
         var d = new Date(ev.start);
-        var sameMonth = d.getMonth() === this.currentMonth && d.getFullYear() === this.currentYear;
-        if (!sameMonth) {
-            this.currentMonth = d.getMonth();
-            this.currentYear  = d.getFullYear();
-            // Skip pendingPopupId — we're handling the popup ourselves with the
-            // two-card slide, so consumePendingPopup() must NOT try to reopen.
+        if (d.getMonth() !== this.currentMonth || d.getFullYear() !== this.currentYear) {
+            this.currentMonth   = d.getMonth();
+            this.currentYear    = d.getFullYear();
             this.pendingPopupId = null;
             this.checkAndLoadEvents();
         }
 
-        // Two-card slide: insert the new card as a SIBLING of the outgoing
-        // card inside the stage. Both animate simultaneously (one out, one in)
-        // so the user never sees an empty popup — that gap was the source of
-        // the "blinking to black" flash.
-        var siblings = this.getSortedEventsAroundId(targetId);
-        var $newCard = $(this.buildCardHtml(ev, siblings)).addClass('is-incoming');
-        $stage.append($newCard);
-        // The outgoing card's header still has arrows pointing at the OLD
-        // siblings. Disable them during the slide so a stray double-tap
-        // doesn't navigate again mid-transition.
-        $stage.find('.lrob-cal-popup-content:not(.is-incoming) .lrob-cal-popup-nav').attr('disabled', 'disabled');
-
-        // Force reflow so both cards' initial transforms are committed before
-        // the animation classes fire — otherwise the browser might collapse
-        // the from→to states into a single frame and skip the animation.
-        $stage[0].offsetHeight; // eslint-disable-line no-unused-expressions
-
-        var navClass = direction === 'left' ? 'is-navigating-left' : 'is-navigating-right';
-        $stage.addClass(navClass);
-
-        // Update tracked event id immediately so subsequent swipes target the
-        // newly-displayed card's siblings, not the outgoing card's.
         this.currentPopupEventId = targetId;
-
-        // After the animation finishes, drop the outgoing card and clean up
-        // the staging classes so the new card sits in normal flow.
-        setTimeout(function () {
-            $stage.find('.lrob-cal-popup-content').not('.is-incoming').remove();
-            $newCard.removeClass('is-incoming');
-            $stage.removeClass('is-navigating-left is-navigating-right');
-        }, 260);
-
-        // Preload thumbs for THIS card's siblings so the next swipe is also instant.
+        var siblings = this.getSortedEventsAroundId(targetId);
         if (siblings.prev && siblings.prev.thumbnail) { (new Image()).src = siblings.prev.thumbnail; }
         if (siblings.next && siblings.next.thumbnail) { (new Image()).src = siblings.next.thumbnail; }
+
+        var popupEl = this.$container.find('.lrob-cal-popup')[0];
+        window.LRobEventPopup.navigateTo(popupEl, ev, siblings, direction);
     };
 
     /**
-     * Format an event's date + time as TWO separate strings so the popup can
-     * stack them on two lines (date on top, time below, no "at" / "à").
-     * Returns { date, time }. Time is '' for all-day events.
+     * Day-list mode is calendar-specific (the shared module handles event
+     * cards only). Wire up its click handler here. Other popup interactions
+     * (close, prev/next, swipe, ESC) are owned by the module.
      */
-    LRobCalendar.prototype.formatEventDateAndTime = function(event) {
-        var start = new Date(event.start);
-        var end   = event.end ? new Date(event.end) : null;
-        var dateOpts = { day: 'numeric', month: 'long', year: 'numeric' };
-        var timeOpts = { hour: '2-digit', minute: '2-digit' };
-        var dateFmt = new Intl.DateTimeFormat(this.siteLocale, dateOpts);
-        var timeFmt = new Intl.DateTimeFormat(this.siteLocale, timeOpts);
-
-        // Instant — start only
-        if (event.instant || !end) {
-            return {
-                date: dateFmt.format(start),
-                time: event.allDay ? '' : timeFmt.format(start),
-            };
-        }
-
-        var sameDay = start.getFullYear() === end.getFullYear()
-            && start.getMonth() === end.getMonth()
-            && start.getDate() === end.getDate();
-
-        if (event.allDay) {
-            return {
-                date: sameDay ? dateFmt.format(start) : dateFmt.format(start) + ' – ' + dateFmt.format(end),
-                time: '',
-            };
-        }
-
-        if (sameDay) {
-            return {
-                date: dateFmt.format(start),
-                time: timeFmt.format(start) + ' – ' + timeFmt.format(end),
-            };
-        }
-        return {
-            // Multi-day non-all-day: keep the date range on the first line and
-            // the start-time on the second (most useful piece of info).
-            date: dateFmt.format(start) + ' – ' + dateFmt.format(end),
-            time: timeFmt.format(start) + ' – ' + timeFmt.format(end),
-        };
-    };
-
-    /**
-     * Legacy single-line formatter — still used by the agenda view and any
-     * older call sites. Internally just joins date+time with an en-dash.
-     */
-    LRobCalendar.prototype.formatEventWhen = function(event) {
-        var start = new Date(event.start);
-        var end = event.end ? new Date(event.end) : null;
-
-        var dateOpts = { day: 'numeric', month: 'long', year: 'numeric' };
-        var timeOpts = { hour: '2-digit', minute: '2-digit' };
-        var fullOpts = Object.assign({}, dateOpts, timeOpts);
-
-        var dateFmt = new Intl.DateTimeFormat(this.siteLocale, dateOpts);
-        var timeFmt = new Intl.DateTimeFormat(this.siteLocale, timeOpts);
-        var fullFmt = new Intl.DateTimeFormat(this.siteLocale, fullOpts);
-
-        // Instant: just the start
-        if (event.instant) {
-            return event.allDay ? dateFmt.format(start) : fullFmt.format(start);
-        }
-
-        if (!end) {
-            return event.allDay ? dateFmt.format(start) : fullFmt.format(start);
-        }
-
-        var sameDay = start.getFullYear() === end.getFullYear()
-            && start.getMonth() === end.getMonth()
-            && start.getDate() === end.getDate();
-
-        if (event.allDay) {
-            return sameDay ? dateFmt.format(start) : dateFmt.format(start) + ' — ' + dateFmt.format(end);
-        }
-
-        if (sameDay) {
-            return fullFmt.format(start) + ' — ' + timeFmt.format(end);
-        }
-        return fullFmt.format(start) + ' — ' + fullFmt.format(end);
-    };
-
-    /**
-     * Delegate to the shared lightbox module (assets/js/lightbox.js).
-     * Loaded as a script dep of `lrob-calendar-view`.
-     */
-    LRobCalendar.prototype.openLightbox = function(imageUrl, title) {
-        if (window.LRobLightbox && window.LRobLightbox.open) {
-            window.LRobLightbox.open(imageUrl, title);
-        }
+    LRobCalendar.prototype.bindPopupHandlers = function() {
+        var self = this;
+        var $popup = this.$container.find('.lrob-cal-popup');
+        $popup.on('click', '.lrob-cal-day-list-item', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var targetId = parseInt($(this).attr('data-event-id'), 10);
+            if (targetId) self.showPopup(targetId);
+        });
     };
 
     LRobCalendar.prototype.escapeHtml = function(text) {

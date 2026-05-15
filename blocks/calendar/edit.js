@@ -6,7 +6,7 @@
     const { registerBlockType } = wp.blocks;
     const { createElement: el, Fragment } = wp.element;
     const { InspectorControls, useBlockProps } = wp.blockEditor;
-    const { PanelBody, SelectControl, TextControl, ToggleControl } = wp.components;
+    const { PanelBody, SelectControl, TextControl } = wp.components;
     const { __ } = wp.i18n;
 
     const data = window.lrobCalendarBlocks || { categories: [], tags: [] };
@@ -52,47 +52,6 @@
                             onChange: (value) => setAttributes({ linkText: value }),
                             help: __('Text for the event link in popup', 'lrob-calendar'),
                             __nextHasNoMarginBottom: true
-                        })
-                    ),
-                    el(PanelBody, { title: __('Popup Display', 'lrob-calendar'), initialOpen: false },
-                        el(SelectControl, {
-                            label: __('Popup size', 'lrob-calendar'),
-                            value: attributes.popupSize,
-                            options: [
-                                { value: 'compact',  label: __('Compact',  'lrob-calendar') },
-                                { value: 'standard', label: __('Standard', 'lrob-calendar') },
-                                { value: 'spacious', label: __('Spacious', 'lrob-calendar') }
-                            ],
-                            onChange: (value) => setAttributes({ popupSize: value })
-                        }),
-                        el(ToggleControl, {
-                            label: __('Show Images', 'lrob-calendar'),
-                            checked: attributes.popupShowImage,
-                            onChange: (value) => setAttributes({ popupShowImage: value })
-                        }),
-                        attributes.popupShowImage && el(SelectControl, {
-                            label: __('Image display', 'lrob-calendar'),
-                            value: attributes.popupImageDisplay,
-                            options: [
-                                { value: 'contain', label: __('Show whole image', 'lrob-calendar') },
-                                { value: 'cover',   label: __('Crop to fill',     'lrob-calendar') }
-                            ],
-                            onChange: (value) => setAttributes({ popupImageDisplay: value })
-                        }),
-                        attributes.popupShowImage && el(SelectControl, {
-                            label: __('Image height', 'lrob-calendar'),
-                            value: attributes.popupImageHeight,
-                            options: [
-                                { value: 'small',  label: __('Small',  'lrob-calendar') },
-                                { value: 'medium', label: __('Medium', 'lrob-calendar') },
-                                { value: 'large',  label: __('Large',  'lrob-calendar') }
-                            ],
-                            onChange: (value) => setAttributes({ popupImageHeight: value })
-                        }),
-                        attributes.popupShowImage && el(ToggleControl, {
-                            label: __('Click image to enlarge', 'lrob-calendar'),
-                            checked: attributes.popupImageLightbox,
-                            onChange: (value) => setAttributes({ popupImageLightbox: value })
                         })
                     )
                 ),

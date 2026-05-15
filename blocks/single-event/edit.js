@@ -5,7 +5,7 @@
     const { registerBlockType } = wp.blocks;
     const { createElement: el, Fragment, useState, useEffect, useMemo } = wp.element;
     const { InspectorControls, useBlockProps } = wp.blockEditor;
-    const { PanelBody, SelectControl, Spinner, TextControl, Button, ToggleControl } = wp.components;
+    const { PanelBody, SelectControl, Spinner, TextControl, Button } = wp.components;
     const { __ } = wp.i18n;
     const apiFetch = wp.apiFetch;
 
@@ -143,13 +143,8 @@
                                 { value: 'large',  label: __('Large',   'lrob-calendar') },
                                 { value: 'auto',   label: __('Natural', 'lrob-calendar') }
                             ],
-                            help: __('Natural fills the card width at the image\'s own aspect ratio and disables click-to-enlarge.', 'lrob-calendar'),
+                            help: __('Natural fills the card width at the image\'s own aspect ratio.', 'lrob-calendar'),
                             onChange: (value) => setAttributes({ imageHeight: value })
-                        }),
-                        attributes.imageHeight !== 'auto' && el(ToggleControl, {
-                            label: __('Click image to enlarge', 'lrob-calendar'),
-                            checked: attributes.imageLightbox,
-                            onChange: (value) => setAttributes({ imageLightbox: value })
                         })
                     )
                 ),
