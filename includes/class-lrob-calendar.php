@@ -34,6 +34,10 @@ class LRob_Calendar {
         require_once LROB_CALENDAR_PATH . 'includes/class-lrob-calendar-single-event.php';
         require_once LROB_CALENDAR_PATH . 'includes/class-lrob-calendar-export.php';
         require_once LROB_CALENDAR_PATH . 'includes/class-lrob-calendar-import.php';
+        // Updater needs to load on every request — WP-cron driven update
+        // checks happen on the frontend too, and those should still pick up
+        // a new GitHub release.
+        require_once LROB_CALENDAR_PATH . 'includes/class-lrob-calendar-updater.php';
 
         if (is_admin()) {
             require_once LROB_CALENDAR_PATH . 'includes/class-lrob-calendar-admin.php';
@@ -55,6 +59,7 @@ class LRob_Calendar {
 
         new LRob_Calendar_Blocks();
         new LRob_Calendar_Single_Event();
+        new LRob_Calendar_Updater();
 
         if (is_admin()) {
             new LRob_Calendar_Admin();

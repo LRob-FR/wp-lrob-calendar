@@ -178,6 +178,12 @@ GPL-2.0-or-later — same as WordPress. See [LICENSE](LICENSE) for the full text
 
 ## Changelog
 
+### 1.1.1 — Self-hosted updates
+
+- Plugin now checks GitHub releases for new versions and surfaces them as standard WordPress update notices. Hits `api.github.com/repos/LRob-FR/wp-lrob-calendar/releases/latest`, compares against `LROB_CALENDAR_VERSION`, injects the release zip URL into WP's update transient. "View version details" shows the release notes (Markdown → HTML).
+- 12h transient cache keeps the API call rate well under GitHub's 60/hour unauthenticated limit even on shared hosting.
+- No external library, ~200 lines in `class-lrob-calendar-updater.php`.
+
 ### 1.1.0 — Frontend overhaul
 
 A visual + UX rebuild. No feature removals, no DB migrations, no breaking changes to imports — installs over 1.0.x cleanly.

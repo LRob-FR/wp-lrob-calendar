@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: LRob Calendar 1.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/lrob-calendar\n"
-"POT-Creation-Date: 2026-05-15T19:46:50+00:00\n"
+"POT-Creation-Date: 2026-05-15T20:11:45+00:00\n"
 "PO-Revision-Date: 2026-05-12 18:00+0200\n"
 "Last-Translator: Robin Labadie <claude@lrob.fr>\n"
 "Language-Team: French <claude@lrob.fr>\n"
@@ -926,6 +926,13 @@ msgstr "Carte du lieu de l'événement"
 #: includes/class-lrob-calendar-single-event.php:248
 msgid "View larger map"
 msgstr "Voir la carte en grand"
+
+#: includes/class-lrob-calendar-updater.php:121
+msgid ""
+"A clean event calendar for WordPress with recurring events, click-to-preview "
+"month grid, agenda view, AJAX-paginated event lists, and an OpenStreetMap "
+"embed on single-event pages."
+msgstr ""
 
 #: blocks/calendar/edit.js:25
 msgid "Layout"
