@@ -269,6 +269,15 @@ body.lrob-cal-popup-open {
     font-weight: var(--lrob-cal-font-weight-semibold);
 }
 
+/* Tighten consecutive contact rows so they read as ONE contact card,
+   not four disconnected meta entries scattered after the cost line. */
+.lrob-cal-popup-meta + .lrob-cal-popup-contact {
+    margin-top: var(--lrob-cal-space-1);
+}
+.lrob-cal-popup-contact + .lrob-cal-popup-contact {
+    margin-top: calc(var(--lrob-cal-space-2) * -1 + 4px);
+}
+
 /* Excerpt (short clamped text for the calendar's quick-look variant) */
 .lrob-cal-popup-excerpt {
     margin: 0 0 var(--lrob-cal-space-4);

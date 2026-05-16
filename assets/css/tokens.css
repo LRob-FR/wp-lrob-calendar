@@ -88,6 +88,28 @@
     color: currentColor;
 }
 
+/* Tiny "Calendar by LRob" credit shown at the bottom of every block.
+   Disable-able via Settings → Appearance → "Show branding". */
+.lrob-cal-credit {
+    margin: var(--lrob-cal-space-2) 0 0;
+    padding: 0;
+    text-align: right;
+    font-size: 0.72em;
+    line-height: 1;
+    color: var(--lrob-cal-text-subtle);
+    opacity: 0.65;
+}
+
+.lrob-cal-credit a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.lrob-cal-credit a:hover {
+    color: var(--lrob-cal-primary);
+    opacity: 1;
+}
+
 /* Empty-state copy reused by every block */
 .lrob-no-events {
     text-align: center;

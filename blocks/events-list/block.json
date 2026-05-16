@@ -18,8 +18,10 @@
         "template":        { "type": "string",  "default": "list" },
         "showImages":      { "type": "boolean", "default": true },
         "showExcerpt":     { "type": "boolean", "default": true },
-        "descriptionMode": { "type": "string",  "default": "inline" },
+        "descriptionMode": { "type": "string",  "default": "button" },
         "showCategories":  { "type": "boolean", "default": true },
+        "locationDisplay": { "type": "string",  "default": "full" },
+        "contactDisplay":  { "type": "string",  "default": "full" },
         "imageDisplay":    { "type": "string",  "default": "contain" },
         "imageHeight":     { "type": "string",  "default": "medium" },
         "imagePosition":   { "type": "string",  "default": "right" }

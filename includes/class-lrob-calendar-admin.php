@@ -232,7 +232,44 @@ class LRob_Calendar_Admin {
         if (!current_user_can('manage_options')) {
             return;
         }
-        
+
+        // Demo events insertion — separate POST handler from the settings
+        // save, so the rest of the page can render normally afterwards.
+        $demo_notice = '';
+        if (isset($_POST['lrob_insert_demo_events']) && wp_verify_nonce($_POST['lrob_demo_nonce'] ?? '', 'lrob_calendar_demo_events')) {
+            $existing  = LRob_Calendar_Demo_Events::existing_count();
+            $confirmed = !empty($_POST['lrob_demo_confirm']);
+            if ($existing > 0 && !$confirmed) {
+                $demo_notice = '<div class="notice notice-warning"><p>'
+                    . sprintf(
+                        /* translators: %d: number of existing events */
+                        esc_html(_n(
+                            'There is already %d event in your calendar. Tick the confirmation box below and click "Insert demo events" again to add the demo events anyway.',
+                            'There are already %d events in your calendar. Tick the confirmation box below and click "Insert demo events" again to add the demo events anyway.',
+                            $existing,
+                            'lrob-calendar'
+                        )),
+                        $existing
+                    )
+                    . '</p></div>';
+            } else {
+                $count = LRob_Calendar_Demo_Events::insert_all();
+                $demo_notice = '<div class="notice notice-success"><p>'
+                    . sprintf(
+                        /* translators: %d: number of events created */
+                        esc_html(_n(
+                            '%d demo event inserted.',
+                            '%d demo events inserted.',
+                            $count,
+                            'lrob-calendar'
+                        )),
+                        $count
+                    )
+                    . '</p></div>';
+            }
+        }
+        if ($demo_notice) echo $demo_notice;
+
         if (isset($_POST['lrob_save_settings']) && wp_verify_nonce($_POST['lrob_settings_nonce'], 'lrob_calendar_settings')) {
             update_option('lrob_calendar_default_timezone', sanitize_text_field($_POST['default_timezone'] ?? 'UTC'));
 
@@ -286,6 +323,10 @@ class LRob_Calendar_Admin {
             update_option('lrob_calendar_popup_show_image', $popup_show_image ? 1 : 0);
             update_option('lrob_calendar_popup_image_fit',  $popup_image_fit);
 
+            // Small "Calendar by LRob" credit at the bottom of each block.
+            $show_branding = !empty($_POST['show_branding']);
+            update_option('lrob_calendar_show_branding', $show_branding ? 1 : 0);
+
             echo '<div class="notice notice-success"><p>' . __('Settings saved.', 'lrob-calendar') . '</p></div>';
         }
 
@@ -301,6 +342,7 @@ class LRob_Calendar_Admin {
         $uncat_color      = (string) get_option('lrob_calendar_uncategorized_pill_color', '');
         $popup_show_image = (bool)   get_option('lrob_calendar_popup_show_image', true);
         $popup_image_fit  = (string) get_option('lrob_calendar_popup_image_fit', 'contain');
+        $show_branding    = (bool)   get_option('lrob_calendar_show_branding', true);
         $effective_start_of_week = LRob_Calendar::get_start_of_week();
         $day_labels = [
             0 => __('Sunday', 'lrob-calendar'),
@@ -473,6 +515,18 @@ class LRob_Calendar_Admin {
                             </p>
                         </td>
                     </tr>
+                    <tr>
+                        <th scope="row"><?php esc_html_e('Branding', 'lrob-calendar'); ?></th>
+                        <td>
+                            <label>
+                                <input type="checkbox" name="show_branding" value="1" <?php checked($show_branding); ?>>
+                                <?php esc_html_e('Show a small "Calendar by LRob" credit at the bottom of each block', 'lrob-calendar'); ?>
+                            </label>
+                            <p class="description">
+                                <?php esc_html_e('Helps spread the word about the plugin. Tiny, low-contrast, links to the LRob website. Disable freely if you prefer no attribution.', 'lrob-calendar'); ?>
+                            </p>
+                        </td>
+                    </tr>
                 </table>
 
                 <h2 style="margin-top: 2em;"><?php esc_html_e('Other', 'lrob-calendar'); ?></h2>
@@ -500,6 +554,40 @@ class LRob_Calendar_Admin {
                     </button>
                 </p>
             </form>
+
+            <?php
+            // Demo events generator — separate <form> so it doesn't interact
+            // with the settings save flow.
+            $existing_count = LRob_Calendar_Demo_Events::existing_count();
+            ?>
+            <hr style="margin: 2em 0;">
+            <h2><?php esc_html_e('Demo events', 'lrob-calendar'); ?></h2>
+            <p class="description" style="max-width: 640px;">
+                <?php esc_html_e('Inserts a handful of sample events spread across the current and upcoming month. Useful for previewing the plugin\'s look on a fresh install, or for client demos. Each event is clearly marked "[DÉMO]" in its title and links back to lrob.fr.', 'lrob-calendar'); ?>
+            </p>
+            <form method="post" action="">
+                <?php wp_nonce_field('lrob_calendar_demo_events', 'lrob_demo_nonce'); ?>
+                <?php if ($existing_count > 0): ?>
+                    <p>
+                        <label>
+                            <input type="checkbox" name="lrob_demo_confirm" value="1">
+                            <?php
+                            printf(
+                                /* translators: %d: existing event count */
+                                esc_html__('I understand my calendar already contains %d event(s); add the demo events anyway.', 'lrob-calendar'),
+                                $existing_count
+                            );
+                            ?>
+                        </label>
+                    </p>
+                <?php endif; ?>
+                <p>
+                    <button type="submit" name="lrob_insert_demo_events" class="button">
+                        <?php esc_html_e('Insert demo events', 'lrob-calendar'); ?>
+                    </button>
+                </p>
+            </form>
+
             <?php $this->render_credit_footer(); ?>
         </div>
         <?php

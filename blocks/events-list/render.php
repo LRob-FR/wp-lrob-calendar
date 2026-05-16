@@ -138,4 +138,5 @@ if ($pagination && !empty($events) && $total_pages > 1):
          aria-hidden="true"
          style="display: none;"></div>
 <?php endif; ?>
+<?php echo LRob_Calendar_Block_Helpers::render_credit(); ?>
 </div>

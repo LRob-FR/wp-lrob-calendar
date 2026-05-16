@@ -42,6 +42,7 @@ class LRob_Calendar {
         if (is_admin()) {
             require_once LROB_CALENDAR_PATH . 'includes/class-lrob-calendar-admin.php';
             require_once LROB_CALENDAR_PATH . 'includes/class-lrob-calendar-meta-boxes.php';
+            require_once LROB_CALENDAR_PATH . 'includes/class-lrob-calendar-demo-events.php';
         }
     }
     
@@ -129,6 +130,13 @@ class LRob_Calendar {
 
         $post_types = new LRob_Calendar_Post_Types();
         $post_types->register();
+
+        // First-install default: dedicated single-event pages are DISABLED.
+        // Most sites only use the calendar/list blocks and don't want stray
+        // /event/foo URLs on their site map. add_option() is a no-op when the
+        // option already exists, so this only fires on fresh installs and
+        // never overrides an existing user choice (true OR false).
+        add_option('lrob_calendar_disable_public_pages', 1);
 
         flush_rewrite_rules();
     }

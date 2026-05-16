@@ -235,13 +235,26 @@
               + '</span>'
               + '</p>';
 
-        if (event.venue || event.city) {
-            var location = [];
-            if (event.venue) location.push(escapeHtml(event.venue));
-            if (event.city)  location.push(escapeHtml(event.city));
+        // Location block — full multi-line address when the event has one.
+        // Lines: venue / address / postal_code city / province / country.
+        // Empty fields are skipped; we never show stray commas.
+        var locLines = [];
+        if (event.venue)   locLines.push(escapeHtml(event.venue));
+        if (event.address) locLines.push(escapeHtml(event.address));
+        var postalCity = [];
+        if (event.postalCode) postalCity.push(escapeHtml(event.postalCode));
+        if (event.city)       postalCity.push(escapeHtml(event.city));
+        if (postalCity.length) locLines.push(postalCity.join(' '));
+        if (event.province) locLines.push(escapeHtml(event.province));
+        if (event.country)  locLines.push(escapeHtml(event.country));
+        if (locLines.length) {
             html += '<p class="lrob-cal-popup-meta lrob-cal-popup-location">'
                   + (config.icons.location || '')
-                  + '<span>' + location.join(', ') + '</span>'
+                  + '<span class="lrob-cal-popup-meta-stack">'
+                  + locLines.map(function (line) {
+                        return '<span>' + line + '</span>';
+                    }).join('')
+                  + '</span>'
                   + '</p>';
         }
 
@@ -261,6 +274,38 @@
             html += '<p class="lrob-cal-popup-meta lrob-cal-popup-cost">'
                   + (config.icons.ticket || '')
                   + '<span>' + escapeHtml(event.cost) + '</span>'
+                  + '</p>';
+        }
+
+        // Contact block — one row per provided field, each with its own icon.
+        // If someone entered the info, they want it surfaced.
+        if (event.contactName) {
+            html += '<p class="lrob-cal-popup-meta lrob-cal-popup-contact lrob-cal-popup-contact--name">'
+                  + (config.icons.person || '')
+                  + '<span>' + escapeHtml(event.contactName) + '</span>'
+                  + '</p>';
+        }
+        if (event.contactEmail) {
+            html += '<p class="lrob-cal-popup-meta lrob-cal-popup-contact lrob-cal-popup-contact--email">'
+                  + (config.icons.email || '')
+                  + '<span><a href="mailto:' + escapeAttr(event.contactEmail) + '">'
+                  + escapeHtml(event.contactEmail) + '</a></span>'
+                  + '</p>';
+        }
+        if (event.contactPhone) {
+            // Strip everything except digits and a leading + for the tel: URI.
+            var telHref = String(event.contactPhone).replace(/[^+\d]/g, '');
+            html += '<p class="lrob-cal-popup-meta lrob-cal-popup-contact lrob-cal-popup-contact--phone">'
+                  + (config.icons.phone || '')
+                  + '<span><a href="tel:' + escapeAttr(telHref) + '">'
+                  + escapeHtml(event.contactPhone) + '</a></span>'
+                  + '</p>';
+        }
+        if (event.contactUrl) {
+            html += '<p class="lrob-cal-popup-meta lrob-cal-popup-contact lrob-cal-popup-contact--url">'
+                  + (config.icons.link || '')
+                  + '<span><a href="' + escapeAttr(event.contactUrl) + '" target="_blank" rel="noopener">'
+                  + escapeHtml(event.contactUrl) + '</a></span>'
                   + '</p>';
         }
         html += '</div>';

@@ -323,6 +323,51 @@ class LRob_Calendar_Event {
         return $out;
     }
     
+    /**
+     * Return the date and time as TWO separate strings so callers can stack
+     * them on different lines. Mirrors the JS formatEventDateAndTime() used
+     * by the popup. Time is '' for all-day events.
+     *
+     * Returns ['date' => '...', 'time' => '...'].
+     */
+    public function format_date_and_time(?string $date_format = null, ?string $time_format = null): array {
+        $date_format = $date_format ?? get_option('date_format');
+        $time_format = $time_format ?? get_option('time_format');
+
+        $start_ts = (int) $this->data['start'];
+
+        if ($this->is_instant()) {
+            return [
+                'date' => wp_date($date_format, $start_ts),
+                'time' => $this->is_allday() ? '' : wp_date($time_format, $start_ts),
+            ];
+        }
+
+        $end_ts   = (int) $this->data['end'];
+        $same_day = wp_date('Y-m-d', $start_ts) === wp_date('Y-m-d', $end_ts);
+
+        if ($this->is_allday()) {
+            return [
+                'date' => $same_day
+                    ? wp_date($date_format, $start_ts)
+                    : wp_date($date_format, $start_ts) . ' – ' . wp_date($date_format, $end_ts),
+                'time' => '',
+            ];
+        }
+
+        if ($same_day) {
+            return [
+                'date' => wp_date($date_format, $start_ts),
+                'time' => wp_date($time_format, $start_ts) . ' – ' . wp_date($time_format, $end_ts),
+            ];
+        }
+
+        return [
+            'date' => wp_date($date_format, $start_ts) . ' – ' . wp_date($date_format, $end_ts),
+            'time' => wp_date($time_format, $start_ts) . ' – ' . wp_date($time_format, $end_ts),
+        ];
+    }
+
     public function is_free(): bool {
         return (bool) $this->data['is_free'];
     }

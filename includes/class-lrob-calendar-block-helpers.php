@@ -62,8 +62,19 @@ class LRob_Calendar_Block_Helpers {
             'allDay'        => $event->is_allday(),
             'instant'       => $event->is_instant(),
             'recurring'     => $event->is_recurring(),
+            // Full location set — popup renders multi-line address, list rows
+            // can opt into 'compact' (venue + city only) or 'full' display.
             'venue'         => $event->get('venue'),
+            'address'       => $event->get('address'),
             'city'          => $event->get('city'),
+            'postalCode'    => $event->get('postal_code'),
+            'province'      => $event->get('province'),
+            'country'       => $event->get('country'),
+            // Full contact set.
+            'contactName'   => $event->get('contact_name'),
+            'contactEmail'  => $event->get('contact_email'),
+            'contactPhone'  => $event->get('contact_phone'),
+            'contactUrl'    => $event->get('contact_url'),
             // The popup uses `thumbnail` directly as its <img src>, so 'large'
             // (≤1024px) keeps it crisp on the ~400-460px popup at any DPR.
             // `thumbnailFull` is the lightbox-grade size — actually larger.
@@ -282,6 +293,11 @@ class LRob_Calendar_Block_Helpers {
         //   below           — full-width below the content (the classic banner)
         // Grid template ignores this (image is always on top with date badge overlay).
         $image_position  = in_array($atts['imagePosition'] ?? 'right', ['right', 'left', 'below'], true) ? $atts['imagePosition'] : 'right';
+        // How verbosely to show location + contact in the ROW (not the popup —
+        // the popup always shows everything available). 'full' is the default
+        // because if a user entered the info, they want it seen.
+        $location_display = in_array($atts['locationDisplay'] ?? 'full', ['full', 'compact', 'none'], true) ? $atts['locationDisplay'] : 'full';
+        $contact_display  = in_array($atts['contactDisplay']  ?? 'full', ['full', 'compact', 'none'], true) ? $atts['contactDisplay']  : 'full';
 
         $date_format   = get_option('date_format');
         $time_format   = get_option('time_format');
@@ -448,23 +464,53 @@ class LRob_Calendar_Block_Helpers {
                 </h3>
 
                 <div class="lrob-event-meta">
+                    <?php $when_parts = $event->format_date_and_time($date_format, $time_format); ?>
                     <span class="lrob-event-date">
                         <?php echo LRob_Calendar_Icons::get('calendar'); ?>
-                        <span><?php echo esc_html($event->format_when($date_format, $time_format, ' – ')); ?></span>
+                        <span class="lrob-event-meta-stack">
+                            <span><?php echo esc_html($when_parts['date']); ?></span>
+                            <?php if ($when_parts['time']): ?>
+                                <span class="lrob-event-time"><?php echo esc_html($when_parts['time']); ?></span>
+                            <?php endif; ?>
+                        </span>
                     </span>
 
-                    <?php if ($event->has_location()): ?>
-                        <span class="lrob-event-location">
-                            <?php echo LRob_Calendar_Icons::get('location'); ?>
-                            <?php
-                            $location_parts = array_filter([
+                    <?php
+                    // Location — three modes:
+                    //   full    → multi-line address (default, shows what the
+                    //             editor filled in)
+                    //   compact → "venue, city" on one line (old behaviour)
+                    //   none    → hidden
+                    if ($location_display !== 'none' && $event->has_location()):
+                        if ($location_display === 'full') {
+                            $loc_lines = array_filter([
                                 $event->get('venue'),
-                                $event->get('city'),
+                                $event->get('address'),
+                                trim(($event->get('postal_code') ?: '') . ' ' . ($event->get('city') ?: '')),
+                                $event->get('province'),
+                                $event->get('country'),
                             ]);
                             ?>
-                            <span><?php echo esc_html(implode(', ', $location_parts)); ?></span>
-                        </span>
-                    <?php endif; ?>
+                            <span class="lrob-event-location lrob-event-location--full">
+                                <?php echo LRob_Calendar_Icons::get('location'); ?>
+                                <span class="lrob-event-meta-stack">
+                                    <?php foreach ($loc_lines as $line): ?>
+                                        <span><?php echo esc_html($line); ?></span>
+                                    <?php endforeach; ?>
+                                </span>
+                            </span>
+                            <?php
+                        } else {
+                            $compact_parts = array_filter([$event->get('venue'), $event->get('city')]);
+                            ?>
+                            <span class="lrob-event-location">
+                                <?php echo LRob_Calendar_Icons::get('location'); ?>
+                                <span><?php echo esc_html(implode(', ', $compact_parts)); ?></span>
+                            </span>
+                            <?php
+                        }
+                    endif;
+                    ?>
 
                     <?php if ($event->is_recurring()): ?>
                         <span class="lrob-event-recurring">
@@ -484,6 +530,47 @@ class LRob_Calendar_Block_Helpers {
                             <span><?php echo esc_html($event->get('cost')); ?></span>
                         </span>
                     <?php endif; ?>
+
+                    <?php
+                    // Contact — three modes. All contact items wrap in a
+                    // single .lrob-event-contact-group so they cluster
+                    // visually (tighter sub-gap) rather than scattering
+                    // among the other meta items.
+                    if ($contact_display !== 'none'):
+                        $c_name  = $event->get('contact_name');
+                        $c_email = $event->get('contact_email');
+                        $c_phone = $event->get('contact_phone');
+                        $c_url   = $event->get('contact_url');
+                        if ($c_name || $c_email || $c_phone || $c_url): ?>
+                            <span class="lrob-event-contact-group">
+                                <?php if ($c_name): ?>
+                                    <span class="lrob-event-contact-item">
+                                        <?php echo LRob_Calendar_Icons::get('person'); ?>
+                                        <span><?php echo esc_html($c_name); ?></span>
+                                    </span>
+                                <?php endif; ?>
+                                <?php if ($contact_display === 'full' && $c_email): ?>
+                                    <span class="lrob-event-contact-item">
+                                        <?php echo LRob_Calendar_Icons::get('email'); ?>
+                                        <span><a href="mailto:<?php echo esc_attr($c_email); ?>"><?php echo esc_html($c_email); ?></a></span>
+                                    </span>
+                                <?php endif; ?>
+                                <?php if ($contact_display === 'full' && $c_phone): ?>
+                                    <span class="lrob-event-contact-item">
+                                        <?php echo LRob_Calendar_Icons::get('phone'); ?>
+                                        <span><a href="tel:<?php echo esc_attr(preg_replace('/[^+\d]/', '', $c_phone)); ?>"><?php echo esc_html($c_phone); ?></a></span>
+                                    </span>
+                                <?php endif; ?>
+                                <?php if ($contact_display === 'full' && $c_url): ?>
+                                    <span class="lrob-event-contact-item">
+                                        <?php echo LRob_Calendar_Icons::get('link'); ?>
+                                        <span><a href="<?php echo esc_url($c_url); ?>" target="_blank" rel="noopener"><?php echo esc_html($c_url); ?></a></span>
+                                    </span>
+                                <?php endif; ?>
+                            </span>
+                        <?php endif;
+                    endif;
+                    ?>
                 </div>
 
                 <?php if ($excerpt_html): ?>
@@ -596,6 +683,22 @@ class LRob_Calendar_Block_Helpers {
         </article>
         <?php
         return (string) ob_get_clean();
+    }
+
+    /**
+     * Small "Powered by LRob Calendar" attribution rendered at the bottom of
+     * each block. Disabled site-wide from the Appearance settings page.
+     * Returns the HTML (or '' when disabled) so callers can echo directly.
+     */
+    public static function render_credit(): string {
+        if (!get_option('lrob_calendar_show_branding', true)) {
+            return '';
+        }
+        $url   = defined('LROB_CALENDAR_PLUGIN_URL') ? LROB_CALENDAR_PLUGIN_URL : 'https://www.lrob.fr/';
+        $label = esc_html__('Calendar by LRob', 'lrob-calendar');
+        return '<p class="lrob-cal-credit">'
+             . '<a href="' . esc_url($url) . '" target="_blank" rel="noopener">© ' . $label . '</a>'
+             . '</p>';
     }
 
     /**

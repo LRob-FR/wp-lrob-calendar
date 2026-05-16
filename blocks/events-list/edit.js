@@ -133,6 +133,28 @@
                             help: __('Inline puts the description in the row. The button mode opens the full event in a popup card on click.', 'lrob-calendar'),
                             onChange: (value) => setAttributes({ descriptionMode: value })
                         }),
+                        el(SelectControl, {
+                            label: __('Location', 'lrob-calendar'),
+                            value: attributes.locationDisplay,
+                            options: [
+                                { value: 'full',    label: __('Full address (multi-line)', 'lrob-calendar') },
+                                { value: 'compact', label: __('Compact (venue, city)',      'lrob-calendar') },
+                                { value: 'none',    label: __('Don’t show',                  'lrob-calendar') }
+                            ],
+                            help: __('The popup always shows the full address; this only affects the row.', 'lrob-calendar'),
+                            onChange: (value) => setAttributes({ locationDisplay: value })
+                        }),
+                        el(SelectControl, {
+                            label: __('Contact info', 'lrob-calendar'),
+                            value: attributes.contactDisplay,
+                            options: [
+                                { value: 'full',    label: __('Name, email, phone, website', 'lrob-calendar') },
+                                { value: 'compact', label: __('Name only',                    'lrob-calendar') },
+                                { value: 'none',    label: __('Don’t show',                    'lrob-calendar') }
+                            ],
+                            help: __('The popup always shows full contact info; this only affects the row.', 'lrob-calendar'),
+                            onChange: (value) => setAttributes({ contactDisplay: value })
+                        }),
                         el(ToggleControl, {
                             label: __('Show Categories', 'lrob-calendar'),
                             checked: attributes.showCategories,

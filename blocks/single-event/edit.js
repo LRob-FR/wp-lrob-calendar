@@ -145,6 +145,26 @@
                             ],
                             help: __('Natural fills the card width at the image\'s own aspect ratio.', 'lrob-calendar'),
                             onChange: (value) => setAttributes({ imageHeight: value })
+                        }),
+                        el(SelectControl, {
+                            label: __('Location', 'lrob-calendar'),
+                            value: attributes.locationDisplay,
+                            options: [
+                                { value: 'full',    label: __('Full address (multi-line)', 'lrob-calendar') },
+                                { value: 'compact', label: __('Compact (venue, city)',      'lrob-calendar') },
+                                { value: 'none',    label: __('Don’t show',                  'lrob-calendar') }
+                            ],
+                            onChange: (value) => setAttributes({ locationDisplay: value })
+                        }),
+                        el(SelectControl, {
+                            label: __('Contact info', 'lrob-calendar'),
+                            value: attributes.contactDisplay,
+                            options: [
+                                { value: 'full',    label: __('Name, email, phone, website', 'lrob-calendar') },
+                                { value: 'compact', label: __('Name only',                    'lrob-calendar') },
+                                { value: 'none',    label: __('Don’t show',                    'lrob-calendar') }
+                            ],
+                            onChange: (value) => setAttributes({ contactDisplay: value })
                         })
                     )
                 ),

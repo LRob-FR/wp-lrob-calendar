@@ -25,11 +25,13 @@ if (!$event->get_post()) {
 }
 
 echo LRob_Calendar_Block_Helpers::render_event_card($event, [
-    'template'       => $attributes['template'],
-    'showImages'     => true,
-    'showExcerpt'    => true,
-    'showCategories' => true,
-    'imageDisplay'   => $attributes['imageDisplay']  ?? 'contain',
-    'imageHeight'    => $attributes['imageHeight']   ?? 'medium',
-    'imageLightbox'  => $attributes['imageLightbox'] ?? true,
+    'template'        => $attributes['template'],
+    'showImages'      => true,
+    'showExcerpt'     => true,
+    'showCategories'  => true,
+    'imageDisplay'    => $attributes['imageDisplay']    ?? 'contain',
+    'imageHeight'     => $attributes['imageHeight']     ?? 'medium',
+    'locationDisplay' => $attributes['locationDisplay'] ?? 'full',
+    'contactDisplay'  => $attributes['contactDisplay']  ?? 'full',
 ]);
+echo LRob_Calendar_Block_Helpers::render_credit();

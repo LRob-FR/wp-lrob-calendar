@@ -1,28 +1,25 @@
 <?php
 /**
- * Uninstall LRob Calendar
+ * LRob Calendar — uninstall handler.
+ *
+ * INTENTIONALLY A NO-OP. Earlier versions wiped every event, every custom
+ * table, and every plugin option whenever the user removed the plugin from
+ * the WordPress admin. That's destructive behaviour the user can't easily
+ * undo or even preview, and WordPress provides no native way to surface a
+ * "what do you want to delete?" prompt in the deletion flow.
+ *
+ * So this file keeps plugin data untouched on uninstall. Re-installing the
+ * plugin later picks up everything where you left off. Users who genuinely
+ * want to scrub the database can drop the `{prefix}lrob_events`,
+ * `{prefix}lrob_event_instances` and `{prefix}lrob_event_category_meta`
+ * tables manually, and delete the `lrob_calendar_*` options + the
+ * `lrob_event` post type rows + the `lrob_event_category` /
+ * `lrob_event_tag` taxonomy terms.
+ *
+ * The principle: it should never be possible to lose months of event data
+ * by clicking "Delete" on a plugin row.
  */
 
 defined('WP_UNINSTALL_PLUGIN') || exit;
 
-global $wpdb;
-
-// Delete posts
-$wpdb->query("DELETE FROM {$wpdb->posts} WHERE post_type = 'lrob_event'");
-$wpdb->query("DELETE FROM {$wpdb->postmeta} WHERE post_id NOT IN (SELECT ID FROM {$wpdb->posts})");
-
-// Delete terms
-$wpdb->query("DELETE FROM {$wpdb->terms} WHERE term_id IN (SELECT term_id FROM {$wpdb->term_taxonomy} WHERE taxonomy IN ('lrob_event_category', 'lrob_event_tag'))");
-$wpdb->query("DELETE FROM {$wpdb->term_taxonomy} WHERE taxonomy IN ('lrob_event_category', 'lrob_event_tag')");
-$wpdb->query("DELETE FROM {$wpdb->term_relationships} WHERE term_taxonomy_id NOT IN (SELECT term_taxonomy_id FROM {$wpdb->term_taxonomy})");
-
-// Drop custom tables
-$wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}lrob_events");
-$wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}lrob_event_instances");
-$wpdb->query("DROP TABLE IF EXISTS {$wpdb->prefix}lrob_event_category_meta");
-
-// Delete options
-$wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE 'lrob_calendar_%'");
-
-// Clear rewrite rules
-flush_rewrite_rules();
+// Intentionally empty.

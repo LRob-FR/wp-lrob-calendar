@@ -178,6 +178,32 @@ GPL-2.0-or-later — same as WordPress. See [LICENSE](LICENSE) for the full text
 
 ## Changelog
 
+### 1.1.2 — Full event info everywhere + demo events + polish
+
+Surface the data you entered, plus quality-of-life additions.
+
+**Popup card**
+- **Full address** (venue, street, postal code + city, region, country) and the **full contact block** (name, email, phone, website) rendered as separate icon rows. Previously only venue + city were visible in popups; contact info was only on the dedicated single-event page.
+- Contact items grouped with tighter row gap so name + email + phone + website read as one block.
+
+**Events list rows**
+- Two new editor sidebar controls: **"Location"** (Full / Compact / Don't show) and **"Contact info"** (Name+email+phone+website / Name only / Don't show). Both default to **Full** — if you took the time to fill the info, it shows by default.
+- **Time of day stacks under the date** instead of joining inline with a separator. Same treatment as the popup.
+- Contact items grouped in a sub-flex container so they read as one cohesive "contact card" rather than four chips scattered among unrelated meta items.
+- **"View details" button is now the default `descriptionMode`** (was inline). Lean rows + full info in the popup is the better default for most calendars.
+
+**New defaults / installs**
+- **Public event pages OFF by default for new installs.** Most calendars are embedded in pages; standalone `/event/foo` URLs were creating duplicate-content situations on small sites. Existing installs are unaffected (the setting is only set on first activation when the option doesn't yet exist).
+
+**Demo events generator**
+- Settings → **"Demo events" → "Insert demo events"** button creates a handful of realistic WordPress/hosting-themed sample events spread across the current + upcoming month (workshop, webinar, multi-day WordCamp, weekly recurring support, instant announcement, planned maintenance). Each event is clearly marked `[DÉMO]` and points to lrob.fr. Warns if events already exist and requires an explicit confirmation checkbox to proceed.
+
+**Branding toggle**
+- Small **"© Calendar by LRob"** credit at the bottom of each block, linking back to the plugin page. On by default. Disable freely from Settings → Appearance → "Branding".
+
+**Uninstall safety**
+- **Uninstall no longer wipes plugin data.** Removing the plugin from the WP admin previously dropped every event, custom table and option silently. Now uninstall is a no-op: re-installing later picks up where you left off. Manual cleanup remains possible by dropping the three `{prefix}lrob_*` tables and `lrob_calendar_*` options.
+
 ### 1.1.1 — Self-hosted updates
 
 - Plugin now checks GitHub releases for new versions and surfaces them as standard WordPress update notices. Hits `api.github.com/repos/LRob-FR/wp-lrob-calendar/releases/latest`, compares against `LROB_CALENDAR_VERSION`, injects the release zip URL into WP's update transient. "View version details" shows the release notes (Markdown → HTML).

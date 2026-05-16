@@ -38,4 +38,5 @@ $config = [
          data-view="<?php echo esc_attr($attributes['view']); ?>"
          data-link-text="<?php echo esc_attr($link_text); ?>"
          data-config="<?php echo esc_attr(wp_json_encode($config)); ?>"></div>
+    <?php echo LRob_Calendar_Block_Helpers::render_credit(); ?>
 </div>

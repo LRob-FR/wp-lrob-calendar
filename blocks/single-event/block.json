@@ -8,11 +8,13 @@
     "icon": "calendar",
     "textdomain": "lrob-calendar",
     "attributes": {
-        "eventId":       { "type": "number", "default": 0 },
-        "template":      { "type": "string", "default": "full" },
-        "imageDisplay":  { "type": "string", "default": "contain" },
-        "imageHeight":   { "type": "string", "default": "medium" },
-        "imagePosition": { "type": "string", "default": "right" }
+        "eventId":         { "type": "number", "default": 0 },
+        "template":        { "type": "string", "default": "full" },
+        "imageDisplay":    { "type": "string", "default": "contain" },
+        "imageHeight":     { "type": "string", "default": "medium" },
+        "imagePosition":   { "type": "string", "default": "right" },
+        "locationDisplay": { "type": "string", "default": "full" },
+        "contactDisplay":  { "type": "string", "default": "full" }
     },
     "editorScript": "lrob-calendar-block-single-event-edit",
     "editorStyle":  "lrob-calendar-blocks-editor",
