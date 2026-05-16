@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: LRob Calendar 1.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/lrob-calendar\n"
-"POT-Creation-Date: 2026-05-16T10:59:23+00:00\n"
+"POT-Creation-Date: 2026-05-16T15:29:54+00:00\n"
 "PO-Revision-Date: 2026-05-12 18:00+0200\n"
 "Last-Translator: Robin Labadie <claude@lrob.fr>\n"
 "Language-Team: French <claude@lrob.fr>\n"
@@ -41,7 +41,7 @@ msgid "https://www.lrob.fr"
 msgstr "https://www.lrob.fr"
 
 #: blocks/calendar/render.php:20
-#: includes/class-lrob-calendar-block-helpers.php:648
+#: includes/class-lrob-calendar-block-helpers.php:659
 #: includes/class-lrob-calendar-blocks.php:217 blocks/calendar/edit.js:51
 msgid "View event"
 msgstr "Voir l'événement"
@@ -500,32 +500,32 @@ msgid "Location"
 msgstr "Lieu"
 
 #: includes/class-lrob-calendar-admin.php:821
-#: includes/class-lrob-calendar-block-helpers.php:518
+#: includes/class-lrob-calendar-block-helpers.php:529
 #: includes/class-lrob-calendar-blocks.php:214
 #: includes/class-lrob-calendar-blocks.php:269
 msgid "Recurring"
 msgstr "Récurrent"
 
-#: includes/class-lrob-calendar-block-helpers.php:525
+#: includes/class-lrob-calendar-block-helpers.php:536
 #: includes/class-lrob-calendar-blocks.php:215
 #: includes/class-lrob-calendar-blocks.php:270
 #: includes/class-lrob-calendar-single-event.php:156
 msgid "Free"
 msgstr "Gratuit"
 
-#: includes/class-lrob-calendar-block-helpers.php:590
-#: includes/class-lrob-calendar-block-helpers.php:668
+#: includes/class-lrob-calendar-block-helpers.php:601
+#: includes/class-lrob-calendar-block-helpers.php:679
 msgid "View details"
 msgstr "Voir les détails"
 
-#: includes/class-lrob-calendar-block-helpers.php:643
+#: includes/class-lrob-calendar-block-helpers.php:654
 #: includes/class-lrob-calendar-blocks.php:216
 #: includes/class-lrob-calendar-blocks.php:271
 #: includes/class-lrob-calendar-single-event.php:165
 msgid "Get tickets"
 msgstr "Réserver une place"
 
-#: includes/class-lrob-calendar-block-helpers.php:698
+#: includes/class-lrob-calendar-block-helpers.php:709
 #, fuzzy
 msgid "Calendar by LRob"
 msgstr "Calendrier"
@@ -667,9 +667,9 @@ msgid ""
 "Gutenberg, picking a theme, managing media. Beginner-friendly, no technical "
 "background required. Held at LRob HQ in central Orléans."
 msgstr ""
-"Initiation pratique à WordPress : installation, premiers pas avec "
-"Gutenberg, choix d'un thème, gestion des médias. Public débutant, aucune "
-"connaissance technique requise. Dans les locaux de LRob, au cœur d'Orléans."
+"Initiation pratique à WordPress : installation, premiers pas avec Gutenberg, "
+"choix d'un thème, gestion des médias. Public débutant, aucune connaissance "
+"technique requise. Dans les locaux de LRob, au cœur d'Orléans."
 
 #: includes/class-lrob-calendar-demo-events.php:113
 msgid "Webinar: green hosting & WordPress performance"
@@ -748,8 +748,8 @@ msgid ""
 "This event is a sample inserted by the LRob Calendar plugin for "
 "demonstration purposes."
 msgstr ""
-"Cet événement est un exemple inséré par l'extension LRob Calendar à des "
-"fins de démonstration."
+"Cet événement est un exemple inséré par l'extension LRob Calendar à des fins "
+"de démonstration."
 
 #: includes/class-lrob-calendar-demo-events.php:177
 msgid "Learn more about the plugin and WordPress hosting from Orléans:"

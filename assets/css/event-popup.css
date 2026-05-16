@@ -229,8 +229,19 @@ body.lrob-cal-popup-open {
     color: var(--lrob-cal-text-muted);
     line-height: 1.4;
     display: flex;
-    align-items: center;
+    /* Top-align the icon — it sits next to the first line of the label
+       regardless of whether the label is single-line or a multi-line stack
+       (date+time, full address). align-items: center would float the icon
+       in the middle of tall blocks, which reads as visually broken. */
+    align-items: flex-start;
     gap: var(--lrob-cal-space-2);
+}
+
+/* Nudge icons down a hair so they sit on the cap-height of the text
+   rather than the absolute top of the line box. Visually centred against
+   single-line labels, still aligned with the first line on multi-line. */
+.lrob-cal-popup-meta .lrob-icon {
+    margin-top: 1px;
 }
 
 .lrob-cal-popup-meta .lrob-icon {
@@ -243,7 +254,6 @@ body.lrob-cal-popup-open {
 .lrob-cal-popup-date {
     color: var(--lrob-cal-text);
     font-weight: var(--lrob-cal-font-weight-medium);
-    align-items: flex-start;
 }
 
 .lrob-cal-popup-meta-stack {

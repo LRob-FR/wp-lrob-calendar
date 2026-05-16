@@ -1,47 +1,89 @@
 /**
  * Expand/collapse toggle for event cards whose description overflows the clamp.
  *
- * On init, scan for `.lrob-event-excerpt.lrob-cal-clampable` elements, measure
- * whether their scrollHeight exceeds the visible clampHeight, and if so insert
- * a "Show more" toggle button after them. Clicking the button toggles the
- * `.lrob-cal-expanded` class which removes the max-height and fade overlay.
+ * Scans `.lrob-event-excerpt.lrob-cal-clampable` elements, measures whether
+ * scrollHeight exceeds clientHeight, and if so inserts a "Show more" toggle
+ * button that adds/removes the `.lrob-cal-expanded` class.
  *
- * Exposed as `window.LRobCalExpand.init(root)` so the AJAX pagination handler
- * can re-bind after swapping the wrapper's innerHTML.
+ * Why multiple passes: the measurement depends on rendered text height,
+ * which depends on the font being loaded. If webfonts load AFTER initial
+ * measurement, text may reflow taller and overflow — but the toggle was
+ * never added because the early measurement said "fits".
+ *
+ * Strategy:
+ *   1. Run on DOMContentLoaded — initial check.
+ *   2. Re-run on document.fonts.ready — after webfonts settle (modern browsers).
+ *   3. Re-run on window.load — covers images + late CSS.
+ *   4. After window.load, items that STILL look like they fit get their
+ *      .lrob-cal-clampable class stripped (drops the fade gradient).
+ *
+ * Exposed as `window.LRobCalExpand.init(root)` so the AJAX pagination
+ * handler can re-bind after swapping the wrapper's innerHTML.
  */
 (function () {
     'use strict';
 
-    var BOUND_FLAG = 'lrobExpandChecked';
+    // Per-element marker on the dataset: 'done' once we've added a toggle.
+    var DONE_FLAG = 'lrobExpandDone';
 
     function getLabel(key, fallback) {
         var i18n = window.lrobCalCardI18n || {};
         return i18n[key] || fallback;
     }
 
-    function init(root) {
-        root = root || document;
-        var excerpts = root.querySelectorAll('.lrob-event-excerpt.lrob-cal-clampable');
+    function overflows(el) {
+        // 2px slack avoids sub-pixel rounding false positives.
+        return el.scrollHeight - el.clientHeight > 2;
+    }
 
+    /**
+     * Measure one excerpt. If it overflows, add the toggle and mark done.
+     * Idempotent — won't re-add if a toggle already exists.
+     */
+    function checkOne(el) {
+        if (el.dataset[DONE_FLAG]) return;
+        if (overflows(el)) addToggle(el);
+    }
+
+    /**
+     * Run a measurement pass on every clampable excerpt that hasn't gotten
+     * a toggle yet. Called from each timing checkpoint.
+     */
+    function pass(root) {
+        var excerpts = (root || document).querySelectorAll(
+            '.lrob-event-excerpt.lrob-cal-clampable'
+        );
         Array.prototype.forEach.call(excerpts, function (el) {
-            if (el.dataset[BOUND_FLAG]) return;
-            el.dataset[BOUND_FLAG] = '1';
+            // Defer to next frame so layout has settled.
+            requestAnimationFrame(function () { checkOne(el); });
+        });
+    }
 
-            // Defer to next frame so layout has settled — scrollHeight needs the
-            // browser to have laid out the content first.
-            requestAnimationFrame(function () {
-                if (el.scrollHeight - el.clientHeight > 2) {
-                    addToggle(el);
-                } else {
-                    // Content fits the clamp — strip the class so we don't
-                    // render the fade-out gradient over text that isn't truncated.
-                    el.classList.remove('lrob-cal-clampable');
-                }
-            });
+    /**
+     * Final pass — for items that still look like they fit AFTER everything
+     * (fonts, images, layout settled), strip the clampable class to drop the
+     * fade gradient. Anything that does overflow has already gotten a
+     * toggle in earlier passes.
+     */
+    function finalize() {
+        var excerpts = document.querySelectorAll(
+            '.lrob-event-excerpt.lrob-cal-clampable'
+        );
+        Array.prototype.forEach.call(excerpts, function (el) {
+            if (el.dataset[DONE_FLAG]) return;
+            if (!overflows(el)) {
+                el.classList.remove('lrob-cal-clampable');
+            } else {
+                // Late-blooming overflow — add the toggle now.
+                addToggle(el);
+            }
         });
     }
 
     function addToggle(excerptEl) {
+        if (excerptEl.dataset[DONE_FLAG]) return;
+        excerptEl.dataset[DONE_FLAG] = '1';
+
         var btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'lrob-cal-expand-toggle';
@@ -54,7 +96,7 @@
         var icon = document.createElement('span');
         icon.className = 'lrob-cal-expand-icon';
         icon.setAttribute('aria-hidden', 'true');
-        icon.textContent = '▾';
+        icon.textContent = '▾'; // ▾
 
         btn.appendChild(label);
         btn.appendChild(icon);
@@ -66,8 +108,16 @@
             label.textContent = expanded
                 ? getLabel('showLess', 'Show less')
                 : getLabel('showMore', 'Show more');
-            icon.textContent = expanded ? '▴' : '▾';
+            icon.textContent = expanded ? '▴' : '▾'; // ▴ / ▾
         });
+    }
+
+    /**
+     * Public entry — called once on DOM ready, then re-called from
+     * `.fonts.ready` / `window.load` / by the AJAX pagination handler.
+     */
+    function init(root) {
+        pass(root);
     }
 
     if (document.readyState === 'loading') {
@@ -75,6 +125,19 @@
     } else {
         init(document);
     }
+
+    // After webfonts settle — text may have grown.
+    if (document.fonts && document.fonts.ready && typeof document.fonts.ready.then === 'function') {
+        document.fonts.ready.then(function () { init(document); });
+    }
+
+    // After full load (images + late stylesheets).
+    window.addEventListener('load', function () {
+        init(document);
+        // One more tick, then finalize: strip clampable from items still
+        // fitting, so the fade gradient doesn't show over un-truncated text.
+        setTimeout(finalize, 100);
+    });
 
     window.LRobCalExpand = { init: init };
 })();

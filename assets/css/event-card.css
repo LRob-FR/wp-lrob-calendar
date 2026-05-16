@@ -164,15 +164,17 @@
 
 .lrob-event-meta > span {
     display: inline-flex;
-    align-items: center;
+    /* Top-align — icon sits next to the first line of the label, whether
+       the label is single-line or a multi-line stack. Consistent visual
+       rhythm across the meta row, no floating icons mid-block. */
+    align-items: flex-start;
     gap: var(--lrob-cal-space-2);
 }
 
-/* Full-address rendering: vertical stack of address lines next to the
-   location icon. align-items:flex-start so the icon sits at the top
-   line rather than getting centred against a tall block of text. */
-.lrob-event-meta > span.lrob-event-location--full {
-    align-items: flex-start;
+/* Nudge icons down 1px so they sit on the cap-height of the text rather
+   than the absolute top of the line box. */
+.lrob-event-meta .lrob-icon {
+    margin-top: 1px;
 }
 
 .lrob-event-meta-stack {
@@ -187,13 +189,6 @@
     color: var(--lrob-cal-text-muted);
     font-size: 0.92em;
     font-variant-numeric: tabular-nums;
-}
-
-/* The date row icon centers OK against a single-line date, but against the
-   date-over-time stack it should top-align so it lines up with the date,
-   not float in the middle. */
-.lrob-event-meta > .lrob-event-date {
-    align-items: flex-start;
 }
 
 /* Contact group — sub-flex container with a tighter gap than the parent's

@@ -178,6 +178,13 @@ GPL-2.0-or-later — same as WordPress. See [LICENSE](LICENSE) for the full text
 
 ## Changelog
 
+### 1.1.3 — Fixes: backslashes, icon alignment, "Show more", popup description parity
+
+- **Backslash bug**: every text field on the event editor (venue, address, contact name, cost…) used to gain a `\` before apostrophes and quotes on save, and the slashes accumulated on re-save. Cause: WordPress emulates legacy magic-quotes on `$_POST`, but the meta-box save handler didn't `wp_unslash()` before sanitizing. Fixed across the entire save path. Existing slashed values can be cleaned by re-saving each affected event once.
+- **Icon alignment**: meta-row icons (location, date, contact…) now top-align with the first line of the label instead of vertically centering against multi-line blocks (full address, date + time stack). Consistent visual rhythm across single-line and multi-line meta items.
+- **"Show more" button missing on long descriptions**: the excerpt clamp ran its overflow check once at DOMContentLoaded, but webfonts often load AFTER and reflow the text taller. The early measurement said "fits", stripped the clampable class, and the user saw a fade-clipped description with no way to read more. Now re-measures on `document.fonts.ready` and `window.load`, with a finalization pass that adds late-blooming toggles or drops the fade gradient on items that really do fit.
+- **Popup description parity between blocks**: clicking an event from the calendar popup used to show only the short excerpt while the events-list popup showed the full content — same module, different payload (descriptionHtml was only attached on the events-list path). Now `format_event_for_client()` always ships `descriptionHtml`, so both blocks render identically.
+
 ### 1.1.2 — Full event info everywhere + demo events + polish
 
 Surface the data you entered, plus quality-of-life additions.

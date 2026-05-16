@@ -3,7 +3,7 @@
  * Plugin Name: LRob - Calendar
  * Plugin URI: https://www.lrob.fr/wordpress/plugins/lrob-calendar/
  * Description: A powerful and clean event calendar for WordPress with recurring events, categories, locations, import/export and more.
- * Version: 1.1.2
+ * Version: 1.1.3
  * Author: LRob
  * Author URI: https://www.lrob.fr
  * License: GPL-2.0+
@@ -18,7 +18,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('LROB_CALENDAR_VERSION', '1.1.2');
+define('LROB_CALENDAR_VERSION', '1.1.3');
 define('LROB_CALENDAR_FILE', __FILE__);
 define('LROB_CALENDAR_PATH', plugin_dir_path(__FILE__));
 define('LROB_CALENDAR_URL', plugin_dir_url(__FILE__));

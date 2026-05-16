@@ -314,7 +314,12 @@ class LRob_Calendar_Meta_Boxes {
         
         // Date & Time — wrap DateTime constructors so an unparseable POST value
         // (gibberish timezone, empty start_date, etc.) doesn't fatal the save_post hook.
-        $timezone = sanitize_text_field($_POST['lrob_timezone'] ?? '');
+        // All $_POST text reads go through wp_unslash() before sanitize_*.
+        // WordPress emulates legacy magic-quotes on $_POST, so apostrophes
+        // and quotes arrive backslash-escaped; without unslashing, a venue
+        // like "Université d'Orléans" persists to the DB as
+        // "Université d\'Orléans" and the backslash renders on the frontend.
+        $timezone = sanitize_text_field(wp_unslash($_POST['lrob_timezone'] ?? ''));
         if ($timezone === '') {
             $timezone = LRob_Calendar_Event::get_default_timezone();
         }
@@ -326,12 +331,12 @@ class LRob_Calendar_Meta_Boxes {
             $tz = new DateTimeZone($timezone);
         }
 
-        $start_date = sanitize_text_field($_POST['lrob_start_date'] ?? '');
-        $start_time = sanitize_text_field($_POST['lrob_start_time'] ?? '00:00');
-        $end_date = sanitize_text_field($_POST['lrob_end_date'] ?? '');
-        $end_time = sanitize_text_field($_POST['lrob_end_time'] ?? '00:00');
+        $start_date = sanitize_text_field(wp_unslash($_POST['lrob_start_date'] ?? ''));
+        $start_time = sanitize_text_field(wp_unslash($_POST['lrob_start_time'] ?? '00:00'));
+        $end_date   = sanitize_text_field(wp_unslash($_POST['lrob_end_date']   ?? ''));
+        $end_time   = sanitize_text_field(wp_unslash($_POST['lrob_end_time']   ?? '00:00'));
 
-        $event_type = sanitize_text_field($_POST['lrob_event_type'] ?? 'standard');
+        $event_type = sanitize_text_field(wp_unslash($_POST['lrob_event_type'] ?? 'standard'));
         if (!in_array($event_type, ['standard', 'allday', 'instant'], true)) {
             $event_type = 'standard';
         }
@@ -368,28 +373,28 @@ class LRob_Calendar_Meta_Boxes {
         // Recurrence
         $rrule = $this->build_rrule_from_post();
         $event->set('recurrence_rules', $rrule);
-        $event->set('exception_dates', sanitize_text_field($_POST['lrob_exception_dates'] ?? ''));
-        
+        $event->set('exception_dates', sanitize_text_field(wp_unslash($_POST['lrob_exception_dates'] ?? '')));
+
         // Location
-        $event->set('venue', sanitize_text_field($_POST['lrob_venue'] ?? ''));
-        $event->set('address', sanitize_text_field($_POST['lrob_address'] ?? ''));
-        $event->set('city', sanitize_text_field($_POST['lrob_city'] ?? ''));
-        $event->set('province', sanitize_text_field($_POST['lrob_province'] ?? ''));
-        $event->set('postal_code', sanitize_text_field($_POST['lrob_postal_code'] ?? ''));
-        $event->set('country', sanitize_text_field($_POST['lrob_country'] ?? ''));
-        $event->set('latitude', floatval($_POST['lrob_latitude'] ?? 0) ?: null);
-        $event->set('longitude', floatval($_POST['lrob_longitude'] ?? 0) ?: null);
-        $event->set('show_map', isset($_POST['lrob_show_map']) ? 1 : 0);
+        $event->set('venue',       sanitize_text_field(wp_unslash($_POST['lrob_venue']       ?? '')));
+        $event->set('address',     sanitize_text_field(wp_unslash($_POST['lrob_address']     ?? '')));
+        $event->set('city',        sanitize_text_field(wp_unslash($_POST['lrob_city']        ?? '')));
+        $event->set('province',    sanitize_text_field(wp_unslash($_POST['lrob_province']    ?? '')));
+        $event->set('postal_code', sanitize_text_field(wp_unslash($_POST['lrob_postal_code'] ?? '')));
+        $event->set('country',     sanitize_text_field(wp_unslash($_POST['lrob_country']     ?? '')));
+        $event->set('latitude',    floatval($_POST['lrob_latitude']  ?? 0) ?: null);
+        $event->set('longitude',   floatval($_POST['lrob_longitude'] ?? 0) ?: null);
+        $event->set('show_map',         isset($_POST['lrob_show_map'])         ? 1 : 0);
         $event->set('show_coordinates', isset($_POST['lrob_show_coordinates']) ? 1 : 0);
-        
+
         // Contact & Cost
-        $event->set('contact_name', sanitize_text_field($_POST['lrob_contact_name'] ?? ''));
-        $event->set('contact_email', sanitize_email($_POST['lrob_contact_email'] ?? ''));
-        $event->set('contact_phone', sanitize_text_field($_POST['lrob_contact_phone'] ?? ''));
-        $event->set('contact_url', esc_url_raw($_POST['lrob_contact_url'] ?? ''));
-        $event->set('cost', sanitize_text_field($_POST['lrob_cost'] ?? ''));
-        $event->set('is_free', isset($_POST['lrob_is_free']) ? 1 : 0);
-        $event->set('ticket_url', esc_url_raw($_POST['lrob_ticket_url'] ?? ''));
+        $event->set('contact_name',  sanitize_text_field(wp_unslash($_POST['lrob_contact_name']  ?? '')));
+        $event->set('contact_email', sanitize_email(wp_unslash($_POST['lrob_contact_email']      ?? '')));
+        $event->set('contact_phone', sanitize_text_field(wp_unslash($_POST['lrob_contact_phone'] ?? '')));
+        $event->set('contact_url',   esc_url_raw(wp_unslash($_POST['lrob_contact_url']           ?? '')));
+        $event->set('cost',          sanitize_text_field(wp_unslash($_POST['lrob_cost']          ?? '')));
+        $event->set('is_free',       isset($_POST['lrob_is_free']) ? 1 : 0);
+        $event->set('ticket_url',    esc_url_raw(wp_unslash($_POST['lrob_ticket_url']            ?? '')));
         
         $event->save();
     }
@@ -441,41 +446,42 @@ class LRob_Calendar_Meta_Boxes {
     }
     
     private function build_rrule_from_post(): string {
-        // Check for raw RRULE first
-        $raw = trim($_POST['lrob_rrule_raw'] ?? '');
+        // Raw RRULE — unslash before trimming; users could legitimately have
+        // an apostrophe-containing rule (rare but possible in custom builds).
+        $raw = trim(wp_unslash($_POST['lrob_rrule_raw'] ?? ''));
         if (!empty($raw)) {
             return $raw;
         }
-        
-        $freq = strtoupper(sanitize_text_field($_POST['lrob_repeat'] ?? ''));
+
+        $freq = strtoupper(sanitize_text_field(wp_unslash($_POST['lrob_repeat'] ?? '')));
         if (empty($freq)) {
             return '';
         }
-        
+
         $parts = ['FREQ=' . $freq];
-        
+
         $interval = max(1, (int) ($_POST['lrob_interval'] ?? 1));
         if ($interval > 1) {
             $parts[] = 'INTERVAL=' . $interval;
         }
-        
+
         if ($freq === 'WEEKLY' && !empty($_POST['lrob_byday'])) {
-            $byday = array_map('sanitize_text_field', $_POST['lrob_byday']);
+            $byday = array_map('sanitize_text_field', wp_unslash((array) $_POST['lrob_byday']));
             $parts[] = 'BYDAY=' . implode(',', $byday);
         }
-        
-        $end_type = sanitize_text_field($_POST['lrob_repeat_end'] ?? 'never');
-        
+
+        $end_type = sanitize_text_field(wp_unslash($_POST['lrob_repeat_end'] ?? 'never'));
+
         if ($end_type === 'count') {
             $count = max(1, (int) ($_POST['lrob_count'] ?? 10));
             $parts[] = 'COUNT=' . $count;
         } elseif ($end_type === 'until') {
-            $until = sanitize_text_field($_POST['lrob_until'] ?? '');
+            $until = sanitize_text_field(wp_unslash($_POST['lrob_until'] ?? ''));
             if ($until) {
                 $parts[] = 'UNTIL=' . str_replace('-', '', $until) . 'T235959Z';
             }
         }
-        
+
         return implode(';', $parts);
     }
 }

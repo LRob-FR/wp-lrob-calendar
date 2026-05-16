@@ -52,10 +52,21 @@ class LRob_Calendar_Block_Helpers {
         // same pair).
         $pill_colors = self::date_pill_colors($color, $post_id);
 
+        // Full post content rendered through `the_content` filter (shortcodes,
+        // autop, oEmbeds, …). Sent in every event payload so the calendar
+        // popup and the events-list popup display identical full descriptions
+        // — previously the calendar fell back to the trimmed `excerpt` because
+        // descriptionHtml was only added by the events-list code path.
+        $description_html = '';
+        if (!empty($post->post_content)) {
+            $description_html = apply_filters('the_content', $post->post_content);
+        }
+
         return [
             'id'            => $post_id,
             'title'         => $post->post_title,
             'excerpt'       => self::build_excerpt($post),
+            'descriptionHtml' => $description_html,
             'url'           => get_permalink($post_id),
             'start'         => $start_dt->format('c'),
             'end'           => $end_dt->format('c'),
@@ -703,17 +714,12 @@ class LRob_Calendar_Block_Helpers {
 
     /**
      * Serialize an event into the JSON shape consumed by the shared
-     * event-popup module (assets/js/event-popup.js). Mirrors
-     * format_event_for_client() but adds `descriptionHtml` (the full
-     * post content, filtered) so the events-list popup can show the full
-     * detail view.
+     * event-popup module (assets/js/event-popup.js). Currently identical
+     * to format_event_for_client() since v1.1.3 — descriptionHtml is
+     * always shipped, so calendar popup and events-list popup show the
+     * same content. The wrapper stays for naming clarity at call sites.
      */
     public static function event_for_popup_json(LRob_Calendar_Event $event): array {
-        $data = self::format_event_for_client($event);
-        $post = $event->get_post();
-        if ($post && !empty($post->post_content)) {
-            $data['descriptionHtml'] = apply_filters('the_content', $post->post_content);
-        }
-        return $data;
+        return self::format_event_for_client($event);
     }
 }
