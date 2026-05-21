@@ -178,6 +178,11 @@ GPL-2.0-or-later — same as WordPress. See [LICENSE](LICENSE) for the full text
 
 ## Changelog
 
+### 1.1.4 — Snappier self-update checks
+
+- **Update cache TTL: 12h → 1h.** New GitHub releases now surface to the WordPress Updates screen within an hour instead of half a day. Still well clear of GitHub's 60 req/h unauthenticated rate limit, even on shared hosting where multiple sites share an outbound IP.
+- **Force-refresh on admin intent.** Clicking "Check again" on the Updates page (`?force-check=1`), or simply landing on `update-core.php`, now bypasses the plugin's release cache for that one request. Matches the behavior of WordPress core's own update checks — no more "I just pushed a release, why isn't it showing?" friction.
+
 ### 1.1.3 — Fixes: backslashes, icon alignment, "Show more", popup description parity
 
 - **Backslash bug**: every text field on the event editor (venue, address, contact name, cost…) used to gain a `\` before apostrophes and quotes on save, and the slashes accumulated on re-save. Cause: WordPress emulates legacy magic-quotes on `$_POST`, but the meta-box save handler didn't `wp_unslash()` before sanitizing. Fixed across the entire save path. Existing slashed values can be cleaned by re-saving each affected event once.

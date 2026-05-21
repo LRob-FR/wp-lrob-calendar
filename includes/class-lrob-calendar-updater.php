@@ -10,9 +10,11 @@
  *      release info from GitHub (changelog from the release body, formatted
  *      via a minimal Markdown→HTML conversion).
  *
- * The GitHub API response is cached in a transient for 12h. GitHub's
+ * The GitHub API response is cached in a transient for 1h. GitHub's
  * unauthenticated rate limit is 60 req/h per IP — well clear of that at this
  * cache rate, even on shared hosting where multiple sites share an outbound IP.
+ * Admin intent signals (the "Check again" button on the Updates page, or
+ * simply landing on update-core.php) bypass the cache for that one request.
  *
  * No external library. ~200 lines.
  */
@@ -24,7 +26,7 @@ if (!defined('ABSPATH')) {
 class LRob_Calendar_Updater {
 
     const TRANSIENT_KEY      = 'lrob_calendar_gh_release';
-    const TRANSIENT_TTL      = 12 * HOUR_IN_SECONDS;
+    const TRANSIENT_TTL      = HOUR_IN_SECONDS;
     const TRANSIENT_TTL_FAIL = HOUR_IN_SECONDS;   // shorter on network/API failure
     const PLUGIN_SLUG        = 'lrob-calendar';
 
@@ -35,7 +37,7 @@ class LRob_Calendar_Updater {
 
     /**
      * Inject our update notice into the transient WordPress uses to decide
-     * which plugins have updates available. Runs every ~12h via wp-cron
+     * which plugins have updates available. Runs every ~1h via wp-cron
      * (and on any admin page load if the transient has expired).
      */
     public function check_for_update($transient) {
@@ -135,17 +137,24 @@ class LRob_Calendar_Updater {
     /* ─── Internals ──────────────────────────────────────────────────── */
 
     /**
-     * Hit the GitHub API for the latest release. Cached 12h on success,
+     * Hit the GitHub API for the latest release. Cached 1h on success,
      * 1h on failure (to avoid hammering the API when it's flaky).
      * Returns null when there's no usable response.
+     *
+     * Cache lookup is skipped when is_force_refresh() — the admin is
+     * actively looking for updates and shouldn't have to wait an hour for
+     * the transient to roll over. The fresh response is still written back
+     * so subsequent loads on the same page don't re-hit the API.
      */
     private function get_release(): ?array {
-        $cached = get_transient(self::TRANSIENT_KEY);
-        if ($cached === 'none') {
-            return null;
-        }
-        if (is_array($cached) && !empty($cached)) {
-            return $cached;
+        if (!$this->is_force_refresh()) {
+            $cached = get_transient(self::TRANSIENT_KEY);
+            if ($cached === 'none') {
+                return null;
+            }
+            if (is_array($cached) && !empty($cached)) {
+                return $cached;
+            }
         }
 
         $api_url = 'https://api.github.com/repos/' . $this->github_repo() . '/releases/latest';
@@ -170,6 +179,29 @@ class LRob_Calendar_Updater {
 
         set_transient(self::TRANSIENT_KEY, $body, self::TRANSIENT_TTL);
         return $body;
+    }
+
+    /**
+     * True when the admin is signalling "check now" intent:
+     *   - ?force-check=1 on the URL — core sets this when "Check again" is
+     *     clicked on the Updates page, and wp_update_plugins() reads the
+     *     same flag to bypass its own cache.
+     *   - pagenow === 'update-core.php' — they're on the Updates screen
+     *     right now, so any cache hit there is just stale data they're
+     *     trying to refresh.
+     * Gated on is_admin() so frontend cron triggers never force-refresh.
+     */
+    private function is_force_refresh(): bool {
+        if (!is_admin()) {
+            return false;
+        }
+        if (isset($_GET['force-check']) && (string) $_GET['force-check'] === '1') {
+            return true;
+        }
+        if (($GLOBALS['pagenow'] ?? '') === 'update-core.php') {
+            return true;
+        }
+        return false;
     }
 
     private function github_repo(): string {
