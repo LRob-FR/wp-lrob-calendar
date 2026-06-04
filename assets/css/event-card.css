@@ -124,6 +124,12 @@
     flex-direction: column;
     gap: var(--lrob-cal-space-2);
     min-width: 0;
+    /* Break long unbreakable strings (e.g. a pasted URL in the description or
+       a long contact link) so they wrap inside the card instead of spilling
+       past its edge. overflow-wrap is inherited, so this covers the title,
+       meta rows and excerpt in one place. */
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
 
 /* Grid keeps the previous in-card padding (it still has card chrome). */
@@ -603,6 +609,17 @@
 .lrob-event-details-btn .lrob-icon {
     width: 18px;
     height: 18px;
+}
+
+/* Icon-only variant — used by the minimal template, where the only detail
+   affordance is a compact round "i" at the end of the row. No label, square
+   tap target, pill shape so it reads as a button. */
+.lrob-event-details-btn--icon {
+    flex: none;
+    align-self: center;
+    padding: var(--lrob-cal-space-1);
+    border-radius: var(--lrob-cal-radius-pill);
+    line-height: 0;
 }
 
 /* ─── Minimal template ───────────────────────────────────────────────────── */

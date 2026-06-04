@@ -361,6 +361,12 @@ class LRob_Calendar_Block_Helpers {
 
         // ─── Minimal template: single-line, no excerpt/image/categories ──
         if ($template === 'minimal') {
+            // Minimal rows show no description/image inline, so they'd otherwise
+            // have no path to the full event details. When the caller wired up
+            // the popup infrastructure (events-list sets enablePopup for minimal
+            // rows), emit a compact icon-only "i" trigger that opens the shared
+            // popup card — no full "View details" button, just the icon.
+            $enable_popup = !empty($atts['enablePopup']);
             ob_start();
             ?>
             <article class="<?php echo esc_attr(implode(' ', $card_classes)); ?>">
@@ -376,6 +382,19 @@ class LRob_Calendar_Block_Helpers {
                 </span>
                 <?php if (!$event->is_allday() && !$event->is_instant()): ?>
                     <span class="lrob-event-card__time"><?php echo esc_html(wp_date($time_format, $start_ts)); ?></span>
+                <?php endif; ?>
+                <?php if ($enable_popup):
+                    $details_label   = __('View details', 'lrob-calendar');
+                    $event_json_attr = esc_attr(wp_json_encode(self::event_for_popup_json($event)));
+                    ?>
+                    <button class="lrob-event-btn lrob-event-btn--ghost lrob-event-details-btn lrob-event-details-btn--icon"
+                            type="button"
+                            data-popup-for="<?php echo (int) $post->ID; ?>"
+                            data-event="<?php echo $event_json_attr; ?>"
+                            aria-expanded="false"
+                            aria-label="<?php echo esc_attr($details_label); ?>">
+                        <?php echo LRob_Calendar_Icons::get('info'); ?>
+                    </button>
                 <?php endif; ?>
             </article>
             <?php

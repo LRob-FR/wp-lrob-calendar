@@ -67,13 +67,20 @@ if ($pagination) {
 $events = LRob_Calendar_Event::get_events($args);
 
 // "View details" popup mode requires the shared event-popup CSS + JS
-// module plus the events-list trigger script. Enqueued conditionally
-// so vanilla list pages don't pay the cost.
-$popup_mode = (($attributes['descriptionMode'] ?? 'inline') === 'button');
-if ($popup_mode) {
+// module plus the events-list trigger script. The minimal template also
+// needs it: its rows carry a compact "i" trigger (their only path to the
+// full details). Enqueued conditionally so vanilla list pages don't pay
+// the cost.
+$popup_mode  = (($attributes['descriptionMode'] ?? 'inline') === 'button');
+$minimal     = (($attributes['template'] ?? 'list') === 'minimal');
+$needs_popup = $popup_mode || $minimal;
+if ($needs_popup) {
     wp_enqueue_style('lrob-calendar-event-popup');
     wp_enqueue_script('lrob-calendar-event-list-popup');
 }
+// Tell render_event_card to emit the minimal "i" trigger (only meaningful
+// for the minimal template, ignored otherwise).
+$attributes['enablePopup'] = $needs_popup;
 ?>
 <div class="lrob-cal-events-list-wrapper">
 <?php if (empty($events)): ?>
@@ -131,7 +138,7 @@ if ($pagination && !empty($events) && $total_pages > 1):
         endif; ?>
     </nav>
 <?php endif; ?>
-<?php if ($popup_mode && !empty($events)): ?>
+<?php if ($needs_popup && !empty($events)): ?>
     <div class="lrob-cal-popup lrob-events-list-popup"
          role="dialog"
          aria-modal="true"

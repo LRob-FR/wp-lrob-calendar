@@ -178,6 +178,12 @@ GPL-2.0-or-later — same as WordPress. See [LICENSE](LICENSE) for the full text
 
 ## Changelog
 
+### 1.1.5 — Calendar cache + card fixes
+
+- **Stale calendar after edits**: the calendar block fetches events over a REST `GET`, but neither the request nor the response forbade caching — so a browser/page-cache layer (e.g. W3 Total Cache "Browser Cache", which doesn't differentiate logged-in admins) could serve outdated events until a hard reload (Ctrl+Shift+R). The endpoint now sends `nocache_headers()` and the front-end AJAX call adds a cache-buster, so a normal reload always shows current events. (Server-side freshness was already handled by the versioned transient.)
+- **Long links overflowing cards**: a long unbreakable string (a pasted URL in the description, a long contact link) used to spill past the card edge, most visibly in the grid template. Card content now wraps with `overflow-wrap: break-word`.
+- **No way to see details in the minimal template**: minimal rows show no description/image inline, leaving no path to the full event. They now carry a compact icon-only "i" trigger at the end of the row that opens the shared popup card — the same info icon used elsewhere, without the full "View details" button.
+
 ### 1.1.4 — Snappier self-update checks
 
 - **Update cache TTL: 12h → 1h.** New GitHub releases now surface to the WordPress Updates screen within an hour instead of half a day. Still well clear of GitHub's 60 req/h unauthenticated rate limit, even on shared hosting where multiple sites share an outbound IP.

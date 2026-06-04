@@ -364,6 +364,12 @@ class LRob_Calendar_Blocks {
     }
 
     public function rest_get_events(WP_REST_Request $request): WP_REST_Response {
+        // Dynamic endpoint: forbid browser / proxy / W3TC browser-cache from
+        // storing the response, otherwise a normal reload can show stale events
+        // until a hard reload. Server-side freshness is handled by the versioned
+        // transient below; the client must always re-fetch.
+        nocache_headers();
+
         $args = [
             'limit'    => (int) $request->get_param('limit'),
             'category' => $request->get_param('category') ?: null,

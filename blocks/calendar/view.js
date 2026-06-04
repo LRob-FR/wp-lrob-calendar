@@ -243,6 +243,11 @@
             url: url,
             method: 'GET',
             dataType: 'json',
+            // Append a cache-buster (_=<ts>) so a normal reload never reuses a
+            // stale browser-cached copy of the REST response. Without this,
+            // page-cache layers (e.g. W3 Total Cache "Browser Cache") can serve
+            // outdated events until a hard reload (Ctrl+Shift+R).
+            cache: false,
             success: function(data) {
                 // Merge new events with existing ones (avoid duplicates)
                 var existingIds = self.events.map(function(e) { return e.id; });
