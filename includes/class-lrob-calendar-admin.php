@@ -14,6 +14,7 @@ class LRob_Calendar_Admin {
         add_action('admin_enqueue_scripts', [$this, 'enqueue_assets']);
         add_action('admin_init', [$this, 'handle_export']);
         add_action('admin_init', [$this, 'handle_import']);
+        add_action('admin_init', [$this, 'handle_migrate_export']);
 
         // "Visit lrob.fr" link on the plugins.php row.
         add_filter('plugin_row_meta', [$this, 'plugin_row_meta'], 10, 2);
@@ -134,6 +135,9 @@ class LRob_Calendar_Admin {
         if (isset($_GET['import_error'])) {
             $message = '<div class="notice notice-error"><p>' . esc_html__('Import failed. Please check your file format.', 'lrob-calendar') . '</p></div>';
         }
+        if (isset($_GET['migrate_error'])) {
+            $message = '<div class="notice notice-error"><p>' . esc_html__('Migration export failed. The source plugin may be inactive or unsupported.', 'lrob-calendar') . '</p></div>';
+        }
 
         // Non-blocking warnings from the previous import (large file size,
         // private-IP image URLs). Stored in a transient by handle_import().
@@ -193,15 +197,63 @@ class LRob_Calendar_Admin {
                     </form>
                 </div>
             </div>
+
+            <?php $this->render_migrate_section(); ?>
         </div>
-        
+
         <style>
             .lrob-import-export-container { display: flex; gap: 20px; margin-top: 20px; }
             .lrob-box { background: #fff; padding: 20px; border: 1px solid #ccd0d4; flex: 1; }
             .lrob-box h2 { margin-top: 0; }
+            .lrob-migrate-box { margin-top: 20px; }
+            .lrob-migrate-source { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid #f0f0f1; }
+            .lrob-migrate-source:first-of-type { border-top: 0; }
+            .lrob-migrate-source .lrob-migrate-label { flex: 1; }
+            .lrob-migrate-source .lrob-migrate-count { color: #646970; }
         </style>
         <?php
         $this->render_credit_footer();
+    }
+
+    /**
+     * "Migrate from another plugin" box. Shown only when a supported foreign
+     * calendar plugin (The Events Calendar, All-in-One Event Calendar) is active
+     * with events to export. Each source streams a canonical JSON download that
+     * is then fed back through the Import box above.
+     */
+    private function render_migrate_section(): void {
+        $migrate = new LRob_Calendar_Migrate();
+        $sources = $migrate->get_available_sources();
+
+        if (empty($sources)) {
+            return;
+        }
+        ?>
+        <div class="lrob-box lrob-migrate-box">
+            <h2><?php esc_html_e('Migrate from another plugin', 'lrob-calendar'); ?></h2>
+            <p><?php esc_html_e('Detected event data from another calendar plugin. Export it to a JSON file, then import that file with the Import box above. The source plugin must stay active during the export.', 'lrob-calendar'); ?></p>
+            <?php foreach ($sources as $source) : ?>
+                <div class="lrob-migrate-source">
+                    <span class="lrob-migrate-label">
+                        <strong><?php echo esc_html($source['label']); ?></strong>
+                        <span class="lrob-migrate-count">
+                            <?php
+                            /* translators: %d: number of events found */
+                            echo esc_html(sprintf(_n('%d event', '%d events', $source['count'], 'lrob-calendar'), $source['count']));
+                            ?>
+                        </span>
+                    </span>
+                    <form method="post" action="">
+                        <?php wp_nonce_field('lrob_calendar_migrate', 'lrob_migrate_nonce'); ?>
+                        <input type="hidden" name="migrate_source" value="<?php echo esc_attr($source['key']); ?>">
+                        <button type="submit" name="lrob_migrate_export" class="button" <?php disabled($source['count'], 0); ?>>
+                            <?php esc_html_e('Export to JSON', 'lrob-calendar'); ?>
+                        </button>
+                    </form>
+                </div>
+            <?php endforeach; ?>
+        </div>
+        <?php
     }
 
     /**
@@ -631,7 +683,44 @@ class LRob_Calendar_Admin {
         echo json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         exit;
     }
-    
+
+    /**
+     * Step 1 of the foreign-plugin migration: read events from another calendar
+     * plugin (The Events Calendar, All-in-One Event Calendar) and stream them as
+     * a canonical JSON download. The admin then re-uploads that file through the
+     * normal Import box (step 2).
+     */
+    public function handle_migrate_export(): void {
+        if (!isset($_POST['lrob_migrate_export']) || !wp_verify_nonce($_POST['lrob_migrate_nonce'] ?? '', 'lrob_calendar_migrate')) {
+            return;
+        }
+
+        if (!current_user_can('manage_options')) {
+            return;
+        }
+
+        $source = sanitize_key($_POST['migrate_source'] ?? '');
+
+        $migrate = new LRob_Calendar_Migrate();
+
+        try {
+            $data = $migrate->export($source);
+        } catch (Exception $e) {
+            wp_redirect(add_query_arg('migrate_error', 1, admin_url('edit.php?post_type=' . LRob_Calendar_Post_Types::POST_TYPE . '&page=lrob-calendar-import-export')));
+            exit;
+        }
+
+        $filename = 'lrob-calendar-' . $source . '-export-' . date('Y-m-d-His') . '.json';
+
+        header('Content-Type: application/json; charset=utf-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Pragma: no-cache');
+        header('Expires: 0');
+
+        echo json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
+    }
+
     public function handle_import(): void {
         if (!isset($_POST['lrob_import']) || !wp_verify_nonce($_POST['lrob_import_nonce'] ?? '', 'lrob_calendar_import')) {
             return;

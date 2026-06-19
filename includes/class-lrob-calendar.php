@@ -43,6 +43,7 @@ class LRob_Calendar {
             require_once LROB_CALENDAR_PATH . 'includes/class-lrob-calendar-admin.php';
             require_once LROB_CALENDAR_PATH . 'includes/class-lrob-calendar-meta-boxes.php';
             require_once LROB_CALENDAR_PATH . 'includes/class-lrob-calendar-demo-events.php';
+            require_once LROB_CALENDAR_PATH . 'includes/class-lrob-calendar-migrate.php';
         }
     }
     
