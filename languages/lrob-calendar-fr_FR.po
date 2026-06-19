@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: LRob Calendar 1.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/lrob-calendar\n"
-"POT-Creation-Date: 2026-06-19T16:39:20+00:00\n"
+"POT-Creation-Date: 2026-06-19T17:21:38+00:00\n"
 "PO-Revision-Date: 2026-05-12 18:00+0200\n"
 "Last-Translator: Robin Labadie <claude@lrob.fr>\n"
 "Language-Team: French <claude@lrob.fr>\n"
@@ -120,8 +120,8 @@ msgstr "L'import a échoué. Veuillez vérifier le format de votre fichier."
 msgid ""
 "Migration export failed. The source plugin may be inactive or unsupported."
 msgstr ""
-"L'export de migration a échoué. Le plugin source est peut-être inactif ou non "
-"pris en charge."
+"L'export de migration a échoué. Le plugin source est peut-être inactif ou "
+"non pris en charge."
 
 #: includes/class-lrob-calendar-admin.php:154
 msgid "Import / Export Events"
@@ -532,7 +532,7 @@ msgstr "Lieu"
 #: includes/class-lrob-calendar-admin.php:910
 #: includes/class-lrob-calendar-block-helpers.php:548
 #: includes/class-lrob-calendar-blocks.php:214
-#: includes/class-lrob-calendar-blocks.php:269
+#: includes/class-lrob-calendar-blocks.php:270
 msgid "Recurring"
 msgstr "Récurrent"
 
@@ -544,14 +544,14 @@ msgstr "Voir les détails"
 
 #: includes/class-lrob-calendar-block-helpers.php:555
 #: includes/class-lrob-calendar-blocks.php:215
-#: includes/class-lrob-calendar-blocks.php:270
+#: includes/class-lrob-calendar-blocks.php:271
 #: includes/class-lrob-calendar-single-event.php:156
 msgid "Free"
 msgstr "Gratuit"
 
 #: includes/class-lrob-calendar-block-helpers.php:673
 #: includes/class-lrob-calendar-blocks.php:216
-#: includes/class-lrob-calendar-blocks.php:271
+#: includes/class-lrob-calendar-blocks.php:272
 #: includes/class-lrob-calendar-single-event.php:165
 msgid "Get tickets"
 msgstr "Réserver une place"
@@ -612,42 +612,46 @@ msgstr "Semaine"
 msgid "No upcoming events."
 msgstr "Aucun événement à venir."
 
+#: includes/class-lrob-calendar-blocks.php:269
+msgid "All day"
+msgstr "Toute la journée"
+
 #. translators: %s = formatted date like "Tuesday, May 18"
-#: includes/class-lrob-calendar-blocks.php:273
+#: includes/class-lrob-calendar-blocks.php:274
 msgid "Events on %s"
 msgstr "Événements du %s"
 
-#: includes/class-lrob-calendar-blocks.php:309
+#: includes/class-lrob-calendar-blocks.php:310
 msgid "Unix timestamp; only events ending at/after this are returned."
 msgstr ""
 "Horodatage Unix ; seuls les événements se terminant à partir de cette date "
 "sont retournés."
 
-#: includes/class-lrob-calendar-blocks.php:314
+#: includes/class-lrob-calendar-blocks.php:315
 msgid "Unix timestamp; only events starting at/before this are returned."
 msgstr ""
 "Horodatage Unix ; seuls les événements commençant avant cette date sont "
 "retournés."
 
-#: includes/class-lrob-calendar-blocks.php:319
+#: includes/class-lrob-calendar-blocks.php:320
 msgid "Event category term ID."
 msgstr "Identifiant de catégorie d'événement."
 
-#: includes/class-lrob-calendar-blocks.php:324
+#: includes/class-lrob-calendar-blocks.php:325
 msgid "Event tag term ID."
 msgstr "Identifiant d'étiquette d'événement."
 
-#: includes/class-lrob-calendar-blocks.php:329
+#: includes/class-lrob-calendar-blocks.php:330
 msgid "Maximum number of events to return."
 msgstr "Nombre maximum d'événements à retourner."
 
-#: includes/class-lrob-calendar-blocks.php:337
+#: includes/class-lrob-calendar-blocks.php:338
 msgid ""
 "When 1, include events that have already ended (default: upcoming only)."
 msgstr ""
 "Si 1, inclut les événements déjà terminés (par défaut : à venir uniquement)."
 
-#: includes/class-lrob-calendar-blocks.php:357
+#: includes/class-lrob-calendar-blocks.php:358
 msgid "Event post ID."
 msgstr "Identifiant de l'article d'événement."
 

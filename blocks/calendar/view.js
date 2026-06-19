@@ -94,7 +94,17 @@
 
     LRobCalendar.prototype.fetchInitialEvents = function() {
         var now = new Date();
-        // Same ±2 months range the old inlined version used.
+        if (this.view === 'agenda') {
+            // The agenda is a forward-looking list of upcoming events, so it must
+            // load far ahead rather than the ±month window the month grid uses —
+            // otherwise events more than a couple months out silently disappear.
+            // Start one month back to keep currently-running multi-day events.
+            var aStart = Math.floor(new Date(now.getFullYear(), now.getMonth() - 1, 1).getTime() / 1000);
+            var aEnd   = Math.floor(new Date(now.getFullYear() + 3, now.getMonth(), 0, 23, 59, 59).getTime() / 1000);
+            this.loadEvents(aStart, aEnd);
+            return;
+        }
+        // Month/week: same ±2 months range the old inlined version used.
         var loadStart = Math.floor(new Date(now.getFullYear(), now.getMonth() - 2, 1).getTime() / 1000);
         var loadEnd   = Math.floor(new Date(now.getFullYear(), now.getMonth() + 3, 0, 23, 59, 59).getTime() / 1000);
         this.loadEvents(loadStart, loadEnd);
@@ -631,9 +641,14 @@
                 }
 
                 html += '<button class="lrob-cal-agenda-item lrob-cal-event-item" type="button" data-event-id="' + ev.id + '">';
-                if (!ev.allDay) {
-                    html += '<span class="lrob-cal-agenda-time">' + this.escapeHtml(timeFmt.format(startDate)) + '</span>';
-                }
+                // Always emit the time cell so the title stays in the wide
+                // column. All-day events show a short label instead of an hour;
+                // without it the title would land in the narrow time column and
+                // overflow onto the location row.
+                var timeText = ev.allDay
+                    ? (this.i18n.allDay || 'All day')
+                    : timeFmt.format(startDate);
+                html += '<span class="lrob-cal-agenda-time">' + this.escapeHtml(timeText) + '</span>';
                 html += '<span class="lrob-cal-agenda-title">' + this.escapeHtml(ev.title) + '</span>';
                 if (ev.venue || ev.city) {
                     var loc = [];

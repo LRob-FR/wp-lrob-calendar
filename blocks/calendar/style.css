@@ -503,6 +503,10 @@
     font: inherit;
     color: inherit;
     width: 100%;
+    /* Neutralize the single-line pill rules inherited from .lrob-cal-event-item
+       (used for month-cell pills): in the agenda the title must wrap, not clip. */
+    white-space: normal;
+    overflow: visible;
     transition: background-color var(--lrob-cal-duration) var(--lrob-cal-ease);
 }
 
@@ -517,14 +521,21 @@
 }
 
 .lrob-cal-agenda-title {
+    grid-column: 2;
+    min-width: 0;
     font-weight: var(--lrob-cal-font-weight-medium);
     color: var(--lrob-cal-text);
+    white-space: normal;
+    overflow-wrap: anywhere;
 }
 
 .lrob-cal-agenda-location {
+    grid-column: 2 / -1;
+    min-width: 0;
     font-size: 0.85em;
     color: var(--lrob-cal-text-muted);
-    grid-column: 2 / -1;
+    white-space: normal;
+    overflow-wrap: anywhere;
 }
 
 .lrob-cal-agenda-empty {

@@ -266,6 +266,7 @@ class LRob_Calendar_Blocks {
                 'monthView'    => __('Month', 'lrob-calendar'),
                 'weekView'     => __('Week', 'lrob-calendar'),
                 'noUpcoming'   => __('No upcoming events.', 'lrob-calendar'),
+                'allDay'       => __('All day', 'lrob-calendar'),
                 'recurring'    => __('Recurring', 'lrob-calendar'),
                 'free'         => __('Free', 'lrob-calendar'),
                 'getTickets'   => __('Get tickets', 'lrob-calendar'),
