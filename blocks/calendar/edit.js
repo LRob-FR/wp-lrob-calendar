@@ -45,6 +45,15 @@
                             onChange: (value) => setAttributes({ tag: parseInt(value, 10) }),
                             __nextHasNoMarginBottom: true
                         }),
+                        attributes.view === 'agenda' && el(TextControl, {
+                            label: __('Maximum events', 'lrob-calendar'),
+                            type: 'number',
+                            min: 0,
+                            value: attributes.limit,
+                            onChange: (value) => setAttributes({ limit: parseInt(value, 10) || 0 }),
+                            help: __('Agenda layout only. 0 = no limit.', 'lrob-calendar'),
+                            __nextHasNoMarginBottom: true
+                        }),
                         el(TextControl, {
                             label: __('Link Text', 'lrob-calendar'),
                             value: attributes.linkText,

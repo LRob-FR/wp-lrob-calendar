@@ -488,11 +488,13 @@
     margin-top: 0;
 }
 
+/* Each item stacks a bold title over one muted meta line (when + location).
+   A flex column avoids the narrow fixed time column that used to squash all-day
+   labels and let long titles overflow onto the location. */
 .lrob-cal-agenda-item {
-    display: grid;
-    grid-template-columns: 64px 1fr auto;
-    gap: var(--lrob-cal-space-2) var(--lrob-cal-space-3);
-    align-items: baseline;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
     padding: var(--lrob-cal-space-3);
     margin: 0;
     background: transparent;
@@ -514,28 +516,35 @@
     background: var(--lrob-cal-surface-hover);
 }
 
-.lrob-cal-agenda-time {
+.lrob-cal-agenda-title {
+    font-weight: var(--lrob-cal-font-weight-medium);
+    color: var(--lrob-cal-text);
+    overflow-wrap: anywhere;
+}
+
+.lrob-cal-agenda-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 var(--lrob-cal-space-2);
+    font-size: 0.85em;
+    color: var(--lrob-cal-text-muted);
+}
+
+.lrob-cal-agenda-when {
     font-weight: var(--lrob-cal-font-weight-semibold);
     color: var(--lrob-cal-primary);
     font-variant-numeric: tabular-nums;
 }
 
-.lrob-cal-agenda-title {
-    grid-column: 2;
-    min-width: 0;
-    font-weight: var(--lrob-cal-font-weight-medium);
-    color: var(--lrob-cal-text);
-    white-space: normal;
+.lrob-cal-agenda-location {
     overflow-wrap: anywhere;
 }
 
-.lrob-cal-agenda-location {
-    grid-column: 2 / -1;
-    min-width: 0;
-    font-size: 0.85em;
-    color: var(--lrob-cal-text-muted);
-    white-space: normal;
-    overflow-wrap: anywhere;
+/* Middle-dot separator between "when" and the location on the meta line. */
+.lrob-cal-agenda-when + .lrob-cal-agenda-location::before {
+    content: "·";
+    margin-right: var(--lrob-cal-space-2);
 }
 
 .lrob-cal-agenda-empty {

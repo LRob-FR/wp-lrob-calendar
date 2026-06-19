@@ -27,6 +27,8 @@ if (!empty($attributes['align'])) {
 $config = [
     'category'    => $attributes['category'] ?: 0,
     'tag'         => $attributes['tag'] ?: 0,
+    // Agenda-only cap on the number of events rendered (0 = unlimited).
+    'limit'       => isset($attributes['limit']) ? (int) $attributes['limit'] : 0,
     // loadedStart=0 / loadedEnd=0 signals view.js to do an initial REST fetch.
     'loadedStart' => 0,
     'loadedEnd'   => 0,

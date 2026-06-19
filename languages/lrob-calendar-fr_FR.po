@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: LRob Calendar 1.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/lrob-calendar\n"
-"POT-Creation-Date: 2026-06-19T17:21:38+00:00\n"
+"POT-Creation-Date: 2026-06-19T17:48:37+00:00\n"
 "PO-Revision-Date: 2026-05-12 18:00+0200\n"
 "Last-Translator: Robin Labadie <claude@lrob.fr>\n"
 "Language-Team: French <claude@lrob.fr>\n"
@@ -42,7 +42,7 @@ msgstr "https://www.lrob.fr"
 
 #: blocks/calendar/render.php:20
 #: includes/class-lrob-calendar-block-helpers.php:678
-#: includes/class-lrob-calendar-blocks.php:217 blocks/calendar/edit.js:51
+#: includes/class-lrob-calendar-blocks.php:217 blocks/calendar/edit.js:60
 msgid "View event"
 msgstr "Voir l'événement"
 
@@ -1182,11 +1182,11 @@ msgstr ""
 msgid "Layout"
 msgstr "Mise en page"
 
-#: blocks/calendar/edit.js:28 blocks/calendar/edit.js:67
+#: blocks/calendar/edit.js:28 blocks/calendar/edit.js:76
 msgid "Month grid"
 msgstr "Grille mensuelle"
 
-#: blocks/calendar/edit.js:29 blocks/calendar/edit.js:66
+#: blocks/calendar/edit.js:29 blocks/calendar/edit.js:75
 msgid "Agenda list"
 msgstr "Liste agenda"
 
@@ -1199,18 +1199,26 @@ msgid "Filter by Tag"
 msgstr "Filtrer par étiquette"
 
 #: blocks/calendar/edit.js:49
+msgid "Maximum events"
+msgstr "Nombre maximum d'événements"
+
+#: blocks/calendar/edit.js:54
+msgid "Agenda layout only. 0 = no limit."
+msgstr "Disposition agenda uniquement. 0 = sans limite."
+
+#: blocks/calendar/edit.js:58
 msgid "Link Text"
 msgstr "Texte du lien"
 
-#: blocks/calendar/edit.js:53
+#: blocks/calendar/edit.js:62
 msgid "Text for the event link in popup"
 msgstr "Texte du lien vers l'événement dans la pop-up"
 
-#: blocks/calendar/edit.js:62
+#: blocks/calendar/edit.js:71
 msgid "Event Calendar"
 msgstr "Calendrier des événements"
 
-#: blocks/calendar/edit.js:64
+#: blocks/calendar/edit.js:73
 msgid "Layout:"
 msgstr "Mise en page :"
 

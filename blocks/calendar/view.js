@@ -31,6 +31,8 @@
         this.tag = config.tag || 0;
         this.loadedStart = config.loadedStart || 0;
         this.loadedEnd = config.loadedEnd || 0;
+        // Agenda max number of events (0 = unlimited), set in the block editor.
+        this.limit = parseInt(config.limit, 10) || 0;
         this.loading = false;
 
         // The popup is now owned by the shared event-popup module — its
@@ -586,6 +588,54 @@
         this.$container.find('.lrob-cal-grid').html(html);
     };
 
+    /** True when both dates fall on the same calendar day (local time). */
+    LRobCalendar.prototype.sameCalendarDay = function(a, b) {
+        return a.getFullYear() === b.getFullYear()
+            && a.getMonth() === b.getMonth()
+            && a.getDate() === b.getDate();
+    };
+
+    /**
+     * The temporal label shown on an agenda row:
+     *   - multi-day event  → a date range ("18 – 25 juillet 2026")
+     *   - all-day, one day → the localized "All day" label
+     *   - timed, one day   → "10:00" (with "– 12:30" when an end time exists)
+     */
+    LRobCalendar.prototype.agendaWhen = function(ev, startDate, endDate) {
+        // For all-day events the stored end is inclusive (…T23:59:59), so step
+        // back a second before comparing days to avoid a false "multi-day".
+        var lastDay = endDate;
+        if (ev.allDay && endDate) {
+            lastDay = new Date(endDate.getTime() - 1000);
+        }
+
+        if (lastDay && !this.sameCalendarDay(startDate, lastDay)) {
+            var fullFmt = new Intl.DateTimeFormat(this.siteLocale, { day: 'numeric', month: 'long', year: 'numeric' });
+            var sameYear  = startDate.getFullYear() === lastDay.getFullYear();
+            var sameMonth = sameYear && startDate.getMonth() === lastDay.getMonth();
+            var left;
+            if (sameMonth) {
+                left = String(startDate.getDate());
+            } else if (sameYear) {
+                left = new Intl.DateTimeFormat(this.siteLocale, { day: 'numeric', month: 'long' }).format(startDate);
+            } else {
+                left = fullFmt.format(startDate);
+            }
+            return left + ' – ' + fullFmt.format(lastDay);
+        }
+
+        if (ev.allDay) {
+            return this.i18n.allDay || 'All day';
+        }
+
+        var timeFmt = new Intl.DateTimeFormat(this.siteLocale, { hour: '2-digit', minute: '2-digit' });
+        var label = timeFmt.format(startDate);
+        if (endDate && endDate.getTime() > startDate.getTime() && this.sameCalendarDay(startDate, endDate)) {
+            label += ' – ' + timeFmt.format(endDate);
+        }
+        return label;
+    };
+
     /**
      * Start-of-week date for the current state. Anchored on `currentDate`
      * when in week view; resets to today when the view first switches.
@@ -619,6 +669,11 @@
             return endTs >= nowTs;
         });
 
+        // Optional cap configured in the block editor (0 = unlimited).
+        if (this.limit > 0) {
+            sorted = sorted.slice(0, this.limit);
+        }
+
         var html = '<div class="lrob-cal-agenda">';
 
         if (sorted.length === 0) {
@@ -628,11 +683,11 @@
         } else {
             var lastDateKey = null;
             var dateFmt = new Intl.DateTimeFormat(this.siteLocale, { weekday: 'long', day: 'numeric', month: 'long' });
-            var timeFmt = new Intl.DateTimeFormat(this.siteLocale, { hour: '2-digit', minute: '2-digit' });
 
             for (var i = 0; i < sorted.length; i++) {
                 var ev = sorted[i];
                 var startDate = new Date(ev.start);
+                var endDate = ev.end ? new Date(ev.end) : null;
                 var dateKey = startDate.toISOString().substring(0, 10);
 
                 if (dateKey !== lastDateKey) {
@@ -641,21 +696,25 @@
                 }
 
                 html += '<button class="lrob-cal-agenda-item lrob-cal-event-item" type="button" data-event-id="' + ev.id + '">';
-                // Always emit the time cell so the title stays in the wide
-                // column. All-day events show a short label instead of an hour;
-                // without it the title would land in the narrow time column and
-                // overflow onto the location row.
-                var timeText = ev.allDay
-                    ? (this.i18n.allDay || 'All day')
-                    : timeFmt.format(startDate);
-                html += '<span class="lrob-cal-agenda-time">' + this.escapeHtml(timeText) + '</span>';
                 html += '<span class="lrob-cal-agenda-title">' + this.escapeHtml(ev.title) + '</span>';
-                if (ev.venue || ev.city) {
-                    var loc = [];
-                    if (ev.venue) loc.push(this.escapeHtml(ev.venue));
-                    if (ev.city)  loc.push(this.escapeHtml(ev.city));
-                    html += '<span class="lrob-cal-agenda-location">' + loc.join(', ') + '</span>';
+
+                // Single muted meta line: "when" (start time / "all day" / a
+                // multi-day date range) followed by the location. Putting the
+                // range here is what stops a 7-day event reading as a single day.
+                var metaParts = [];
+                metaParts.push('<span class="lrob-cal-agenda-when">' +
+                    this.escapeHtml(this.agendaWhen(ev, startDate, endDate)) + '</span>');
+
+                var loc = [];
+                if (ev.venue)   loc.push(ev.venue);
+                if (ev.city)    loc.push(ev.city);
+                if (ev.country) loc.push(ev.country);
+                if (loc.length) {
+                    metaParts.push('<span class="lrob-cal-agenda-location">' +
+                        this.escapeHtml(loc.join(', ')) + '</span>');
                 }
+
+                html += '<span class="lrob-cal-agenda-meta">' + metaParts.join('') + '</span>';
                 html += '</button>';
             }
         }
