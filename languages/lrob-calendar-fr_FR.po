@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: LRob Calendar 1.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/lrob-calendar\n"
-"POT-Creation-Date: 2026-06-23T22:14:08+00:00\n"
+"POT-Creation-Date: 2026-06-23T22:34:10+00:00\n"
 "PO-Revision-Date: 2026-05-12 18:00+0200\n"
 "Last-Translator: Robin Labadie <claude@lrob.fr>\n"
 "Language-Team: French <claude@lrob.fr>\n"
@@ -46,7 +46,7 @@ msgstr "https://www.lrob.fr"
 msgid "View event"
 msgstr "Voir l'événement"
 
-#: blocks/events-list/render.php:87 admin/js/manage-events.js:221
+#: blocks/events-list/render.php:87 admin/js/manage-events.js:223
 msgid "No events found."
 msgstr "Aucun événement trouvé."
 
@@ -67,11 +67,11 @@ msgstr "Page %1$d / %2$d"
 msgid "Next page"
 msgstr "Page suivante"
 
-#: blocks/events-list/render.php:135 admin/js/manage-events.js:198
+#: blocks/events-list/render.php:135 admin/js/manage-events.js:201
 msgid "Previous"
 msgstr "Précédent"
 
-#: blocks/events-list/render.php:136 admin/js/manage-events.js:203
+#: blocks/events-list/render.php:136 admin/js/manage-events.js:206
 msgid "Next"
 msgstr "Suivant"
 
@@ -612,7 +612,7 @@ msgstr "Semaine"
 msgid "No upcoming events."
 msgstr "Aucun événement à venir."
 
-#: includes/class-lrob-calendar-blocks.php:269 admin/js/manage-events.js:122
+#: includes/class-lrob-calendar-blocks.php:269 admin/js/manage-events.js:117
 msgid "All day"
 msgstr "Toute la journée"
 
@@ -808,27 +808,27 @@ msgid "All statuses"
 msgstr "Tous les statuts"
 
 #: includes/class-lrob-calendar-manage-screen.php:75
-#: admin/js/manage-events.js:92
+#: admin/js/manage-events.js:87
 msgid "Published"
 msgstr "Publié"
 
 #: includes/class-lrob-calendar-manage-screen.php:76
-#: admin/js/manage-events.js:93
+#: admin/js/manage-events.js:88
 msgid "Draft"
 msgstr "Brouillon"
 
 #: includes/class-lrob-calendar-manage-screen.php:77
-#: admin/js/manage-events.js:94
+#: admin/js/manage-events.js:89
 msgid "Pending"
 msgstr "En attente"
 
 #: includes/class-lrob-calendar-manage-screen.php:78
-#: admin/js/manage-events.js:95
+#: admin/js/manage-events.js:90
 msgid "Scheduled"
 msgstr "Planifié"
 
 #: includes/class-lrob-calendar-manage-screen.php:79
-#: admin/js/manage-events.js:96
+#: admin/js/manage-events.js:91
 msgid "Private"
 msgstr "Privé"
 
@@ -1050,7 +1050,7 @@ msgstr "Événement gratuit"
 msgid "Ticket URL"
 msgstr "URL de billetterie"
 
-#: includes/class-lrob-calendar-post-types.php:23 admin/js/manage-events.js:149
+#: includes/class-lrob-calendar-post-types.php:23 admin/js/manage-events.js:144
 msgid "Events"
 msgstr "Événements"
 
@@ -1216,41 +1216,45 @@ msgstr ""
 "paginées en AJAX et une carte OpenStreetMap intégrée sur les pages "
 "d'événement."
 
-#: admin/js/manage-events.js:97 admin/js/manage-events.js:190
+#: admin/js/manage-events.js:92
 msgid "Trash"
 msgstr "Corbeille"
 
-#: admin/js/manage-events.js:138
+#: admin/js/manage-events.js:133
 msgid "All categories"
 msgstr "Toutes les catégories"
 
-#: admin/js/manage-events.js:139
+#: admin/js/manage-events.js:134
 msgid "All tags"
 msgstr "Toutes les étiquettes"
 
-#: admin/js/manage-events.js:141
+#: admin/js/manage-events.js:136
 msgid "Date (soonest first)"
 msgstr "Date (plus proche d'abord)"
 
-#: admin/js/manage-events.js:142
+#: admin/js/manage-events.js:137
 msgid "Date (latest first)"
 msgstr "Date (plus lointaine d'abord)"
 
-#: admin/js/manage-events.js:143
+#: admin/js/manage-events.js:138
 msgid "Title (A→Z)"
 msgstr "Titre (A→Z)"
 
-#: admin/js/manage-events.js:144
+#: admin/js/manage-events.js:139
 msgid "Recently modified"
 msgstr "Modifié récemment"
 
-#: admin/js/manage-events.js:151
+#: admin/js/manage-events.js:146
 msgid "+ New event"
 msgstr "+ Nouvel événement"
 
-#: admin/js/manage-events.js:156
+#: admin/js/manage-events.js:152
 msgid "Search events…"
 msgstr "Rechercher des événements…"
+
+#: admin/js/manage-events.js:154
+msgid "Clear search"
+msgstr "Effacer la recherche"
 
 #: admin/js/manage-events.js:178
 msgid "(no title)"
@@ -1260,11 +1264,15 @@ msgstr "(sans titre)"
 msgid "Edit"
 msgstr "Modifier"
 
-#: admin/js/manage-events.js:200
+#: admin/js/manage-events.js:191
+msgid "Move to trash"
+msgstr "Déplacer vers la corbeille"
+
+#: admin/js/manage-events.js:203
 msgid "Page"
 msgstr "Page"
 
-#: admin/js/manage-events.js:201 blocks/events-list/edit.js:182
+#: admin/js/manage-events.js:204 blocks/events-list/edit.js:182
 msgid "events"
 msgstr "événements"
 
@@ -1272,11 +1280,11 @@ msgstr "événements"
 msgid "Could not load events."
 msgstr "Impossible de charger les événements."
 
-#: admin/js/manage-events.js:276
+#: admin/js/manage-events.js:291
 msgid "Move this event to the trash?"
 msgstr "Déplacer cet événement vers la corbeille ?"
 
-#: admin/js/manage-events.js:282
+#: admin/js/manage-events.js:297
 msgid "Could not delete the event."
 msgstr "Impossible de supprimer l'événement."
 

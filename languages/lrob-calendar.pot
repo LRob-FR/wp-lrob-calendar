@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-06-23T22:19:20+00:00\n"
+"POT-Creation-Date: 2026-06-23T22:37:34+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: lrob-calendar\n"
@@ -42,7 +42,7 @@ msgid "View event"
 msgstr ""
 
 #: blocks/events-list/render.php:87
-#: admin/js/manage-events.js:221
+#: admin/js/manage-events.js:223
 msgid "No events found."
 msgstr ""
 
@@ -64,12 +64,12 @@ msgid "Next page"
 msgstr ""
 
 #: blocks/events-list/render.php:135
-#: admin/js/manage-events.js:198
+#: admin/js/manage-events.js:201
 msgid "Previous"
 msgstr ""
 
 #: blocks/events-list/render.php:136
-#: admin/js/manage-events.js:203
+#: admin/js/manage-events.js:206
 msgid "Next"
 msgstr ""
 
@@ -524,7 +524,7 @@ msgid "No upcoming events."
 msgstr ""
 
 #: includes/class-lrob-calendar-blocks.php:269
-#: admin/js/manage-events.js:122
+#: admin/js/manage-events.js:117
 msgid "All day"
 msgstr ""
 
@@ -670,27 +670,27 @@ msgid "All statuses"
 msgstr ""
 
 #: includes/class-lrob-calendar-manage-screen.php:75
-#: admin/js/manage-events.js:92
+#: admin/js/manage-events.js:87
 msgid "Published"
 msgstr ""
 
 #: includes/class-lrob-calendar-manage-screen.php:76
-#: admin/js/manage-events.js:93
+#: admin/js/manage-events.js:88
 msgid "Draft"
 msgstr ""
 
 #: includes/class-lrob-calendar-manage-screen.php:77
-#: admin/js/manage-events.js:94
+#: admin/js/manage-events.js:89
 msgid "Pending"
 msgstr ""
 
 #: includes/class-lrob-calendar-manage-screen.php:78
-#: admin/js/manage-events.js:95
+#: admin/js/manage-events.js:90
 msgid "Scheduled"
 msgstr ""
 
 #: includes/class-lrob-calendar-manage-screen.php:79
-#: admin/js/manage-events.js:96
+#: admin/js/manage-events.js:91
 msgid "Private"
 msgstr ""
 
@@ -912,7 +912,7 @@ msgid "Ticket URL"
 msgstr ""
 
 #: includes/class-lrob-calendar-post-types.php:23
-#: admin/js/manage-events.js:149
+#: admin/js/manage-events.js:144
 msgid "Events"
 msgstr ""
 
@@ -1073,41 +1073,44 @@ msgstr ""
 msgid "A clean event calendar for WordPress with recurring events, click-to-preview month grid, agenda view, AJAX-paginated event lists, and an OpenStreetMap embed on single-event pages."
 msgstr ""
 
-#: admin/js/manage-events.js:97
-#: admin/js/manage-events.js:190
+#: admin/js/manage-events.js:92
 msgid "Trash"
 msgstr ""
 
-#: admin/js/manage-events.js:138
+#: admin/js/manage-events.js:133
 msgid "All categories"
 msgstr ""
 
-#: admin/js/manage-events.js:139
+#: admin/js/manage-events.js:134
 msgid "All tags"
 msgstr ""
 
-#: admin/js/manage-events.js:141
+#: admin/js/manage-events.js:136
 msgid "Date (soonest first)"
 msgstr ""
 
-#: admin/js/manage-events.js:142
+#: admin/js/manage-events.js:137
 msgid "Date (latest first)"
 msgstr ""
 
-#: admin/js/manage-events.js:143
+#: admin/js/manage-events.js:138
 msgid "Title (A→Z)"
 msgstr ""
 
-#: admin/js/manage-events.js:144
+#: admin/js/manage-events.js:139
 msgid "Recently modified"
 msgstr ""
 
-#: admin/js/manage-events.js:151
+#: admin/js/manage-events.js:146
 msgid "+ New event"
 msgstr ""
 
-#: admin/js/manage-events.js:156
+#: admin/js/manage-events.js:152
 msgid "Search events…"
+msgstr ""
+
+#: admin/js/manage-events.js:154
+msgid "Clear search"
 msgstr ""
 
 #: admin/js/manage-events.js:178
@@ -1118,11 +1121,15 @@ msgstr ""
 msgid "Edit"
 msgstr ""
 
-#: admin/js/manage-events.js:200
+#: admin/js/manage-events.js:191
+msgid "Move to trash"
+msgstr ""
+
+#: admin/js/manage-events.js:203
 msgid "Page"
 msgstr ""
 
-#: admin/js/manage-events.js:201
+#: admin/js/manage-events.js:204
 #: blocks/events-list/edit.js:182
 msgid "events"
 msgstr ""
@@ -1131,11 +1138,11 @@ msgstr ""
 msgid "Could not load events."
 msgstr ""
 
-#: admin/js/manage-events.js:276
+#: admin/js/manage-events.js:291
 msgid "Move this event to the trash?"
 msgstr ""
 
-#: admin/js/manage-events.js:282
+#: admin/js/manage-events.js:297
 msgid "Could not delete the event."
 msgstr ""
 

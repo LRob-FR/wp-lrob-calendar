@@ -35,14 +35,58 @@
     gap: 8px;
     margin-bottom: 16px;
 }
-.lrob-manage-search {
+.lrob-manage-search-wrap {
+    position: relative;
     flex: 1 1 220px;
     min-width: 180px;
-    height: 32px;
+    display: flex;
 }
+.lrob-manage-search {
+    width: 100%;
+    height: 32px;
+    padding-right: 28px;
+}
+.lrob-manage-search-clear {
+    position: absolute;
+    top: 0;
+    right: 4px;
+    height: 32px;
+    width: 24px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--lrm-muted);
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+}
+.lrob-manage-search-clear:hover { color: #1d2327; }
+.lrob-manage-search-wrap.has-value .lrob-manage-search-clear { display: flex; }
 .lrob-manage-filter {
     height: 32px;
     max-width: 220px;
+}
+
+/* Icon-only action button (trash) sized to host a dashicon. */
+.lrob-manage-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    padding: 0;
+}
+.lrob-manage-icon-btn .dashicons {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    line-height: 1;
+}
+.lrob-manage-del:hover {
+    color: #b32d2e;
+    border-color: #b32d2e;
 }
 
 /* Body */

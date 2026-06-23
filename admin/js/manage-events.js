@@ -1,9 +1,10 @@
 /**
  * Custom event management screen (v1.2, Phase 1).
  *
- * REST-driven list with search, filters, sorting, paging and inline delete —
- * no full page reloads. Create/edit currently bridge to the native editor; the
- * dynamic modal lands in a later phase.
+ * REST-driven list with live search, filters, sorting, paging and inline trash —
+ * no full page reloads. The toolbar is mounted once and never rebuilt, so the
+ * search field keeps focus while results refresh live. Create/edit currently
+ * bridge to the native editor; the dynamic modal lands in a later phase.
  */
 (function (cfg, i18n) {
     if (!cfg) return;
@@ -24,7 +25,6 @@
     };
 
     var data = { events: [], total: 0, pages: 0, paged: 1 };
-    var loading = false;
     var searchTimer = null;
 
     /* ── REST ─────────────────────────────────────────────────────────────── */
@@ -44,8 +44,7 @@
     }
 
     function fetchEvents() {
-        loading = true;
-        renderChrome();
+        markLoading(true);
         fetch(apiUrl(), {
             headers: { 'X-WP-Nonce': cfg.nonce },
             credentials: 'same-origin'
@@ -54,13 +53,9 @@
             .then(function (json) {
                 data = json;
                 state.paged = json.paged || 1;
-                loading = false;
-                render();
+                renderList();
             })
-            .catch(function () {
-                loading = false;
-                renderError();
-            });
+            .catch(function () { renderError(); });
     }
 
     function deleteEvent(id, permanent) {
@@ -132,9 +127,9 @@
         return parts.join(', ');
     }
 
-    /* ── Render ───────────────────────────────────────────────────────────── */
+    /* ── Chrome (built once) ──────────────────────────────────────────────── */
 
-    function toolbarHtml() {
+    function chromeHtml() {
         var catOpts = [{ value: 0, label: __('All categories', 'lrob-calendar') }].concat(cfg.categories || []);
         var tagOpts = [{ value: 0, label: __('All tags', 'lrob-calendar') }].concat(cfg.tags || []);
         var orderOpts = [
@@ -152,14 +147,19 @@
                 '</button>' +
             '</div>' +
             '<div class="lrob-manage-toolbar">' +
-                '<input type="search" class="lrob-manage-search" placeholder="' +
-                    esc(__('Search events…', 'lrob-calendar')) + '" value="' + esc(state.search) + '">' +
+                '<div class="lrob-manage-search-wrap">' +
+                    '<input type="text" class="lrob-manage-search" placeholder="' +
+                        esc(__('Search events…', 'lrob-calendar')) + '" value="' + esc(state.search) + '">' +
+                    '<button type="button" class="lrob-manage-search-clear" data-action="clear-search" aria-label="' +
+                        esc(__('Clear search', 'lrob-calendar')) + '">&times;</button>' +
+                '</div>' +
                 '<select class="lrob-manage-filter" data-filter="status">' + optionList(cfg.statuses || [], state.status) + '</select>' +
                 '<select class="lrob-manage-filter" data-filter="category">' + optionList(catOpts, state.category) + '</select>' +
                 '<select class="lrob-manage-filter" data-filter="tag">' + optionList(tagOpts, state.tag) + '</select>' +
                 '<select class="lrob-manage-filter" data-filter="order">' +
                     optionList(orderOpts, state.orderby + '|' + state.order) + '</select>' +
-            '</div>';
+            '</div>' +
+            '<div class="lrob-manage-body"></div>';
     }
 
     function rowHtml(ev) {
@@ -176,7 +176,7 @@
                 '<div class="lrob-manage-main">' +
                     '<div class="lrob-manage-card-title">' +
                         esc(ev.title || __('(no title)', 'lrob-calendar')) +
-                        (ev.recurring ? ' <span class="lrob-manage-badge lrob-manage-badge-rec dashicons dashicons-update" title="' + esc(__('Recurring', 'lrob-calendar')) + '"></span>' : '') +
+                        (ev.recurring ? ' <span class="lrob-manage-badge-rec dashicons dashicons-update" title="' + esc(__('Recurring', 'lrob-calendar')) + '"></span>' : '') +
                         '<span class="lrob-manage-status lrob-status-' + esc(ev.status) + '">' + esc(statusLabel(ev.status)) + '</span>' +
                     '</div>' +
                     '<div class="lrob-manage-meta">' +
@@ -187,7 +187,10 @@
                 '</div>' +
                 '<div class="lrob-manage-actions">' +
                     '<button type="button" class="button button-small" data-action="edit" data-id="' + esc(ev.id) + '">' + esc(__('Edit', 'lrob-calendar')) + '</button>' +
-                    '<button type="button" class="button button-small button-link-delete lrob-manage-del" data-action="delete" data-id="' + esc(ev.id) + '">' + esc(__('Trash', 'lrob-calendar')) + '</button>' +
+                    '<button type="button" class="button button-small lrob-manage-icon-btn lrob-manage-del" data-action="delete" data-id="' + esc(ev.id) + '" ' +
+                        'title="' + esc(__('Move to trash', 'lrob-calendar')) + '" aria-label="' + esc(__('Move to trash', 'lrob-calendar')) + '">' +
+                        '<span class="dashicons dashicons-trash"></span>' +
+                    '</button>' +
                 '</div>' +
             '</li>';
     }
@@ -204,23 +207,20 @@
             '</div>';
     }
 
-    // Render just the toolbar + a loading hint (used while fetching).
-    function renderChrome() {
-        if (!root.querySelector('.lrob-manage-header')) {
-            root.innerHTML = toolbarHtml() + '<div class="lrob-manage-body"></div>';
-            bindChrome();
-        }
+    /* ── Render (body only — toolbar persists) ────────────────────────────── */
+
+    function markLoading(on) {
         var body = root.querySelector('.lrob-manage-body');
-        if (body && loading) body.classList.add('is-loading');
+        if (body) body.classList.toggle('is-loading', !!on);
     }
 
-    function render() {
-        root.innerHTML = toolbarHtml() + '<div class="lrob-manage-body">' +
-            (data.events.length
-                ? '<ul class="lrob-manage-list">' + data.events.map(rowHtml).join('') + '</ul>' + paginationHtml()
-                : '<p class="lrob-manage-empty">' + esc(__('No events found.', 'lrob-calendar')) + '</p>') +
-            '</div>';
-        bindChrome();
+    function renderList() {
+        var body = root.querySelector('.lrob-manage-body');
+        if (!body) return;
+        body.classList.remove('is-loading');
+        body.innerHTML = data.events.length
+            ? '<ul class="lrob-manage-list">' + data.events.map(rowHtml).join('') + '</ul>' + paginationHtml()
+            : '<p class="lrob-manage-empty">' + esc(__('No events found.', 'lrob-calendar')) + '</p>';
     }
 
     function renderError() {
@@ -228,21 +228,27 @@
         if (body) body.innerHTML = '<p class="lrob-manage-empty">' + esc(__('Could not load events.', 'lrob-calendar')) + '</p>';
     }
 
-    /* ── Events ───────────────────────────────────────────────────────────── */
+    function syncSearchClear() {
+        var wrap = root.querySelector('.lrob-manage-search-wrap');
+        if (wrap) wrap.classList.toggle('has-value', state.search !== '');
+    }
 
-    function bindChrome() {
+    /* ── Wiring ───────────────────────────────────────────────────────────── */
+
+    function mount() {
+        root.innerHTML = chromeHtml();
+
         var search = root.querySelector('.lrob-manage-search');
-        if (search) {
-            search.addEventListener('input', function () {
-                clearTimeout(searchTimer);
-                var v = this.value;
-                searchTimer = setTimeout(function () {
-                    state.search = v;
-                    state.paged = 1;
-                    fetchEvents();
-                }, 300);
-            });
-        }
+        search.addEventListener('input', function () {
+            clearTimeout(searchTimer);
+            var v = this.value;
+            syncSearchClearValue(v);
+            searchTimer = setTimeout(function () {
+                state.search = v;
+                state.paged = 1;
+                fetchEvents();
+            }, 220);
+        });
 
         root.querySelectorAll('.lrob-manage-filter').forEach(function (sel) {
             sel.addEventListener('change', function () {
@@ -258,6 +264,15 @@
                 fetchEvents();
             });
         });
+
+        syncSearchClear();
+    }
+
+    // Toggle the clear (×) affordance live as the user types, before the
+    // debounced fetch commits the value to state.
+    function syncSearchClearValue(v) {
+        var wrap = root.querySelector('.lrob-manage-search-wrap');
+        if (wrap) wrap.classList.toggle('has-value', v !== '');
     }
 
     root.addEventListener('click', function (e) {
@@ -281,6 +296,14 @@
                 btn.disabled = false;
                 window.alert(__('Could not delete the event.', 'lrob-calendar'));
             });
+        } else if (action === 'clear-search') {
+            var input = root.querySelector('.lrob-manage-search');
+            if (input) { input.value = ''; input.focus(); }
+            clearTimeout(searchTimer);
+            state.search = '';
+            state.paged = 1;
+            syncSearchClear();
+            fetchEvents();
         } else if (action === 'prev' && state.paged > 1) {
             state.paged--; fetchEvents();
         } else if (action === 'next' && state.paged < data.pages) {
@@ -288,5 +311,6 @@
         }
     });
 
+    mount();
     fetchEvents();
 })(window.lrobCalendarManage, window.wp && window.wp.i18n);
