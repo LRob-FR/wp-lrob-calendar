@@ -229,6 +229,10 @@ class LRob_Calendar_Admin_REST {
             // simplifying block markup (handled fully in a later phase).
             'hasBlocks'   => function_exists('has_blocks') ? has_blocks($post->post_content) : (strpos($post->post_content, '<!-- wp:') !== false),
             'fields'      => $fields,
+            // Wall-clock date/time split in the event's own timezone, so the
+            // editor never does timezone math (server owns the conversion, just
+            // like the classic meta box).
+            'datetime'    => $this->event_datetime_block($event),
             'categories'  => wp_get_post_terms($post_id, LRob_Calendar_Post_Types::TAX_CATEGORY, ['fields' => 'ids']),
             'tags'        => wp_get_post_terms($post_id, LRob_Calendar_Post_Types::TAX_TAG, ['fields' => 'ids']),
             'featuredImage' => $thumb_id ? [
@@ -302,6 +306,9 @@ class LRob_Calendar_Admin_REST {
             foreach ($this->sanitize_event_fields($body['fields']) as $key => $value) {
                 $event->set($key, $value);
             }
+        }
+        if (isset($body['datetime']) && is_array($body['datetime'])) {
+            $this->apply_datetime($event, $body['datetime']);
         }
         $event->save();
 
@@ -413,5 +420,81 @@ class LRob_Calendar_Admin_REST {
         }
 
         return $out;
+    }
+
+    /**
+     * Stored timestamps → wall-clock parts in the event's timezone, for the editor.
+     */
+    private function event_datetime_block(LRob_Calendar_Event $event): array {
+        $tzname = $event->get('timezone') ?: LRob_Calendar_Event::get_default_timezone();
+        try {
+            $tz = new DateTimeZone($tzname);
+        } catch (Exception $e) {
+            $tz = wp_timezone();
+            $tzname = $tz->getName();
+        }
+
+        $start = (int) $event->get('start');
+        $end   = (int) $event->get('end');
+        $sdt   = (new DateTime('@' . $start))->setTimezone($tz);
+        $edt   = (new DateTime('@' . $end))->setTimezone($tz);
+
+        $type = $event->is_instant() ? 'instant' : ($event->is_allday() ? 'allday' : 'standard');
+
+        return [
+            'type'       => $type,
+            'timezone'   => $tzname,
+            'start_date' => $start ? $sdt->format('Y-m-d') : '',
+            'start_time' => $start ? $sdt->format('H:i') : '',
+            'end_date'   => $end ? $edt->format('Y-m-d') : '',
+            'end_time'   => $end ? $edt->format('H:i') : '',
+        ];
+    }
+
+    /**
+     * Wall-clock parts (in a given timezone) → stored timestamps, mirroring the
+     * classic meta box so both editors behave identically. Invalid/empty input
+     * leaves the existing values untouched.
+     */
+    private function apply_datetime(LRob_Calendar_Event $event, array $dt): void {
+        $tzname = sanitize_text_field($dt['timezone'] ?? '');
+        if ($tzname === '') {
+            $tzname = LRob_Calendar_Event::get_default_timezone();
+        }
+        try {
+            $tz = new DateTimeZone($tzname);
+        } catch (Exception $e) {
+            $tzname = LRob_Calendar_Event::get_default_timezone();
+            $tz = new DateTimeZone($tzname);
+        }
+
+        $type = in_array($dt['type'] ?? 'standard', ['standard', 'allday', 'instant'], true)
+            ? $dt['type'] : 'standard';
+        $allday  = ($type === 'allday');
+        $instant = ($type === 'instant');
+
+        $start_date = sanitize_text_field($dt['start_date'] ?? '');
+        if ($start_date === '') {
+            return; // No date provided — keep existing.
+        }
+        $start_time = $allday ? '00:00' : sanitize_text_field($dt['start_time'] ?? '00:00');
+        $end_date   = sanitize_text_field($dt['end_date'] ?? '') ?: $start_date;
+        $end_time   = $allday ? '23:59' : sanitize_text_field($dt['end_time'] ?? '00:00');
+
+        try {
+            $sdt = new DateTime("{$start_date} {$start_time}", $tz);
+            $edt = new DateTime("{$end_date} {$end_time}", $tz);
+        } catch (Exception $e) {
+            return;
+        }
+        if ($instant) {
+            $edt = clone $sdt;
+        }
+
+        $event->set('start', $sdt->getTimestamp());
+        $event->set('end', $edt->getTimestamp());
+        $event->set('timezone', $tzname);
+        $event->set('allday', $allday ? 1 : 0);
+        $event->set('instant_event', $instant ? 1 : 0);
     }
 }

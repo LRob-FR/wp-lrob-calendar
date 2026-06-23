@@ -50,27 +50,46 @@ class LRob_Calendar_Manage_Screen {
             [],
             LROB_CALENDAR_VERSION
         );
+        wp_enqueue_style(
+            'lrob-calendar-event-modal',
+            LROB_CALENDAR_URL . 'admin/css/event-modal.css',
+            ['lrob-calendar-manage'],
+            LROB_CALENDAR_VERSION
+        );
+
+        // The modal script loads first and carries the shared config global; the
+        // list script depends on it so window.lrobCalendarManage is always ready.
+        wp_enqueue_script(
+            'lrob-calendar-event-modal',
+            LROB_CALENDAR_URL . 'admin/js/event-modal.js',
+            ['wp-i18n'],
+            LROB_CALENDAR_VERSION,
+            true
+        );
+        wp_set_script_translations('lrob-calendar-event-modal', 'lrob-calendar', LROB_CALENDAR_PATH . 'languages');
 
         wp_enqueue_script(
             'lrob-calendar-manage',
             LROB_CALENDAR_URL . 'admin/js/manage-events.js',
-            ['wp-i18n'],
+            ['wp-i18n', 'lrob-calendar-event-modal'],
             LROB_CALENDAR_VERSION,
             true
         );
         wp_set_script_translations('lrob-calendar-manage', 'lrob-calendar', LROB_CALENDAR_PATH . 'languages');
 
-        wp_localize_script('lrob-calendar-manage', 'lrobCalendarManage', [
-            'restRoot'   => esc_url_raw(rest_url(LRob_Calendar_Admin_REST::NAMESPACE . '/admin/events')),
-            'nonce'      => wp_create_nonce('wp_rest'),
-            'newLink'    => admin_url('post-new.php?post_type=' . LRob_Calendar_Post_Types::POST_TYPE),
-            'canPublish' => current_user_can('publish_lrob_events'),
-            'dateFormat' => get_option('date_format'),
-            'timeFormat' => get_option('time_format'),
-            'locale'     => str_replace('_', '-', get_locale()),
-            'categories' => $this->term_options(LRob_Calendar_Post_Types::TAX_CATEGORY),
-            'tags'       => $this->term_options(LRob_Calendar_Post_Types::TAX_TAG),
-            'statuses'   => [
+        $public_pages = LRob_Calendar::public_pages_enabled();
+
+        wp_localize_script('lrob-calendar-event-modal', 'lrobCalendarManage', [
+            'restRoot'     => esc_url_raw(rest_url(LRob_Calendar_Admin_REST::NAMESPACE . '/admin/events')),
+            'nonce'        => wp_create_nonce('wp_rest'),
+            'newLink'      => admin_url('post-new.php?post_type=' . LRob_Calendar_Post_Types::POST_TYPE),
+            'canPublish'   => current_user_can('publish_lrob_events'),
+            'dateFormat'   => get_option('date_format'),
+            'timeFormat'   => get_option('time_format'),
+            'locale'       => str_replace('_', '-', get_locale()),
+            'categories'   => $this->term_options(LRob_Calendar_Post_Types::TAX_CATEGORY),
+            'tags'         => $this->term_options(LRob_Calendar_Post_Types::TAX_TAG),
+            'statuses'     => [
                 ['value' => 'any',     'label' => __('All statuses', 'lrob-calendar')],
                 ['value' => 'publish', 'label' => __('Published', 'lrob-calendar')],
                 ['value' => 'draft',   'label' => __('Draft', 'lrob-calendar')],
@@ -78,6 +97,15 @@ class LRob_Calendar_Manage_Screen {
                 ['value' => 'future',  'label' => __('Scheduled', 'lrob-calendar')],
                 ['value' => 'private', 'label' => __('Private', 'lrob-calendar')],
             ],
+            // Modal editor:
+            'defaultTimezone'  => LRob_Calendar_Event::get_default_timezone(),
+            'timezoneChoice'   => wp_timezone_choice(LRob_Calendar_Event::get_default_timezone()),
+            'publicPages'      => $public_pages,
+            // Adaptive recommended description length (chars). Tighter when there
+            // is no public event page to host a long write-up.
+            'descRecommended'  => $public_pages
+                ? (int) apply_filters('lrob_calendar_description_recommended', 800)
+                : (int) apply_filters('lrob_calendar_description_recommended_no_pages', 350),
         ]);
     }
 

@@ -282,11 +282,18 @@
         var id = btn.getAttribute('data-id');
 
         if (action === 'new') {
-            // Phase 1 bridge: native editor. Replaced by the modal in Phase 2.
-            window.location.href = cfg.newLink;
+            if (window.LrobEventModal) {
+                window.LrobEventModal.open(null, fetchEvents);
+            } else {
+                window.location.href = cfg.newLink; // fallback
+            }
         } else if (action === 'edit') {
-            var ev = data.events.filter(function (x) { return String(x.id) === String(id); })[0];
-            if (ev && ev.editLink) window.location.href = ev.editLink;
+            if (window.LrobEventModal) {
+                window.LrobEventModal.open(parseInt(id, 10), fetchEvents);
+            } else {
+                var ev = data.events.filter(function (x) { return String(x.id) === String(id); })[0];
+                if (ev && ev.editLink) window.location.href = ev.editLink;
+            }
         } else if (action === 'delete') {
             if (!window.confirm(__('Move this event to the trash?', 'lrob-calendar'))) return;
             btn.disabled = true;

@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-06-23T22:37:34+00:00\n"
+"POT-Creation-Date: 2026-06-23T22:45:22+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: lrob-calendar\n"
@@ -481,6 +481,7 @@ msgstr ""
 
 #: includes/class-lrob-calendar-blocks.php:210
 #: includes/class-lrob-calendar-blocks.php:259
+#: admin/js/event-modal.js:294
 msgid "Close"
 msgstr ""
 
@@ -524,6 +525,7 @@ msgid "No upcoming events."
 msgstr ""
 
 #: includes/class-lrob-calendar-blocks.php:269
+#: admin/js/event-modal.js:202
 #: admin/js/manage-events.js:117
 msgid "All day"
 msgstr ""
@@ -665,36 +667,36 @@ msgstr ""
 msgid "Manage Events"
 msgstr ""
 
-#: includes/class-lrob-calendar-manage-screen.php:74
+#: includes/class-lrob-calendar-manage-screen.php:93
 msgid "All statuses"
 msgstr ""
 
-#: includes/class-lrob-calendar-manage-screen.php:75
+#: includes/class-lrob-calendar-manage-screen.php:94
 #: admin/js/manage-events.js:87
 msgid "Published"
 msgstr ""
 
-#: includes/class-lrob-calendar-manage-screen.php:76
+#: includes/class-lrob-calendar-manage-screen.php:95
 #: admin/js/manage-events.js:88
 msgid "Draft"
 msgstr ""
 
-#: includes/class-lrob-calendar-manage-screen.php:77
+#: includes/class-lrob-calendar-manage-screen.php:96
 #: admin/js/manage-events.js:89
 msgid "Pending"
 msgstr ""
 
-#: includes/class-lrob-calendar-manage-screen.php:78
+#: includes/class-lrob-calendar-manage-screen.php:97
 #: admin/js/manage-events.js:90
 msgid "Scheduled"
 msgstr ""
 
-#: includes/class-lrob-calendar-manage-screen.php:79
+#: includes/class-lrob-calendar-manage-screen.php:98
 #: admin/js/manage-events.js:91
 msgid "Private"
 msgstr ""
 
-#: includes/class-lrob-calendar-manage-screen.php:101
+#: includes/class-lrob-calendar-manage-screen.php:129
 msgid "This screen requires JavaScript."
 msgstr ""
 
@@ -711,14 +713,17 @@ msgid "Contact & Cost"
 msgstr ""
 
 #: includes/class-lrob-calendar-meta-boxes.php:74
+#: admin/js/event-modal.js:211
 msgid "Start"
 msgstr ""
 
 #: includes/class-lrob-calendar-meta-boxes.php:84
+#: admin/js/event-modal.js:216
 msgid "End"
 msgstr ""
 
 #: includes/class-lrob-calendar-meta-boxes.php:94
+#: admin/js/event-modal.js:224
 msgid "Timezone"
 msgstr ""
 
@@ -1004,6 +1009,7 @@ msgid "New Category Name"
 msgstr ""
 
 #: includes/class-lrob-calendar-post-types.php:107
+#: admin/js/event-modal.js:235
 msgid "Categories"
 msgstr ""
 
@@ -1042,10 +1048,12 @@ msgid "New Tag Name"
 msgstr ""
 
 #: includes/class-lrob-calendar-post-types.php:134
+#: admin/js/event-modal.js:239
 msgid "Tags"
 msgstr ""
 
 #: includes/class-lrob-calendar-single-event.php:58
+#: admin/js/event-modal.js:208
 msgid "When"
 msgstr ""
 
@@ -1071,6 +1079,122 @@ msgstr ""
 
 #: includes/class-lrob-calendar-updater.php:123
 msgid "A clean event calendar for WordPress with recurring events, click-to-preview month grid, agenda view, AJAX-paginated event lists, and an OpenStreetMap embed on single-event pages."
+msgstr ""
+
+#: admin/js/event-modal.js:106
+msgid "Bold"
+msgstr ""
+
+#: admin/js/event-modal.js:107
+msgid "Italic"
+msgstr ""
+
+#: admin/js/event-modal.js:108
+msgid "Bulleted list"
+msgstr ""
+
+#: admin/js/event-modal.js:109
+msgid "Numbered list"
+msgstr ""
+
+#: admin/js/event-modal.js:110
+msgid "Link"
+msgstr ""
+
+#: admin/js/event-modal.js:111
+msgid "Clear formatting"
+msgstr ""
+
+#: admin/js/event-modal.js:126
+msgid "Link URL:"
+msgstr ""
+
+#: admin/js/event-modal.js:175
+msgid "No categories yet."
+msgstr ""
+
+#: admin/js/event-modal.js:180
+msgid "No tags yet."
+msgstr ""
+
+#: admin/js/event-modal.js:194
+msgid "Title"
+msgstr ""
+
+#: admin/js/event-modal.js:195
+msgid "Event title"
+msgstr ""
+
+#: admin/js/event-modal.js:199
+msgid "Type"
+msgstr ""
+
+#: admin/js/event-modal.js:201
+msgid "Standard"
+msgstr ""
+
+#: admin/js/event-modal.js:203
+msgid "Instant"
+msgstr ""
+
+#: admin/js/event-modal.js:229
+msgid "Description"
+msgstr ""
+
+#: admin/js/event-modal.js:246
+msgid "Status"
+msgstr ""
+
+#: admin/js/event-modal.js:250
+msgid "Featured image"
+msgstr ""
+
+#: admin/js/event-modal.js:253
+msgid "Set image"
+msgstr ""
+
+#: admin/js/event-modal.js:254
+msgid "Remove"
+msgstr ""
+
+#: admin/js/event-modal.js:274
+msgid "Edit event"
+msgstr ""
+
+#: admin/js/event-modal.js:279
+msgid "Could not load the event."
+msgstr ""
+
+#: admin/js/event-modal.js:281
+msgid "New event"
+msgstr ""
+
+#: admin/js/event-modal.js:293
+msgid "→ WordPress editor"
+msgstr ""
+
+#: admin/js/event-modal.js:301
+msgid "Cancel"
+msgstr ""
+
+#: admin/js/event-modal.js:302
+msgid "Save"
+msgstr ""
+
+#: admin/js/event-modal.js:383
+msgid "Please set a start date."
+msgstr ""
+
+#: admin/js/event-modal.js:388
+msgid "Saving…"
+msgstr ""
+
+#: admin/js/event-modal.js:404
+msgid "Could not save the event."
+msgstr ""
+
+#: admin/js/event-modal.js:416
+msgid "Select image"
 msgstr ""
 
 #: admin/js/manage-events.js:92
@@ -1138,11 +1262,11 @@ msgstr ""
 msgid "Could not load events."
 msgstr ""
 
-#: admin/js/manage-events.js:291
+#: admin/js/manage-events.js:298
 msgid "Move this event to the trash?"
 msgstr ""
 
-#: admin/js/manage-events.js:297
+#: admin/js/manage-events.js:304
 msgid "Could not delete the event."
 msgstr ""
 
