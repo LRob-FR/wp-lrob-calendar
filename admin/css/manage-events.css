@@ -1,0 +1,193 @@
+/**
+ * Custom event management screen (v1.2). Self-contained — does not depend on the
+ * front-end tokens.css. Tuned to sit cleanly inside wp-admin.
+ */
+
+.lrob-cal-manage {
+    --lrm-border: #dcdcde;
+    --lrm-muted: #646970;
+    --lrm-bg: #fff;
+    --lrm-accent: #2271b1;
+    --lrm-radius: 8px;
+    max-width: 1100px;
+    margin-top: 12px;
+}
+
+/* Header */
+.lrob-manage-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+.lrob-manage-title {
+    margin: 0;
+    padding: 0;
+    font-size: 23px;
+    font-weight: 400;
+}
+
+/* Toolbar */
+.lrob-manage-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+.lrob-manage-search {
+    flex: 1 1 220px;
+    min-width: 180px;
+    height: 32px;
+}
+.lrob-manage-filter {
+    height: 32px;
+    max-width: 220px;
+}
+
+/* Body */
+.lrob-manage-body.is-loading {
+    opacity: 0.5;
+    transition: opacity 0.15s ease;
+}
+.lrob-manage-list {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.lrob-manage-empty {
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--lrm-muted);
+    background: var(--lrm-bg);
+    border: 1px solid var(--lrm-border);
+    border-radius: var(--lrm-radius);
+}
+
+/* Card */
+.lrob-manage-card {
+    display: grid;
+    grid-template-columns: 56px 1fr auto;
+    align-items: center;
+    gap: 14px;
+    margin: 0;
+    padding: 12px 14px;
+    background: var(--lrm-bg);
+    border: 1px solid var(--lrm-border);
+    border-radius: var(--lrm-radius);
+    transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+.lrob-manage-card:hover {
+    border-color: #c3c4c7;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.lrob-manage-thumb {
+    width: 56px;
+    height: 56px;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #f0f0f1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.lrob-manage-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.lrob-manage-thumb-empty {
+    color: #c3c4c7;
+    font-size: 26px;
+    width: 26px;
+    height: 26px;
+}
+
+.lrob-manage-main { min-width: 0; }
+.lrob-manage-card-title {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.3;
+}
+.lrob-manage-badge-rec {
+    color: var(--lrm-accent);
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+}
+
+.lrob-manage-status {
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: #f0f0f1;
+    color: var(--lrm-muted);
+}
+.lrob-status-publish { background: #edfaef; color: #1a7f37; }
+.lrob-status-draft   { background: #f6f7f7; color: #646970; }
+.lrob-status-pending { background: #fcf3e6; color: #8a6116; }
+.lrob-status-future  { background: #eef4fb; color: #2c5e8a; }
+.lrob-status-private { background: #f3eefb; color: #5a3a8a; }
+
+.lrob-manage-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    margin-top: 3px;
+    font-size: 13px;
+    color: var(--lrm-muted);
+}
+.lrob-manage-when { font-variant-numeric: tabular-nums; }
+
+.lrob-manage-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 6px;
+}
+.lrob-manage-chip {
+    font-size: 11px;
+    padding: 1px 8px;
+    border-radius: 10px;
+    background: #f0f6fc;
+    color: #2c5e8a;
+}
+
+.lrob-manage-actions {
+    display: flex;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+/* Pagination */
+.lrob-manage-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 18px;
+}
+.lrob-manage-pageinfo {
+    color: var(--lrm-muted);
+    font-size: 13px;
+}
+
+@media (max-width: 600px) {
+    .lrob-manage-card {
+        grid-template-columns: 44px 1fr;
+        grid-template-areas: "thumb main" "actions actions";
+    }
+    .lrob-manage-thumb { grid-area: thumb; width: 44px; height: 44px; }
+    .lrob-manage-main { grid-area: main; }
+    .lrob-manage-actions { grid-area: actions; justify-content: flex-end; }
+}

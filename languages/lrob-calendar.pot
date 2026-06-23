@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-06-19T17:48:59+00:00\n"
+"POT-Creation-Date: 2026-06-23T22:19:20+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: lrob-calendar\n"
@@ -42,6 +42,7 @@ msgid "View event"
 msgstr ""
 
 #: blocks/events-list/render.php:87
+#: admin/js/manage-events.js:221
 msgid "No events found."
 msgstr ""
 
@@ -63,10 +64,12 @@ msgid "Next page"
 msgstr ""
 
 #: blocks/events-list/render.php:135
+#: admin/js/manage-events.js:198
 msgid "Previous"
 msgstr ""
 
 #: blocks/events-list/render.php:136
+#: admin/js/manage-events.js:203
 msgid "Next"
 msgstr ""
 
@@ -440,6 +443,7 @@ msgstr ""
 #: includes/class-lrob-calendar-block-helpers.php:548
 #: includes/class-lrob-calendar-blocks.php:214
 #: includes/class-lrob-calendar-blocks.php:270
+#: admin/js/manage-events.js:179
 msgid "Recurring"
 msgstr ""
 
@@ -520,6 +524,7 @@ msgid "No upcoming events."
 msgstr ""
 
 #: includes/class-lrob-calendar-blocks.php:269
+#: admin/js/manage-events.js:122
 msgid "All day"
 msgstr ""
 
@@ -653,6 +658,44 @@ msgstr ""
 #. translators: %s: hostname
 #: includes/class-lrob-calendar-import.php:444
 msgid "Imported image(s) reference a private or localhost host (%s). They may not be reachable from your live site after migration."
+msgstr ""
+
+#: includes/class-lrob-calendar-manage-screen.php:28
+#: includes/class-lrob-calendar-manage-screen.php:29
+msgid "Manage Events"
+msgstr ""
+
+#: includes/class-lrob-calendar-manage-screen.php:74
+msgid "All statuses"
+msgstr ""
+
+#: includes/class-lrob-calendar-manage-screen.php:75
+#: admin/js/manage-events.js:92
+msgid "Published"
+msgstr ""
+
+#: includes/class-lrob-calendar-manage-screen.php:76
+#: admin/js/manage-events.js:93
+msgid "Draft"
+msgstr ""
+
+#: includes/class-lrob-calendar-manage-screen.php:77
+#: admin/js/manage-events.js:94
+msgid "Pending"
+msgstr ""
+
+#: includes/class-lrob-calendar-manage-screen.php:78
+#: admin/js/manage-events.js:95
+msgid "Scheduled"
+msgstr ""
+
+#: includes/class-lrob-calendar-manage-screen.php:79
+#: admin/js/manage-events.js:96
+msgid "Private"
+msgstr ""
+
+#: includes/class-lrob-calendar-manage-screen.php:101
+msgid "This screen requires JavaScript."
 msgstr ""
 
 #: includes/class-lrob-calendar-meta-boxes.php:20
@@ -869,6 +912,7 @@ msgid "Ticket URL"
 msgstr ""
 
 #: includes/class-lrob-calendar-post-types.php:23
+#: admin/js/manage-events.js:149
 msgid "Events"
 msgstr ""
 
@@ -1027,6 +1071,72 @@ msgstr ""
 
 #: includes/class-lrob-calendar-updater.php:123
 msgid "A clean event calendar for WordPress with recurring events, click-to-preview month grid, agenda view, AJAX-paginated event lists, and an OpenStreetMap embed on single-event pages."
+msgstr ""
+
+#: admin/js/manage-events.js:97
+#: admin/js/manage-events.js:190
+msgid "Trash"
+msgstr ""
+
+#: admin/js/manage-events.js:138
+msgid "All categories"
+msgstr ""
+
+#: admin/js/manage-events.js:139
+msgid "All tags"
+msgstr ""
+
+#: admin/js/manage-events.js:141
+msgid "Date (soonest first)"
+msgstr ""
+
+#: admin/js/manage-events.js:142
+msgid "Date (latest first)"
+msgstr ""
+
+#: admin/js/manage-events.js:143
+msgid "Title (A→Z)"
+msgstr ""
+
+#: admin/js/manage-events.js:144
+msgid "Recently modified"
+msgstr ""
+
+#: admin/js/manage-events.js:151
+msgid "+ New event"
+msgstr ""
+
+#: admin/js/manage-events.js:156
+msgid "Search events…"
+msgstr ""
+
+#: admin/js/manage-events.js:178
+msgid "(no title)"
+msgstr ""
+
+#: admin/js/manage-events.js:189
+msgid "Edit"
+msgstr ""
+
+#: admin/js/manage-events.js:200
+msgid "Page"
+msgstr ""
+
+#: admin/js/manage-events.js:201
+#: blocks/events-list/edit.js:182
+msgid "events"
+msgstr ""
+
+#: admin/js/manage-events.js:228
+msgid "Could not load events."
+msgstr ""
+
+#: admin/js/manage-events.js:276
+msgid "Move this event to the trash?"
+msgstr ""
+
+#: admin/js/manage-events.js:282
+msgid "Could not delete the event."
 msgstr ""
 
 #: blocks/calendar/edit.js:25
@@ -1293,10 +1403,6 @@ msgstr ""
 
 #: blocks/events-list/edit.js:182
 msgid "Events List"
-msgstr ""
-
-#: blocks/events-list/edit.js:182
-msgid "events"
 msgstr ""
 
 #: blocks/events-list/edit.js:193

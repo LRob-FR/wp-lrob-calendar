@@ -38,12 +38,16 @@ class LRob_Calendar {
         // checks happen on the frontend too, and those should still pick up
         // a new GitHub release.
         require_once LROB_CALENDAR_PATH . 'includes/class-lrob-calendar-updater.php';
+        // Admin REST controller must load on every request: REST calls (wp-json)
+        // don't run in an is_admin() context, so its routes can't be gated below.
+        require_once LROB_CALENDAR_PATH . 'includes/class-lrob-calendar-admin-rest.php';
 
         if (is_admin()) {
             require_once LROB_CALENDAR_PATH . 'includes/class-lrob-calendar-admin.php';
             require_once LROB_CALENDAR_PATH . 'includes/class-lrob-calendar-meta-boxes.php';
             require_once LROB_CALENDAR_PATH . 'includes/class-lrob-calendar-demo-events.php';
             require_once LROB_CALENDAR_PATH . 'includes/class-lrob-calendar-migrate.php';
+            require_once LROB_CALENDAR_PATH . 'includes/class-lrob-calendar-manage-screen.php';
         }
     }
     
@@ -63,9 +67,15 @@ class LRob_Calendar {
         new LRob_Calendar_Single_Event();
         new LRob_Calendar_Updater();
 
+        // Admin REST routes register on rest_api_init (runs for wp-json requests,
+        // which are not is_admin()). Access is gated per-route by capability.
+        $admin_rest = new LRob_Calendar_Admin_REST();
+        add_action('rest_api_init', [$admin_rest, 'register_routes']);
+
         if (is_admin()) {
             new LRob_Calendar_Admin();
             new LRob_Calendar_Meta_Boxes();
+            new LRob_Calendar_Manage_Screen();
         }
     }
 
