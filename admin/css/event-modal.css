@@ -198,6 +198,23 @@ body.lrob-modal-open { overflow: hidden; }
 .lrob-modal-msg.is-error { color: #b32d2e; }
 .lrob-modal-foot-actions { display: flex; gap: 8px; }
 
+/* Block-editor content warning banner */
+.lrob-modal-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+    padding: 10px 12px;
+    background: #fcf3e6;
+    border: 1px solid #f0d8a8;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #8a6116;
+}
+.lrob-modal-banner-actions { display: flex; align-items: center; gap: 10px; white-space: nowrap; }
+
 /* Section headings */
 .lrob-modal-section {
     margin: 22px 0 12px;

@@ -347,6 +347,13 @@
 
     function bodyHtml() {
         return '' +
+        '<div class="lrob-modal-banner" hidden>' +
+            '<span class="lrob-modal-banner-text"></span>' +
+            '<span class="lrob-modal-banner-actions">' +
+                '<button type="button" class="button button-small lrob-banner-advanced">' + esc(__('Open in WordPress editor', 'lrob-calendar')) + '</button>' +
+                '<button type="button" class="button-link lrob-banner-dismiss">' + esc(__('Edit as simple text', 'lrob-calendar')) + '</button>' +
+            '</span>' +
+        '</div>' +
         '<div class="lrob-f-row">' +
             '<label class="lrob-f-label">' + esc(__('Title', 'lrob-calendar')) + '</label>' +
             '<input type="text" class="lrob-f-title widefat" placeholder="' + esc(__('Event title', 'lrob-calendar')) + '">' +
@@ -529,6 +536,10 @@
         });
         q('.lrob-r-freq').addEventListener('change', applyRecurrence);
 
+        // Gutenberg-content banner actions.
+        q('.lrob-banner-advanced').addEventListener('click', function () { q('.lrob-modal-advanced').click(); });
+        q('.lrob-banner-dismiss').addEventListener('click', function () { q('.lrob-modal-banner').hidden = true; });
+
         overlay.querySelectorAll('.lrob-f-add-term').forEach(function (b) {
             b.addEventListener('click', function () { openTermPopup(this.getAttribute('data-tax')); });
         });
@@ -605,6 +616,17 @@
 
         var adv = q('.lrob-modal-advanced');
         if (d.editLink) { adv.href = d.editLink; adv.hidden = false; } else { adv.hidden = true; }
+
+        // Warn (non-destructively) when the content came from the block editor:
+        // editing here keeps only the simple formatting.
+        var banner = q('.lrob-modal-banner');
+        if (d.hasBlocks) {
+            q('.lrob-modal-banner-text').textContent =
+                __('This event was created with the WordPress block editor. Editing it here keeps only simple formatting (bold, italic, lists, links).', 'lrob-calendar');
+            banner.hidden = false;
+        } else {
+            banner.hidden = true;
+        }
 
         applyTypeVisibility();
         dirty = false;
