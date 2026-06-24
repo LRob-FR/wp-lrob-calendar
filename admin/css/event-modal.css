@@ -118,16 +118,28 @@ body.lrob-modal-open { overflow: hidden; }
     border-bottom: 1px solid var(--lm-border);
 }
 .lrob-rte-spacer { flex: 1; }
-.lrob-rte-btn {
-    display: inline-grid;
-    place-items: center;
-    width: 30px;
-    height: 28px;
-    padding: 0;
+/* High specificity + line-height:0 so neither the dashicons base (20px) nor the
+   WP .button styles fight the centering/size. */
+.lrob-rte-toolbar .lrob-rte-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: 28px;
+    height: 26px;
+    min-width: 0;
     min-height: 0;
-    line-height: 1;
+    padding: 0;
+    line-height: 0;
 }
-.lrob-rte-btn .dashicons { font-size: 16px; width: 16px; height: 16px; line-height: 1; margin: 0; }
+.lrob-rte-toolbar .lrob-rte-btn .dashicons {
+    font-size: 15px;
+    width: 15px;
+    height: 15px;
+    line-height: 15px;
+    margin: 0;
+    vertical-align: middle;
+}
 .lrob-rte-code-toggle.is-active { background: #2271b1; border-color: #2271b1; color: #fff; }
 .lrob-rte-code-toggle.is-active .dashicons { color: #fff; }
 .lrob-rte {
