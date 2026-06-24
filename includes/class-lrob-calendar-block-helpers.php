@@ -14,19 +14,23 @@ class LRob_Calendar_Block_Helpers {
     /**
      * Shape an event for client consumption (REST + inlined initial JSON in the calendar).
      */
-    public static function format_event_for_client(LRob_Calendar_Event $event): array {
+    public static function format_event_for_client(LRob_Calendar_Event $event, ?array $occurrence = null): array {
         $post     = $event->get_post();
         $post_id  = $event->get_post_id();
         $thumb_id = get_post_thumbnail_id($post_id);
 
-        // For recurring events, prefer the next upcoming instance over the base.
-        // Otherwise an event whose base happened years ago but recurs forever
-        // would display its original 2018 date in the popup — confusing.
-        // Cutoff is start-of-today (site timezone) so today's instance still
-        // counts as "next upcoming" even after its time has passed.
         $start_dt = $event->get_start_datetime();
         $end_dt   = $event->get_end_datetime();
-        if ($event->is_recurring()) {
+        if ($occurrence) {
+            // Caller asked for a specific materialized occurrence (calendar
+            // expands recurring events into one entry per date).
+            $tz = new DateTimeZone($event->get('timezone') ?: 'UTC');
+            $start_dt = (new DateTime('@' . (int) $occurrence['start']))->setTimezone($tz);
+            $end_dt   = (new DateTime('@' . (int) $occurrence['end']))->setTimezone($tz);
+        } elseif ($event->is_recurring()) {
+            // No specific occurrence: prefer the next upcoming instance over the
+            // base, so an event whose base happened years ago but recurs forever
+            // doesn't display its original date. Cutoff is start-of-today.
             $today_start = (new DateTimeImmutable('today', wp_timezone()))->getTimestamp();
             $next = $event->get_next_instance_after($today_start);
             if ($next) {

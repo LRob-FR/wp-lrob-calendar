@@ -196,7 +196,7 @@
                     return;
                 }
             }
-            var eventId = $(this).data('event-id');
+            var eventId = $(this).attr('data-event-id');
             self.showPopup(eventId, $(this), e);
         });
 
@@ -881,7 +881,7 @@
         });
         var idx = -1;
         for (var i = 0; i < sorted.length; i++) {
-            if (sorted[i].id === id) { idx = i; break; }
+            if (String(sorted[i].id) === String(id)) { idx = i; break; }
         }
         if (idx === -1) return { prev: null, next: null };
         return {
@@ -891,7 +891,7 @@
     };
 
     LRobCalendar.prototype.showPopup = function(eventId) {
-        var event = this.events.find(function(e) { return e.id === eventId; });
+        var event = this.events.find(function(e) { return String(e.id) === String(eventId); });
         if (!event) return;
         this.currentPopupEventId = eventId;
 
@@ -926,7 +926,7 @@
      * background — the popup lives above the grid and isn't affected.
      */
     LRobCalendar.prototype.navigatePopupTo = function(targetId, direction) {
-        var ev = this.events.find(function (e) { return e.id === targetId; });
+        var ev = this.events.find(function (e) { return String(e.id) === String(targetId); });
         if (!ev) return;
 
         // Derive direction if not given (used by programmatic nav).
@@ -936,8 +936,8 @@
             });
             var currIdx = -1, targetIdx = -1;
             for (var i = 0; i < sorted.length; i++) {
-                if (sorted[i].id === this.currentPopupEventId) currIdx = i;
-                if (sorted[i].id === targetId) targetIdx = i;
+                if (String(sorted[i].id) === String(this.currentPopupEventId)) currIdx = i;
+                if (String(sorted[i].id) === String(targetId)) targetIdx = i;
             }
             direction = targetIdx > currIdx ? 'left' : 'right';
         }
@@ -970,7 +970,7 @@
         $popup.on('click', '.lrob-cal-day-list-item', function (e) {
             e.preventDefault();
             e.stopPropagation();
-            var targetId = parseInt($(this).attr('data-event-id'), 10);
+            var targetId = $(this).attr('data-event-id');
             if (targetId) self.showPopup(targetId);
         });
     };

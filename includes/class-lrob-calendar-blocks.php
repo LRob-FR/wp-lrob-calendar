@@ -399,10 +399,32 @@ class LRob_Calendar_Blocks {
 
         $events = LRob_Calendar_Event::get_events($args);
         LRob_Calendar_Block_Helpers::prime_caches_for_events($events);
-        $response = array_map(
-            [LRob_Calendar_Block_Helpers::class, 'format_event_for_client'],
-            $events
-        );
+
+        // Expand recurring events into one entry per occurrence within the
+        // requested window, so they actually appear on every recurrence date
+        // (not just the base/next instance). Non-recurring events pass through.
+        $range_start = isset($args['start']) ? (int) $args['start'] : null;
+        $range_end   = isset($args['end'])   ? (int) $args['end']   : null;
+
+        $response = [];
+        foreach ($events as $event) {
+            if ($event->is_recurring()) {
+                $occurrences = $event->get_instances_in_range($range_start, $range_end, 500);
+                if (!empty($occurrences)) {
+                    foreach ($occurrences as $occ) {
+                        $payload = LRob_Calendar_Block_Helpers::format_event_for_client($event, $occ);
+                        // Unique per-occurrence id: the calendar JS dedupes by id
+                        // and looks up popup data by it, so each date needs its own.
+                        // Non-numeric so it stays a string client-side (real post
+                        // id stays in `url`/details).
+                        $payload['id'] = $payload['id'] . ':' . (int) $occ['start'];
+                        $response[] = $payload;
+                    }
+                    continue;
+                }
+            }
+            $response[] = LRob_Calendar_Block_Helpers::format_event_for_client($event);
+        }
 
         set_transient($cache_key, $response, self::REST_CACHE_TTL);
         return new WP_REST_Response($response);

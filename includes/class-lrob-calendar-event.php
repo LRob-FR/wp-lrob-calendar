@@ -429,7 +429,30 @@ class LRob_Calendar_Event {
         ), ARRAY_A);
         return $row ?: null;
     }
-    
+
+    /**
+     * Materialized occurrences overlapping [range_start, range_end] (either bound
+     * may be null = open-ended). Used to expand a recurring event into one entry
+     * per occurrence for calendar display.
+     *
+     * @return array<int, array{start:int,end:int}>
+     */
+    public function get_instances_in_range(?int $range_start, ?int $range_end, int $limit = 500): array {
+        global $wpdb;
+        if ($this->post_id <= 0) {
+            return [];
+        }
+        $table  = LRob_Calendar_Database::get_instances_table();
+        $where  = ['post_id = %d'];
+        $params = [$this->post_id];
+        if ($range_start !== null) { $where[] = 'end >= %d';   $params[] = $range_start; }
+        if ($range_end !== null)   { $where[] = 'start <= %d'; $params[] = $range_end; }
+        $params[] = $limit;
+
+        $sql = "SELECT start, end FROM {$table} WHERE " . implode(' AND ', $where) . ' ORDER BY start ASC LIMIT %d';
+        return $wpdb->get_results($wpdb->prepare($sql, $params), ARRAY_A) ?: [];
+    }
+
     // Static query methods
     
     public static function get_events(array $args = []): array {
