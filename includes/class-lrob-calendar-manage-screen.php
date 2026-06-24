@@ -19,7 +19,64 @@ class LRob_Calendar_Manage_Screen {
 
     public function __construct() {
         add_action('admin_menu', [$this, 'add_menu_page']);
+        add_action('admin_menu', [$this, 'promote_in_menu'], 999);
         add_action('admin_enqueue_scripts', [$this, 'enqueue_assets']);
+        // Make the custom screen the default landing for the Events menu.
+        add_action('load-edit.php', [$this, 'maybe_redirect_to_manage']);
+    }
+
+    /**
+     * The Events top-level menu (and "All Events") both point at edit.php — the
+     * classic list. Redirect that bare landing to the custom screen so it becomes
+     * the default, while keeping the classic list reachable via an escape param.
+     */
+    public function maybe_redirect_to_manage(): void {
+        if (!current_user_can('edit_lrob_events')) {
+            return;
+        }
+        if (($_GET['post_type'] ?? '') !== LRob_Calendar_Post_Types::POST_TYPE) {
+            return;
+        }
+        if (isset($_GET['lrob_classic'])) {
+            return; // explicit classic-list request
+        }
+        // Only the plain menu landing — never a filtered/searched/bulk view.
+        $keys = array_keys($_GET);
+        sort($keys);
+        if ($keys !== ['post_type']) {
+            return;
+        }
+        wp_safe_redirect(admin_url('edit.php?post_type=' . LRob_Calendar_Post_Types::POST_TYPE . '&page=' . self::SLUG));
+        exit;
+    }
+
+    /**
+     * Reorder the Events submenu: "Manage Events" first, and rewrite the classic
+     * "All Events" link to carry the escape param so it survives the redirect.
+     */
+    public function promote_in_menu(): void {
+        global $submenu;
+        $parent = 'edit.php?post_type=' . LRob_Calendar_Post_Types::POST_TYPE;
+        if (empty($submenu[$parent])) {
+            return;
+        }
+
+        $manage_idx = null;
+        foreach ($submenu[$parent] as $i => $item) {
+            if (($item[2] ?? '') === self::SLUG) {
+                $manage_idx = $i;
+            }
+            if (($item[2] ?? '') === $parent) {
+                $submenu[$parent][$i][2] = $parent . '&lrob_classic=1';
+                $submenu[$parent][$i][0] = __('All Events (classic)', 'lrob-calendar');
+            }
+        }
+
+        if ($manage_idx !== null) {
+            $item = $submenu[$parent][$manage_idx];
+            unset($submenu[$parent][$manage_idx]);
+            array_unshift($submenu[$parent], $item);
+        }
     }
 
     public function add_menu_page(): void {

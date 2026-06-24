@@ -1,24 +1,25 @@
 /**
- * Dynamic event editor modal (v1.2, Phase 2).
+ * Dynamic event editor modal (v1.2).
  *
  * window.LrobEventModal.open(id|null, onSaved) — loads an event over REST (or a
- * blank form), edits the core fields without leaving the page, and saves via
- * create/update. Timezone math lives entirely on the server: the modal sends
- * wall-clock date/time parts + the chosen timezone and PHP computes the stored
- * timestamps (identical to the classic meta box).
+ * blank form), edits every field in-page, and saves via create/update. Timezone
+ * math lives on the server: the modal sends wall-clock parts + the timezone and
+ * PHP computes the stored timestamps (identical to the classic meta box).
  *
- * The description uses a deliberately minimal rich-text editor — bold, italic,
- * lists and links only. No headings, no images: the guardrail against authors
- * pasting an H1 for "bigger text" or a giant image. Server-side wp_kses enforces
- * the same allow-list, so this is UX, not security.
+ * The description uses a deliberately minimal rich-text editor (bold/italic/
+ * lists/link + a raw-HTML code view). No headings, no images — the guardrail
+ * against authors faking "big text" or pasting giant images. Server-side
+ * wp_kses enforces the same allow-list, so this is UX, not security.
  */
 (function (i18n) {
     var __ = (i18n && i18n.__) ? i18n.__ : function (s) { return s; };
     function cfg() { return window.lrobCalendarManage || {}; }
+    function termsUrl() { return (cfg().restRoot || '').replace(/\/events$/, '/terms'); }
 
     var overlay = null;
-    var ed = null;            // active mini-editor instance
+    var ed = null;
     var featuredId = 0;
+    var dirty = false;
     var current = { id: null, onSaved: null };
 
     /* ── Helpers ─────────────────────────────────────────────────────────── */
@@ -34,6 +35,7 @@
         t.innerHTML = html.trim();
         return t.content.firstChild;
     }
+    function q(sel) { return overlay.querySelector(sel); }
 
     function defaults() {
         var now = new Date();
@@ -48,41 +50,36 @@
                 type: 'standard', timezone: cfg().defaultTimezone || 'UTC',
                 start_date: d(now), start_time: t(now), end_date: d(end), end_time: t(end)
             },
-            categories: [], tags: [], featuredImage: null, editLink: null
+            fields: {}, categories: [], tags: [], featuredImage: null, editLink: null
         };
     }
 
-    /* ── Minimal rich-text editor ────────────────────────────────────────── */
+    /* ── Minimal rich-text editor (+ code view) ──────────────────────────── */
 
     var ALLOWED = ['P', 'BR', 'STRONG', 'B', 'EM', 'I', 'U', 'UL', 'OL', 'LI', 'A'];
 
     function cleanHtml(html) {
         var box = document.createElement('div');
         box.innerHTML = html || '';
-
-        // Drop block-editor comment nodes and disallowed/empty media outright.
         (function walk(node) {
             var child = node.firstChild;
             while (child) {
                 var next = child.nextSibling;
-                if (child.nodeType === 8) { // comment (e.g. <!-- wp:paragraph -->)
+                if (child.nodeType === 8) {
                     node.removeChild(child);
                 } else if (child.nodeType === 1) {
                     var tag = child.tagName;
                     if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'IMG') {
                         node.removeChild(child);
                     } else if (tag === 'DIV') {
-                        // execCommand wraps lines in <div>; promote to <p>.
                         var p = document.createElement('p');
                         while (child.firstChild) p.appendChild(child.firstChild);
                         node.replaceChild(p, child);
                         walk(p);
                     } else if (ALLOWED.indexOf(tag) === -1) {
-                        // Unwrap unknown tags (H1, SPAN, FONT…), keep their text.
                         while (child.firstChild) node.insertBefore(child.firstChild, child);
                         node.removeChild(child);
                     } else {
-                        // Strip every attribute except href on links.
                         var keep = (tag === 'A') ? child.getAttribute('href') : null;
                         while (child.attributes.length) child.removeAttribute(child.attributes[0].name);
                         if (keep) {
@@ -96,62 +93,88 @@
                 child = next;
             }
         })(box);
-
         return box.innerHTML.trim();
     }
 
     function createEditor(host, html) {
         host.innerHTML =
             '<div class="lrob-rte-toolbar">' +
-                btn('bold', 'editor-bold', __('Bold', 'lrob-calendar')) +
-                btn('italic', 'editor-italic', __('Italic', 'lrob-calendar')) +
-                btn('insertUnorderedList', 'editor-ul', __('Bulleted list', 'lrob-calendar')) +
-                btn('insertOrderedList', 'editor-ol', __('Numbered list', 'lrob-calendar')) +
-                btn('createLink', 'admin-links', __('Link', 'lrob-calendar')) +
-                btn('removeFormat', 'editor-removeformatting', __('Clear formatting', 'lrob-calendar')) +
+                fbtn('bold', 'editor-bold', __('Bold', 'lrob-calendar')) +
+                fbtn('italic', 'editor-italic', __('Italic', 'lrob-calendar')) +
+                fbtn('insertUnorderedList', 'editor-ul', __('Bulleted list', 'lrob-calendar')) +
+                fbtn('insertOrderedList', 'editor-ol', __('Numbered list', 'lrob-calendar')) +
+                fbtn('createLink', 'admin-links', __('Link', 'lrob-calendar')) +
+                fbtn('removeFormat', 'editor-removeformatting', __('Clear formatting', 'lrob-calendar')) +
+                '<span class="lrob-rte-spacer"></span>' +
+                '<button type="button" class="button lrob-rte-btn lrob-rte-code-toggle" data-toggle="code" ' +
+                    'title="' + esc(__('Code view', 'lrob-calendar')) + '" aria-label="' + esc(__('Code view', 'lrob-calendar')) + '">' +
+                    '<span class="dashicons dashicons-editor-code"></span></button>' +
             '</div>' +
             '<div class="lrob-rte" contenteditable="true"></div>' +
+            '<textarea class="lrob-rte-code" spellcheck="false" hidden></textarea>' +
             '<div class="lrob-rte-counter"><span class="lrob-rte-count">0</span> / ' +
                 esc(cfg().descRecommended || 800) + '</div>';
 
         var area = host.querySelector('.lrob-rte');
+        var code = host.querySelector('.lrob-rte-code');
+        var toolbar = host.querySelector('.lrob-rte-toolbar');
+        var counterBox = host.querySelector('.lrob-rte-counter');
+        var counter = host.querySelector('.lrob-rte-count');
+        var max = parseInt(cfg().descRecommended, 10) || 800;
+        var mode = 'rich';
+
         area.innerHTML = cleanHtml(html);
 
-        host.querySelectorAll('.lrob-rte-btn').forEach(function (b) {
-            b.addEventListener('click', function (e) {
-                e.preventDefault();
-                area.focus();
-                var cmd = this.getAttribute('data-cmd');
-                if (cmd === 'createLink') {
-                    var url = window.prompt(__('Link URL:', 'lrob-calendar'), 'https://');
-                    if (url) document.execCommand('createLink', false, url);
-                } else {
-                    document.execCommand(cmd, false, null);
-                }
-                updateCount();
-            });
+        // Use mousedown+preventDefault so the contenteditable keeps its selection.
+        toolbar.addEventListener('mousedown', function (e) {
+            var b = e.target.closest('.lrob-rte-btn[data-cmd]');
+            if (!b || mode !== 'rich') return;
+            e.preventDefault();
+            var cmd = b.getAttribute('data-cmd');
+            if (cmd === 'createLink') {
+                var url = window.prompt(__('Link URL:', 'lrob-calendar'), 'https://');
+                if (url) document.execCommand('createLink', false, url);
+            } else {
+                document.execCommand(cmd, false, null);
+            }
+            updateCount();
         });
 
-        // Paste as plain text — kills inherited headings, colors, images, sizes.
+        host.querySelector('.lrob-rte-code-toggle').addEventListener('click', function () {
+            if (mode === 'rich') {
+                code.value = cleanHtml(area.innerHTML);
+                area.hidden = true; code.hidden = false;
+                this.classList.add('is-active');
+                mode = 'code';
+            } else {
+                area.innerHTML = cleanHtml(code.value);
+                code.hidden = true; area.hidden = false;
+                this.classList.remove('is-active');
+                mode = 'rich';
+                updateCount();
+            }
+        });
+
         area.addEventListener('paste', function (e) {
             e.preventDefault();
             var text = (e.clipboardData || window.clipboardData).getData('text/plain');
             document.execCommand('insertText', false, text);
         });
         area.addEventListener('input', updateCount);
+        code.addEventListener('input', function () { counter.textContent = code.value.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim().length; });
 
-        var counter = host.querySelector('.lrob-rte-count');
-        var max = parseInt(cfg().descRecommended, 10) || 800;
         function updateCount() {
             var len = area.textContent.replace(/\s+/g, ' ').trim().length;
             counter.textContent = len;
-            host.querySelector('.lrob-rte-counter').classList.toggle('is-over', len > max);
+            counterBox.classList.toggle('is-over', len > max);
         }
         updateCount();
 
-        return { getHTML: function () { return cleanHtml(area.innerHTML); } };
+        return {
+            getHTML: function () { return cleanHtml(mode === 'code' ? code.value : area.innerHTML); }
+        };
 
-        function btn(cmd, icon, label) {
+        function fbtn(cmd, icon, label) {
             return '<button type="button" class="button lrob-rte-btn" data-cmd="' + cmd + '" ' +
                 'title="' + esc(label) + '" aria-label="' + esc(label) + '">' +
                 '<span class="dashicons dashicons-' + icon + '"></span></button>';
@@ -160,26 +183,30 @@
 
     /* ── Field markup ────────────────────────────────────────────────────── */
 
+    function txtRow(cls, label, ph, type) {
+        return '<div class="lrob-f-row lrob-f-col">' +
+            '<label class="lrob-f-label">' + esc(label) + '</label>' +
+            '<input type="' + (type || 'text') + '" class="' + cls + ' widefat" placeholder="' + esc(ph || '') + '">' +
+            '</div>';
+    }
+
     function catTree() {
         var cats = (cfg().categories || []).slice();
         var byParent = {};
         cats.forEach(function (c) { (byParent[c.parent] = byParent[c.parent] || []).push(c); });
         function branch(parent, depth) {
             return (byParent[parent] || []).map(function (c) {
-                return '<label class="lrob-f-check" style="padding-left:' + (depth * 16) + 'px">' +
+                return '<label class="lrob-f-check" data-term="' + esc(c.value) + '" style="padding-left:' + (depth * 16) + 'px">' +
                     '<input type="checkbox" class="lrob-f-cat" value="' + esc(c.value) + '"> ' + esc(c.label) +
                     '</label>' + branch(c.value, depth + 1);
             }).join('');
         }
-        var html = branch(0, 0);
-        return html || '<p class="lrob-modal-hint">' + esc(__('No categories yet.', 'lrob-calendar')) + '</p>';
+        return branch(0, 0);
     }
 
-    function tagList() {
-        var tags = cfg().tags || [];
-        if (!tags.length) return '<p class="lrob-modal-hint">' + esc(__('No tags yet.', 'lrob-calendar')) + '</p>';
-        return tags.map(function (t) {
-            return '<label class="lrob-f-check"><input type="checkbox" class="lrob-f-tag" value="' + esc(t.value) + '"> ' + esc(t.label) + '</label>';
+    function tagChecks() {
+        return (cfg().tags || []).map(function (t) {
+            return '<label class="lrob-f-check" data-term="' + esc(t.value) + '"><input type="checkbox" class="lrob-f-tag" value="' + esc(t.value) + '"> ' + esc(t.label) + '</label>';
         }).join('');
     }
 
@@ -187,6 +214,8 @@
         return (cfg().statuses || []).filter(function (s) { return s.value !== 'any'; })
             .map(function (s) { return '<option value="' + esc(s.value) + '">' + esc(s.label) + '</option>'; }).join('');
     }
+
+    function section(title) { return '<h3 class="lrob-modal-section">' + esc(title) + '</h3>'; }
 
     function bodyHtml() {
         return '' +
@@ -209,20 +238,17 @@
             '<div class="lrob-f-when-grid">' +
                 '<div class="lrob-f-dt">' +
                     '<span class="lrob-f-sub">' + esc(__('Start', 'lrob-calendar')) + '</span>' +
-                    '<input type="date" class="lrob-f-sd">' +
-                    '<input type="time" class="lrob-f-st">' +
+                    '<input type="date" class="lrob-f-sd"><input type="time" class="lrob-f-st">' +
                 '</div>' +
                 '<div class="lrob-f-dt lrob-f-end">' +
                     '<span class="lrob-f-sub">' + esc(__('End', 'lrob-calendar')) + '</span>' +
-                    '<input type="date" class="lrob-f-ed">' +
-                    '<input type="time" class="lrob-f-et">' +
+                    '<input type="date" class="lrob-f-ed"><input type="time" class="lrob-f-et">' +
+                '</div>' +
+                '<div class="lrob-f-dt lrob-f-tz-wrap">' +
+                    '<span class="lrob-f-sub">' + esc(__('Timezone', 'lrob-calendar')) + '</span>' +
+                    '<select class="lrob-f-tz">' + (cfg().timezoneChoice || '') + '</select>' +
                 '</div>' +
             '</div>' +
-        '</div>' +
-
-        '<div class="lrob-f-row">' +
-            '<label class="lrob-f-label">' + esc(__('Timezone', 'lrob-calendar')) + '</label>' +
-            '<select class="lrob-f-tz">' + (cfg().timezoneChoice || '') + '</select>' +
         '</div>' +
 
         '<div class="lrob-f-row">' +
@@ -230,14 +256,59 @@
             '<div class="lrob-f-desc"></div>' +
         '</div>' +
 
+        section(__('Location', 'lrob-calendar')) +
+        '<div class="lrob-f-cols">' +
+            txtRow('lrob-x-venue', __('Venue', 'lrob-calendar'), '') +
+            txtRow('lrob-x-address', __('Address', 'lrob-calendar'), '') +
+        '</div>' +
+        '<div class="lrob-f-cols">' +
+            txtRow('lrob-x-city', __('City', 'lrob-calendar'), '') +
+            txtRow('lrob-x-province', __('State / Province', 'lrob-calendar'), '') +
+        '</div>' +
+        '<div class="lrob-f-cols">' +
+            txtRow('lrob-x-postal_code', __('Postal code', 'lrob-calendar'), '') +
+            txtRow('lrob-x-country', __('Country', 'lrob-calendar'), '') +
+        '</div>' +
+        '<div class="lrob-f-cols">' +
+            txtRow('lrob-x-latitude', __('Latitude', 'lrob-calendar'), '') +
+            txtRow('lrob-x-longitude', __('Longitude', 'lrob-calendar'), '') +
+        '</div>' +
+        '<div class="lrob-f-row">' +
+            '<label class="lrob-f-check"><input type="checkbox" class="lrob-x-show_map"> ' + esc(__('Show map', 'lrob-calendar')) + '</label>' +
+            '<label class="lrob-f-check"><input type="checkbox" class="lrob-x-show_coordinates"> ' + esc(__('Show coordinates', 'lrob-calendar')) + '</label>' +
+        '</div>' +
+
+        section(__('Contact', 'lrob-calendar')) +
+        '<div class="lrob-f-cols">' +
+            txtRow('lrob-x-contact_name', __('Contact name', 'lrob-calendar'), '') +
+            txtRow('lrob-x-contact_phone', __('Phone', 'lrob-calendar'), '', 'tel') +
+        '</div>' +
+        '<div class="lrob-f-cols">' +
+            txtRow('lrob-x-contact_email', __('Email', 'lrob-calendar'), '', 'email') +
+            txtRow('lrob-x-contact_url', __('Website', 'lrob-calendar'), 'https://', 'url') +
+        '</div>' +
+
+        section(__('Cost', 'lrob-calendar')) +
         '<div class="lrob-f-cols">' +
             '<div class="lrob-f-row lrob-f-col">' +
-                '<label class="lrob-f-label">' + esc(__('Categories', 'lrob-calendar')) + '</label>' +
-                '<div class="lrob-f-checks">' + catTree() + '</div>' +
+                '<label class="lrob-f-label">' + esc(__('Price', 'lrob-calendar')) + '</label>' +
+                '<input type="text" class="lrob-x-cost widefat" placeholder="' + esc(__('e.g. 10 €', 'lrob-calendar')) + '">' +
+                '<label class="lrob-f-check"><input type="checkbox" class="lrob-x-is_free"> ' + esc(__('Free event', 'lrob-calendar')) + '</label>' +
+            '</div>' +
+            txtRow('lrob-x-ticket_url', __('Ticket URL', 'lrob-calendar'), 'https://', 'url') +
+        '</div>' +
+
+        section(__('Organization', 'lrob-calendar')) +
+        '<div class="lrob-f-cols">' +
+            '<div class="lrob-f-row lrob-f-col">' +
+                '<label class="lrob-f-label">' + esc(__('Categories', 'lrob-calendar')) + ' <span class="lrob-f-opt">' + esc(__('(optional)', 'lrob-calendar')) + '</span></label>' +
+                '<div class="lrob-f-checks lrob-f-cats">' + catTree() + '</div>' +
+                '<button type="button" class="button-link lrob-f-add-term" data-tax="category">+ ' + esc(__('Add category', 'lrob-calendar')) + '</button>' +
             '</div>' +
             '<div class="lrob-f-row lrob-f-col">' +
-                '<label class="lrob-f-label">' + esc(__('Tags', 'lrob-calendar')) + '</label>' +
-                '<div class="lrob-f-checks">' + tagList() + '</div>' +
+                '<label class="lrob-f-label">' + esc(__('Tags', 'lrob-calendar')) + ' <span class="lrob-f-opt">' + esc(__('(optional)', 'lrob-calendar')) + '</span></label>' +
+                '<div class="lrob-f-checks lrob-f-tags">' + tagChecks() + '</div>' +
+                '<button type="button" class="button-link lrob-f-add-term" data-tax="tag">+ ' + esc(__('Add tag', 'lrob-calendar')) + '</button>' +
             '</div>' +
         '</div>' +
 
@@ -290,7 +361,7 @@
                     '<header class="lrob-modal-head">' +
                         '<h2 class="lrob-modal-title"></h2>' +
                         '<div class="lrob-modal-head-actions">' +
-                            '<a class="lrob-modal-advanced" target="_blank" hidden>' + esc(__('→ WordPress editor', 'lrob-calendar')) + '</a>' +
+                            '<a class="lrob-modal-advanced" hidden>' + esc(__('→ WordPress editor', 'lrob-calendar')) + '</a>' +
                             '<button type="button" class="lrob-modal-close" aria-label="' + esc(__('Close', 'lrob-calendar')) + '">&times;</button>' +
                         '</div>' +
                     '</header>' +
@@ -306,25 +377,41 @@
             '</div>'
         );
 
-        ed = createEditor(overlay.querySelector('.lrob-f-desc'), '');
+        ed = createEditor(q('.lrob-f-desc'), '');
 
-        overlay.querySelector('.lrob-modal-close').addEventListener('click', close);
-        overlay.querySelector('.lrob-modal-cancel').addEventListener('click', close);
-        overlay.addEventListener('mousedown', function (e) { if (e.target === overlay) close(); });
+        q('.lrob-modal-close').addEventListener('click', requestClose);
+        q('.lrob-modal-cancel').addEventListener('click', requestClose);
+        overlay.addEventListener('mousedown', function (e) { if (e.target === overlay) requestClose(); });
         document.addEventListener('keydown', onKey);
-        overlay.querySelector('.lrob-modal-save').addEventListener('click', save);
+        q('.lrob-modal-save').addEventListener('click', save);
 
-        // Type radios toggle time/end visibility.
+        q('.lrob-modal-advanced').addEventListener('click', function (e) {
+            e.preventDefault();
+            if (this.hidden || !this.href) return;
+            if (dirty && !window.confirm(__('You have unsaved changes that will be lost. Open the WordPress editor anyway?', 'lrob-calendar'))) {
+                return;
+            }
+            window.location.href = this.href;
+        });
+
         overlay.querySelectorAll('input[name="lrob-type"]').forEach(function (r) {
             r.addEventListener('change', applyTypeVisibility);
         });
+
+        overlay.querySelectorAll('.lrob-f-add-term').forEach(function (b) {
+            b.addEventListener('click', function () { openTermPopup(this.getAttribute('data-tax')); });
+        });
+
+        // Dirty tracking: any user edit flips the flag (drives the unsaved warning).
+        q('.lrob-modal-body').addEventListener('input', markDirty);
+        q('.lrob-modal-body').addEventListener('change', markDirty);
 
         bindImage();
     }
 
     function populate(d) {
         current.id = d.id || current.id;
-        var q = function (s) { return overlay.querySelector(s); };
+        var f = d.fields || {};
 
         q('.lrob-f-title').value = d.title || '';
         var dt = d.datetime || defaults().datetime;
@@ -336,28 +423,42 @@
         if (dt.timezone) q('.lrob-f-tz').value = dt.timezone;
         q('.lrob-f-status').value = d.status && d.status !== 'auto-draft' ? d.status : 'draft';
 
-        (d.categories || []).forEach(function (id) {
-            var c = q('.lrob-f-cat[value="' + id + '"]'); if (c) c.checked = true;
-        });
-        (d.tags || []).forEach(function (id) {
-            var c = q('.lrob-f-tag[value="' + id + '"]'); if (c) c.checked = true;
-        });
+        // Location / contact / cost.
+        setVal('.lrob-x-venue', f.venue);
+        setVal('.lrob-x-address', f.address);
+        setVal('.lrob-x-city', f.city);
+        setVal('.lrob-x-province', f.province);
+        setVal('.lrob-x-postal_code', f.postal_code);
+        setVal('.lrob-x-country', f.country);
+        setVal('.lrob-x-latitude', f.latitude);
+        setVal('.lrob-x-longitude', f.longitude);
+        setChk('.lrob-x-show_map', f.show_map);
+        setChk('.lrob-x-show_coordinates', f.show_coordinates);
+        setVal('.lrob-x-contact_name', f.contact_name);
+        setVal('.lrob-x-contact_phone', f.contact_phone);
+        setVal('.lrob-x-contact_email', f.contact_email);
+        setVal('.lrob-x-contact_url', f.contact_url);
+        setVal('.lrob-x-cost', f.cost);
+        setChk('.lrob-x-is_free', f.is_free);
+        setVal('.lrob-x-ticket_url', f.ticket_url);
+
+        (d.categories || []).forEach(function (id) { var c = q('.lrob-f-cat[value="' + id + '"]'); if (c) c.checked = true; });
+        (d.tags || []).forEach(function (id) { var c = q('.lrob-f-tag[value="' + id + '"]'); if (c) c.checked = true; });
 
         featuredId = d.featuredImage ? d.featuredImage.id : 0;
         renderImage(d.featuredImage ? d.featuredImage.url : '');
 
-        // Rebuild the editor with the loaded content.
         ed = createEditor(q('.lrob-f-desc'), d.content || '');
 
         var adv = q('.lrob-modal-advanced');
         if (d.editLink) { adv.href = d.editLink; adv.hidden = false; } else { adv.hidden = true; }
 
         applyTypeVisibility();
+        dirty = false;
         q('.lrob-f-title').focus();
     }
 
     function collect() {
-        var q = function (s) { return overlay.querySelector(s); };
         var type = (overlay.querySelector('input[name="lrob-type"]:checked') || {}).value || 'standard';
         return {
             title: q('.lrob-f-title').value,
@@ -371,6 +472,15 @@
                 end_date: q('.lrob-f-ed').value,
                 end_time: q('.lrob-f-et').value
             },
+            fields: {
+                venue: val('.lrob-x-venue'), address: val('.lrob-x-address'), city: val('.lrob-x-city'),
+                province: val('.lrob-x-province'), postal_code: val('.lrob-x-postal_code'), country: val('.lrob-x-country'),
+                latitude: val('.lrob-x-latitude'), longitude: val('.lrob-x-longitude'),
+                show_map: chk('.lrob-x-show_map'), show_coordinates: chk('.lrob-x-show_coordinates'),
+                contact_name: val('.lrob-x-contact_name'), contact_phone: val('.lrob-x-contact_phone'),
+                contact_email: val('.lrob-x-contact_email'), contact_url: val('.lrob-x-contact_url'),
+                cost: val('.lrob-x-cost'), is_free: chk('.lrob-x-is_free'), ticket_url: val('.lrob-x-ticket_url')
+            },
             categories: checkedValues('.lrob-f-cat'),
             tags: checkedValues('.lrob-f-tag'),
             featuredImageId: featuredId
@@ -383,7 +493,7 @@
             message(__('Please set a start date.', 'lrob-calendar'), true);
             return;
         }
-        var saveBtn = overlay.querySelector('.lrob-modal-save');
+        var saveBtn = q('.lrob-modal-save');
         saveBtn.disabled = true;
         message(__('Saving…', 'lrob-calendar'), false);
 
@@ -396,6 +506,7 @@
         })
             .then(function (r) { return r.ok ? r.json() : Promise.reject(r); })
             .then(function () {
+                dirty = false;
                 close();
                 if (typeof current.onSaved === 'function') current.onSaved();
             })
@@ -405,11 +516,84 @@
             });
     }
 
+    /* ── Quick term creation (second popup) ──────────────────────────────── */
+
+    function openTermPopup(tax) {
+        var isCat = (tax === 'category');
+        var parentOpts = isCat
+            ? '<option value="0">' + esc(__('— No parent —', 'lrob-calendar')) + '</option>' +
+              (cfg().categories || []).map(function (c) { return '<option value="' + esc(c.value) + '">' + esc(c.label) + '</option>'; }).join('')
+            : '';
+
+        var pop = el(
+            '<div class="lrob-term-overlay">' +
+                '<div class="lrob-term-pop" role="dialog" aria-modal="true">' +
+                    '<h3>' + esc(isCat ? __('Add category', 'lrob-calendar') : __('Add tag', 'lrob-calendar')) + '</h3>' +
+                    '<label class="lrob-f-label">' + esc(__('Name', 'lrob-calendar')) + '</label>' +
+                    '<input type="text" class="lrob-term-name widefat">' +
+                    (isCat ? '<label class="lrob-f-label">' + esc(__('Parent', 'lrob-calendar')) + '</label><select class="lrob-term-parent widefat">' + parentOpts + '</select>' : '') +
+                    '<p class="lrob-term-msg" aria-live="polite"></p>' +
+                    '<div class="lrob-term-actions">' +
+                        '<button type="button" class="button lrob-term-cancel">' + esc(__('Cancel', 'lrob-calendar')) + '</button>' +
+                        '<button type="button" class="button button-primary lrob-term-create">' + esc(__('Create', 'lrob-calendar')) + '</button>' +
+                    '</div>' +
+                '</div>' +
+            '</div>'
+        );
+        overlay.appendChild(pop);
+        var name = pop.querySelector('.lrob-term-name');
+        name.focus();
+
+        function done() { pop.remove(); }
+        pop.querySelector('.lrob-term-cancel').addEventListener('click', done);
+        pop.addEventListener('mousedown', function (e) { if (e.target === pop) done(); });
+
+        pop.querySelector('.lrob-term-create').addEventListener('click', function () {
+            var nm = name.value.trim();
+            if (!nm) { name.focus(); return; }
+            var parent = isCat ? parseInt((pop.querySelector('.lrob-term-parent') || {}).value || 0, 10) : 0;
+            var btn = this; btn.disabled = true;
+            pop.querySelector('.lrob-term-msg').textContent = __('Creating…', 'lrob-calendar');
+
+            fetch(termsUrl(), {
+                method: 'POST',
+                headers: { 'X-WP-Nonce': cfg().nonce, 'Content-Type': 'application/json' },
+                credentials: 'same-origin',
+                body: JSON.stringify({ taxonomy: isCat ? 'category' : 'tag', name: nm, parent: parent })
+            })
+                .then(function (r) { return r.ok ? r.json() : Promise.reject(r); })
+                .then(function (term) {
+                    addTermCheckbox(isCat, term);
+                    done();
+                })
+                .catch(function () {
+                    btn.disabled = false;
+                    pop.querySelector('.lrob-term-msg').textContent = __('Could not create.', 'lrob-calendar');
+                });
+        });
+    }
+
+    function addTermCheckbox(isCat, term) {
+        var listSel = isCat ? '.lrob-f-cats' : '.lrob-f-tags';
+        var inputCls = isCat ? 'lrob-f-cat' : 'lrob-f-tag';
+        var list = q(listSel);
+        if (q('.' + inputCls + '[value="' + term.id + '"]')) {
+            q('.' + inputCls + '[value="' + term.id + '"]').checked = true;
+            return;
+        }
+        var label = el('<label class="lrob-f-check" data-term="' + esc(term.id) + '">' +
+            '<input type="checkbox" class="' + inputCls + '" value="' + esc(term.id) + '" checked> ' + esc(term.name) + '</label>');
+        list.appendChild(label);
+        // Keep the config list in sync for any later re-render.
+        (isCat ? cfg().categories : cfg().tags).push({ value: term.id, label: term.name, parent: term.parent || 0 });
+        markDirty();
+    }
+
     /* ── Featured image (wp.media) ───────────────────────────────────────── */
 
     function bindImage() {
         var frame = null;
-        overlay.querySelector('.lrob-f-image-set').addEventListener('click', function (e) {
+        q('.lrob-f-image-set').addEventListener('click', function (e) {
             e.preventDefault();
             if (!window.wp || !window.wp.media) return;
             if (!frame) {
@@ -419,27 +603,24 @@
                     featuredId = att.id;
                     var url = (att.sizes && att.sizes.medium) ? att.sizes.medium.url : att.url;
                     renderImage(url);
+                    markDirty();
                 });
             }
             frame.open();
         });
-        overlay.querySelector('.lrob-f-image-remove').addEventListener('click', function (e) {
+        q('.lrob-f-image-remove').addEventListener('click', function (e) {
             e.preventDefault();
             featuredId = 0;
             renderImage('');
+            markDirty();
         });
     }
 
     function renderImage(url) {
-        var prev = overlay.querySelector('.lrob-f-image-preview');
-        var rm = overlay.querySelector('.lrob-f-image-remove');
-        if (url) {
-            prev.innerHTML = '<img src="' + esc(url) + '" alt="">';
-            rm.hidden = false;
-        } else {
-            prev.innerHTML = '';
-            rm.hidden = true;
-        }
+        var prev = q('.lrob-f-image-preview');
+        var rm = q('.lrob-f-image-remove');
+        if (url) { prev.innerHTML = '<img src="' + esc(url) + '" alt="">'; rm.hidden = false; }
+        else { prev.innerHTML = ''; rm.hidden = true; }
     }
 
     /* ── Small UI utils ──────────────────────────────────────────────────── */
@@ -448,25 +629,28 @@
         var type = (overlay.querySelector('input[name="lrob-type"]:checked') || {}).value || 'standard';
         var timed = (type === 'standard');
         overlay.querySelectorAll('.lrob-f-st, .lrob-f-et').forEach(function (i) { i.style.display = timed ? '' : 'none'; });
-        overlay.querySelector('.lrob-f-end').style.display = (type === 'instant') ? 'none' : '';
+        q('.lrob-f-end').style.display = (type === 'instant') ? 'none' : '';
     }
 
+    function val(sel) { var e = q(sel); return e ? e.value : ''; }
+    function chk(sel) { var e = q(sel); return e && e.checked ? 1 : 0; }
+    function setVal(sel, v) { var e = q(sel); if (e) e.value = (v == null ? '' : v); }
+    function setChk(sel, v) { var e = q(sel); if (e) e.checked = !!(v && v !== '0'); }
     function checkedValues(sel) {
         return Array.prototype.slice.call(overlay.querySelectorAll(sel + ':checked'))
             .map(function (c) { return parseInt(c.value, 10); });
     }
-    function setRadio(name, value) {
-        var r = overlay.querySelector('input[name="' + name + '"][value="' + value + '"]');
-        if (r) r.checked = true;
+    function setRadio(name, value) { var r = overlay.querySelector('input[name="' + name + '"][value="' + value + '"]'); if (r) r.checked = true; }
+    function setTitle(t) { q('.lrob-modal-title').textContent = t; }
+    function setBusy(on) { q('.lrob-modal').classList.toggle('is-busy', !!on); }
+    function message(text, isError) { var m = q('.lrob-modal-msg'); m.textContent = text || ''; m.classList.toggle('is-error', !!isError); }
+    function markDirty() { dirty = true; }
+    function onKey(e) { if (e.key === 'Escape') requestClose(); }
+
+    function requestClose() {
+        if (dirty && !window.confirm(__('Discard your changes?', 'lrob-calendar'))) return;
+        close();
     }
-    function setTitle(t) { overlay.querySelector('.lrob-modal-title').textContent = t; }
-    function setBusy(on) { overlay.querySelector('.lrob-modal').classList.toggle('is-busy', !!on); }
-    function message(text, isError) {
-        var m = overlay.querySelector('.lrob-modal-msg');
-        m.textContent = text || '';
-        m.classList.toggle('is-error', !!isError);
-    }
-    function onKey(e) { if (e.key === 'Escape') close(); }
 
     function close() {
         if (!overlay) return;
@@ -475,6 +659,7 @@
         overlay = null;
         ed = null;
         featuredId = 0;
+        dirty = false;
         document.body.classList.remove('lrob-modal-open');
     }
 

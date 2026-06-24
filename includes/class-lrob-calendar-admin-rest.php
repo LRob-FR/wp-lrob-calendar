@@ -55,6 +55,12 @@ class LRob_Calendar_Admin_REST {
             ],
         ]);
 
+        register_rest_route(self::NAMESPACE, '/admin/terms', [
+            'methods'             => WP_REST_Server::CREATABLE,
+            'callback'            => [$this, 'create_term'],
+            'permission_callback' => [$this, 'can_edit_events'],
+        ]);
+
         register_rest_route(self::NAMESPACE, '/admin/events/(?P<id>\d+)', [
             [
                 'methods'             => WP_REST_Server::READABLE,
@@ -333,6 +339,58 @@ class LRob_Calendar_Admin_REST {
         if (method_exists('LRob_Calendar_Blocks', 'bump_rest_cache_version')) {
             LRob_Calendar_Blocks::bump_rest_cache_version();
         }
+    }
+
+    /* ── Quick term creation (categories/tags from the editor) ───────────── */
+
+    public function create_term(WP_REST_Request $request): WP_REST_Response {
+        $body   = $request->get_json_params() ?: $request->get_params();
+        $name   = sanitize_text_field($body['name'] ?? '');
+        $parent = (int) ($body['parent'] ?? 0);
+
+        // Accept both the short keys the editor uses ("category"/"tag") and the
+        // full taxonomy names.
+        $map = [
+            'category' => LRob_Calendar_Post_Types::TAX_CATEGORY,
+            'tag'      => LRob_Calendar_Post_Types::TAX_TAG,
+        ];
+        $taxonomy = sanitize_key($body['taxonomy'] ?? '');
+        $taxonomy = $map[$taxonomy] ?? $taxonomy;
+
+        $allowed = [LRob_Calendar_Post_Types::TAX_CATEGORY, LRob_Calendar_Post_Types::TAX_TAG];
+        if (!in_array($taxonomy, $allowed, true)) {
+            return new WP_REST_Response(['error' => 'invalid_taxonomy'], 400);
+        }
+        if ($name === '') {
+            return new WP_REST_Response(['error' => 'empty_name'], 400);
+        }
+
+        $args = [];
+        if ($parent && $taxonomy === LRob_Calendar_Post_Types::TAX_CATEGORY) {
+            $args['parent'] = $parent;
+        }
+
+        $result = wp_insert_term($name, $taxonomy, $args);
+        if (is_wp_error($result)) {
+            // A duplicate name still resolves to a usable id (error data is the
+            // existing term_id, as an int or inside an array depending on WP).
+            $existing = $result->get_error_data();
+            if (is_array($existing) && isset($existing['term_id'])) {
+                $result = ['term_id' => (int) $existing['term_id']];
+            } elseif (is_numeric($existing)) {
+                $result = ['term_id' => (int) $existing];
+            } else {
+                return new WP_REST_Response(['error' => $result->get_error_message()], 400);
+            }
+        }
+
+        $term = get_term((int) $result['term_id'], $taxonomy);
+        return new WP_REST_Response([
+            'id'       => (int) $term->term_id,
+            'name'     => $term->name,
+            'parent'   => (int) $term->parent,
+            'taxonomy' => $taxonomy,
+        ], 201);
     }
 
     /* ── Delete ──────────────────────────────────────────────────────────── */
