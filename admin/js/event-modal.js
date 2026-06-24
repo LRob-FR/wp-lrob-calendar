@@ -20,6 +20,7 @@
     var ed = null;
     var featuredId = 0;
     var dirty = false;
+    var recurrenceRaw = '';   // original RRULE, preserved when too complex to edit here
     var current = { id: null, onSaved: null };
 
     /* ── Helpers ─────────────────────────────────────────────────────────── */
@@ -181,6 +182,81 @@
         }
     }
 
+    /* ── Recurrence (RRULE) parse / build ────────────────────────────────── */
+
+    // Parse an RRULE into the simple UI model. Anything the simple builder can't
+    // round-trip (BYMONTH, BYMONTHDAY, nth-weekday like "2MO", embedded RDATE/
+    // EXDATE, unknown parts) is flagged complex and preserved verbatim.
+    function parseRRule(raw) {
+        var base = { freq: '', interval: 1, byday: [], endType: 'never', count: 10, until: '', complex: false, raw: raw || '' };
+        if (!raw) return base;
+        if (/[\r\n]/.test(raw)) { base.complex = true; return base; }
+
+        var rule = raw.replace(/^RRULE:/i, '').trim();
+        var parts = {};
+        rule.split(';').forEach(function (p) {
+            var kv = p.split('=');
+            if (kv.length === 2) parts[kv[0].toUpperCase()] = kv[1];
+        });
+
+        var known = ['FREQ', 'INTERVAL', 'BYDAY', 'COUNT', 'UNTIL', 'WKST'];
+        var hasUnknown = Object.keys(parts).some(function (k) { return known.indexOf(k) === -1; });
+        var byday = parts.BYDAY ? parts.BYDAY.split(',') : [];
+        var bydayNth = byday.some(function (d) { return /\d/.test(d); });
+        var freq = (parts.FREQ || '').toUpperCase();
+
+        if (hasUnknown || bydayNth || (byday.length && freq !== 'WEEKLY') ||
+            ['DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY'].indexOf(freq) === -1) {
+            base.complex = true;
+            return base;
+        }
+
+        base.freq = freq;
+        base.interval = parseInt(parts.INTERVAL, 10) || 1;
+        base.byday = byday;
+        if (parts.COUNT) { base.endType = 'count'; base.count = parseInt(parts.COUNT, 10) || 10; }
+        else if (parts.UNTIL) {
+            base.endType = 'until';
+            var m = parts.UNTIL.match(/^(\d{4})(\d{2})(\d{2})/);
+            if (m) base.until = m[1] + '-' + m[2] + '-' + m[3];
+        }
+        return base;
+    }
+
+    function buildRRule() {
+        var freq = q('.lrob-r-freq').value;
+        if (freq === 'custom') return recurrenceRaw || '';
+        if (!freq) return '';
+        var parts = ['FREQ=' + freq];
+        var interval = Math.max(1, parseInt(q('.lrob-r-interval').value, 10) || 1);
+        if (interval > 1) parts.push('INTERVAL=' + interval);
+        if (freq === 'WEEKLY') {
+            var days = checkedStr('.lrob-r-byday');
+            if (days.length) parts.push('BYDAY=' + days.join(','));
+        }
+        var endType = (overlay.querySelector('input[name="lrob-r-end"]:checked') || {}).value || 'never';
+        if (endType === 'count') {
+            parts.push('COUNT=' + Math.max(1, parseInt(q('.lrob-r-count').value, 10) || 10));
+        } else if (endType === 'until') {
+            var u = q('.lrob-r-until').value;
+            if (u) parts.push('UNTIL=' + u.replace(/-/g, '') + 'T235959Z');
+        }
+        return parts.join(';');
+    }
+
+    function applyRecurrence() {
+        var freq = q('.lrob-r-freq').value;
+        var custom = (freq === 'custom');
+        q('.lrob-r-detail').hidden = (freq === '' || custom);
+        q('.lrob-r-custom-note').hidden = !custom;
+        q('.lrob-r-days-row').hidden = (freq !== 'WEEKLY');
+        var units = {
+            DAILY: __('day(s)', 'lrob-calendar'), WEEKLY: __('week(s)', 'lrob-calendar'),
+            MONTHLY: __('month(s)', 'lrob-calendar'), YEARLY: __('year(s)', 'lrob-calendar')
+        };
+        q('.lrob-r-unit').textContent = units[freq] || '';
+    }
+
     /* ── Field markup ────────────────────────────────────────────────────── */
 
     function txtRow(cls, label, ph, type) {
@@ -216,6 +292,58 @@
     }
 
     function section(title) { return '<h3 class="lrob-modal-section">' + esc(title) + '</h3>'; }
+
+    function dayChecks() {
+        var days = [
+            ['MO', __('Mon', 'lrob-calendar')], ['TU', __('Tue', 'lrob-calendar')], ['WE', __('Wed', 'lrob-calendar')],
+            ['TH', __('Thu', 'lrob-calendar')], ['FR', __('Fri', 'lrob-calendar')], ['SA', __('Sat', 'lrob-calendar')],
+            ['SU', __('Sun', 'lrob-calendar')]
+        ];
+        return days.map(function (d) {
+            return '<label class="lrob-r-day"><input type="checkbox" class="lrob-r-byday" value="' + d[0] + '"> ' + esc(d[1]) + '</label>';
+        }).join('');
+    }
+
+    function recurrenceHtml() {
+        return section(__('Recurrence', 'lrob-calendar')) +
+        '<div class="lrob-f-row">' +
+            '<select class="lrob-r-freq">' +
+                '<option value="">' + esc(__('Does not repeat', 'lrob-calendar')) + '</option>' +
+                '<option value="DAILY">' + esc(__('Daily', 'lrob-calendar')) + '</option>' +
+                '<option value="WEEKLY">' + esc(__('Weekly', 'lrob-calendar')) + '</option>' +
+                '<option value="MONTHLY">' + esc(__('Monthly', 'lrob-calendar')) + '</option>' +
+                '<option value="YEARLY">' + esc(__('Yearly', 'lrob-calendar')) + '</option>' +
+            '</select>' +
+        '</div>' +
+        '<div class="lrob-r-detail" hidden>' +
+            '<div class="lrob-f-row lrob-r-interval-row">' +
+                '<label class="lrob-f-label">' + esc(__('Every', 'lrob-calendar')) + '</label>' +
+                '<input type="number" min="1" value="1" class="lrob-r-interval"> <span class="lrob-r-unit"></span>' +
+            '</div>' +
+            '<div class="lrob-f-row lrob-r-days-row" hidden>' +
+                '<label class="lrob-f-label">' + esc(__('On days', 'lrob-calendar')) + '</label>' +
+                '<div class="lrob-r-days">' + dayChecks() + '</div>' +
+            '</div>' +
+            '<div class="lrob-f-row">' +
+                '<label class="lrob-f-label">' + esc(__('Ends', 'lrob-calendar')) + '</label>' +
+                '<div class="lrob-r-ends">' +
+                    '<label class="lrob-f-check"><input type="radio" name="lrob-r-end" value="never" checked> ' + esc(__('Never', 'lrob-calendar')) + '</label>' +
+                    '<label class="lrob-f-check"><input type="radio" name="lrob-r-end" value="count"> ' + esc(__('After', 'lrob-calendar')) +
+                        ' <input type="number" min="1" value="10" class="lrob-r-count"> ' + esc(__('occurrences', 'lrob-calendar')) + '</label>' +
+                    '<label class="lrob-f-check"><input type="radio" name="lrob-r-end" value="until"> ' + esc(__('On date', 'lrob-calendar')) +
+                        ' <input type="date" class="lrob-r-until"></label>' +
+                '</div>' +
+            '</div>' +
+        '</div>' +
+        '<p class="lrob-r-custom-note" hidden>' +
+            esc(__('This recurrence is too advanced to edit here — use the WordPress editor to change it.', 'lrob-calendar')) +
+            ' <code class="lrob-r-raw"></code></p>' +
+        '<div class="lrob-f-row">' +
+            '<label class="lrob-f-label">' + esc(__('Exception dates', 'lrob-calendar')) +
+                ' <span class="lrob-f-opt">' + esc(__('(optional)', 'lrob-calendar')) + '</span></label>' +
+            '<input type="text" class="lrob-x-exception_dates widefat" placeholder="2026-12-25, 2027-01-01">' +
+        '</div>';
+    }
 
     function bodyHtml() {
         return '' +
@@ -255,6 +383,8 @@
             '<label class="lrob-f-label">' + esc(__('Description', 'lrob-calendar')) + '</label>' +
             '<div class="lrob-f-desc"></div>' +
         '</div>' +
+
+        recurrenceHtml() +
 
         section(__('Location', 'lrob-calendar')) +
         '<div class="lrob-f-cols">' +
@@ -397,6 +527,7 @@
         overlay.querySelectorAll('input[name="lrob-type"]').forEach(function (r) {
             r.addEventListener('change', applyTypeVisibility);
         });
+        q('.lrob-r-freq').addEventListener('change', applyRecurrence);
 
         overlay.querySelectorAll('.lrob-f-add-term').forEach(function (b) {
             b.addEventListener('click', function () { openTermPopup(this.getAttribute('data-tax')); });
@@ -442,6 +573,28 @@
         setChk('.lrob-x-is_free', f.is_free);
         setVal('.lrob-x-ticket_url', f.ticket_url);
 
+        // Recurrence.
+        var rec = parseRRule(f.recurrence_rules || '');
+        recurrenceRaw = rec.raw || '';
+        var freqSel = q('.lrob-r-freq');
+        if (rec.complex) {
+            var opt = document.createElement('option');
+            opt.value = 'custom';
+            opt.textContent = __('Custom (advanced)', 'lrob-calendar');
+            freqSel.appendChild(opt);
+            freqSel.value = 'custom';
+            q('.lrob-r-raw').textContent = rec.raw;
+        } else {
+            freqSel.value = rec.freq || '';
+            q('.lrob-r-interval').value = rec.interval || 1;
+            rec.byday.forEach(function (dy) { var c = q('.lrob-r-byday[value="' + dy + '"]'); if (c) c.checked = true; });
+            setRadio('lrob-r-end', rec.endType || 'never');
+            if (rec.count) q('.lrob-r-count').value = rec.count;
+            if (rec.until) q('.lrob-r-until').value = rec.until;
+        }
+        setVal('.lrob-x-exception_dates', f.exception_dates);
+        applyRecurrence();
+
         (d.categories || []).forEach(function (id) { var c = q('.lrob-f-cat[value="' + id + '"]'); if (c) c.checked = true; });
         (d.tags || []).forEach(function (id) { var c = q('.lrob-f-tag[value="' + id + '"]'); if (c) c.checked = true; });
 
@@ -479,7 +632,8 @@
                 show_map: chk('.lrob-x-show_map'), show_coordinates: chk('.lrob-x-show_coordinates'),
                 contact_name: val('.lrob-x-contact_name'), contact_phone: val('.lrob-x-contact_phone'),
                 contact_email: val('.lrob-x-contact_email'), contact_url: val('.lrob-x-contact_url'),
-                cost: val('.lrob-x-cost'), is_free: chk('.lrob-x-is_free'), ticket_url: val('.lrob-x-ticket_url')
+                cost: val('.lrob-x-cost'), is_free: chk('.lrob-x-is_free'), ticket_url: val('.lrob-x-ticket_url'),
+                recurrence_rules: buildRRule(), exception_dates: val('.lrob-x-exception_dates')
             },
             categories: checkedValues('.lrob-f-cat'),
             tags: checkedValues('.lrob-f-tag'),
@@ -639,6 +793,10 @@
     function checkedValues(sel) {
         return Array.prototype.slice.call(overlay.querySelectorAll(sel + ':checked'))
             .map(function (c) { return parseInt(c.value, 10); });
+    }
+    function checkedStr(sel) {
+        return Array.prototype.slice.call(overlay.querySelectorAll(sel + ':checked'))
+            .map(function (c) { return c.value; });
     }
     function setRadio(name, value) { var r = overlay.querySelector('input[name="' + name + '"][value="' + value + '"]'); if (r) r.checked = true; }
     function setTitle(t) { q('.lrob-modal-title').textContent = t; }

@@ -241,6 +241,25 @@ body.lrob-modal-open { overflow: hidden; }
 .lrob-term-msg { min-height: 16px; font-size: 12px; color: var(--lm-muted); margin: 8px 0 0; }
 .lrob-term-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
 
+/* Recurrence */
+.lrob-r-detail {
+    padding: 12px 14px;
+    margin-bottom: 16px;
+    background: #fafafa;
+    border: 1px solid var(--lm-border);
+    border-radius: 6px;
+}
+.lrob-r-detail .lrob-f-row:last-child { margin-bottom: 0; }
+.lrob-r-interval-row { display: flex; align-items: center; gap: 8px; }
+.lrob-r-interval-row .lrob-f-label { margin: 0; }
+.lrob-r-interval, .lrob-r-count { width: 72px; }
+.lrob-r-days { display: flex; flex-wrap: wrap; gap: 10px; }
+.lrob-r-day { font-size: 13px; }
+.lrob-r-ends { display: flex; flex-direction: column; gap: 6px; }
+.lrob-r-ends .lrob-f-check { display: flex; align-items: center; gap: 6px; }
+.lrob-r-custom-note { font-size: 12px; color: var(--lm-muted); }
+.lrob-r-custom-note code { background: #f0f0f1; padding: 1px 6px; border-radius: 3px; word-break: break-all; }
+
 @media (max-width: 600px) {
     .lrob-modal-overlay { padding: 0; }
     .lrob-modal { max-width: 100%; min-height: 100vh; max-height: 100vh; border-radius: 0; }
