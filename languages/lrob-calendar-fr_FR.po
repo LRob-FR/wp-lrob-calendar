@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: LRob Calendar 1.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/lrob-calendar\n"
-"POT-Creation-Date: 2026-06-24T12:17:55+00:00\n"
+"POT-Creation-Date: 2026-06-24T14:27:44+00:00\n"
 "PO-Revision-Date: 2026-05-12 18:00+0200\n"
 "Last-Translator: Robin Labadie <claude@lrob.fr>\n"
 "Language-Team: French <claude@lrob.fr>\n"
@@ -41,7 +41,7 @@ msgid "https://www.lrob.fr"
 msgstr "https://www.lrob.fr"
 
 #: blocks/calendar/render.php:20
-#: includes/class-lrob-calendar-block-helpers.php:678
+#: includes/class-lrob-calendar-block-helpers.php:682
 #: includes/class-lrob-calendar-blocks.php:217 blocks/calendar/edit.js:60
 msgid "View event"
 msgstr "Voir l'événement"
@@ -524,39 +524,39 @@ msgid "Date"
 msgstr "Date"
 
 #: includes/class-lrob-calendar-admin.php:887
-#: includes/class-lrob-calendar-meta-boxes.php:38 admin/js/event-modal.js:396
+#: includes/class-lrob-calendar-meta-boxes.php:38 admin/js/event-modal.js:390
 #: blocks/events-list/edit.js:137 blocks/single-event/edit.js:150
 msgid "Location"
 msgstr "Lieu"
 
 #: includes/class-lrob-calendar-admin.php:910
-#: includes/class-lrob-calendar-block-helpers.php:548
+#: includes/class-lrob-calendar-block-helpers.php:552
 #: includes/class-lrob-calendar-blocks.php:214
 #: includes/class-lrob-calendar-blocks.php:270 admin/js/manage-events.js:179
 msgid "Recurring"
 msgstr "Récurrent"
 
-#: includes/class-lrob-calendar-block-helpers.php:387
-#: includes/class-lrob-calendar-block-helpers.php:620
-#: includes/class-lrob-calendar-block-helpers.php:698
+#: includes/class-lrob-calendar-block-helpers.php:391
+#: includes/class-lrob-calendar-block-helpers.php:624
+#: includes/class-lrob-calendar-block-helpers.php:702
 msgid "View details"
 msgstr "Voir les détails"
 
-#: includes/class-lrob-calendar-block-helpers.php:555
+#: includes/class-lrob-calendar-block-helpers.php:559
 #: includes/class-lrob-calendar-blocks.php:215
 #: includes/class-lrob-calendar-blocks.php:271
 #: includes/class-lrob-calendar-single-event.php:156
 msgid "Free"
 msgstr "Gratuit"
 
-#: includes/class-lrob-calendar-block-helpers.php:673
+#: includes/class-lrob-calendar-block-helpers.php:677
 #: includes/class-lrob-calendar-blocks.php:216
 #: includes/class-lrob-calendar-blocks.php:272
 #: includes/class-lrob-calendar-single-event.php:165
 msgid "Get tickets"
 msgstr "Réserver une place"
 
-#: includes/class-lrob-calendar-block-helpers.php:728
+#: includes/class-lrob-calendar-block-helpers.php:732
 msgid "Calendar by LRob"
 msgstr "Calendrier par LRob"
 
@@ -569,7 +569,7 @@ msgid "Show less"
 msgstr "Voir moins"
 
 #: includes/class-lrob-calendar-blocks.php:210
-#: includes/class-lrob-calendar-blocks.php:259 admin/js/event-modal.js:502
+#: includes/class-lrob-calendar-blocks.php:259 admin/js/event-modal.js:496
 msgid "Close"
 msgstr "Fermer"
 
@@ -612,7 +612,7 @@ msgstr "Semaine"
 msgid "No upcoming events."
 msgstr "Aucun événement à venir."
 
-#: includes/class-lrob-calendar-blocks.php:269 admin/js/event-modal.js:366
+#: includes/class-lrob-calendar-blocks.php:269 admin/js/event-modal.js:359
 #: admin/js/manage-events.js:117
 msgid "All day"
 msgstr "Toute la journée"
@@ -799,45 +799,45 @@ msgstr ""
 "(%s). Elles pourraient ne pas être accessibles depuis votre site en "
 "production après migration."
 
-#: includes/class-lrob-calendar-manage-screen.php:71
+#: includes/class-lrob-calendar-manage-screen.php:92
 msgid "All Events (classic)"
 msgstr "Tous les événements (classique)"
 
-#: includes/class-lrob-calendar-manage-screen.php:85
-#: includes/class-lrob-calendar-manage-screen.php:86
+#: includes/class-lrob-calendar-manage-screen.php:106
+#: includes/class-lrob-calendar-manage-screen.php:107
 msgid "Manage Events"
 msgstr "Gérer les événements"
 
-#: includes/class-lrob-calendar-manage-screen.php:150
+#: includes/class-lrob-calendar-manage-screen.php:172
 msgid "All statuses"
 msgstr "Tous les statuts"
 
-#: includes/class-lrob-calendar-manage-screen.php:151
+#: includes/class-lrob-calendar-manage-screen.php:173
 #: admin/js/manage-events.js:87
 msgid "Published"
 msgstr "Publié"
 
-#: includes/class-lrob-calendar-manage-screen.php:152
+#: includes/class-lrob-calendar-manage-screen.php:174
 #: admin/js/manage-events.js:88
 msgid "Draft"
 msgstr "Brouillon"
 
-#: includes/class-lrob-calendar-manage-screen.php:153
+#: includes/class-lrob-calendar-manage-screen.php:175
 #: admin/js/manage-events.js:89
 msgid "Pending"
 msgstr "En attente"
 
-#: includes/class-lrob-calendar-manage-screen.php:154
+#: includes/class-lrob-calendar-manage-screen.php:176
 #: admin/js/manage-events.js:90
 msgid "Scheduled"
 msgstr "Planifié"
 
-#: includes/class-lrob-calendar-manage-screen.php:155
+#: includes/class-lrob-calendar-manage-screen.php:177
 #: admin/js/manage-events.js:91
 msgid "Private"
 msgstr "Privé"
 
-#: includes/class-lrob-calendar-manage-screen.php:186
+#: includes/class-lrob-calendar-manage-screen.php:208
 msgid "This screen requires JavaScript."
 msgstr "Cet écran nécessite JavaScript."
 
@@ -853,15 +853,15 @@ msgstr "Récurrence"
 msgid "Contact & Cost"
 msgstr "Contact et tarif"
 
-#: includes/class-lrob-calendar-meta-boxes.php:74 admin/js/event-modal.js:375
+#: includes/class-lrob-calendar-meta-boxes.php:74 admin/js/event-modal.js:368
 msgid "Start"
 msgstr "Début"
 
-#: includes/class-lrob-calendar-meta-boxes.php:84 admin/js/event-modal.js:379
+#: includes/class-lrob-calendar-meta-boxes.php:84 admin/js/event-modal.js:372
 msgid "End"
 msgstr "Fin"
 
-#: includes/class-lrob-calendar-meta-boxes.php:94 admin/js/event-modal.js:383
+#: includes/class-lrob-calendar-meta-boxes.php:94 admin/js/event-modal.js:376
 msgid "Timezone"
 msgstr "Fuseau horaire"
 
@@ -978,19 +978,19 @@ msgid "Advanced: Direct RRULE string (overrides above settings if not empty)"
 msgstr ""
 "Avancé : chaîne RRULE directe (remplace les réglages ci-dessus si renseignée)"
 
-#: includes/class-lrob-calendar-meta-boxes.php:213 admin/js/event-modal.js:398
+#: includes/class-lrob-calendar-meta-boxes.php:213 admin/js/event-modal.js:392
 msgid "Venue"
 msgstr "Nom du lieu"
 
-#: includes/class-lrob-calendar-meta-boxes.php:217 admin/js/event-modal.js:399
+#: includes/class-lrob-calendar-meta-boxes.php:217 admin/js/event-modal.js:393
 msgid "Address"
 msgstr "Adresse"
 
-#: includes/class-lrob-calendar-meta-boxes.php:221 admin/js/event-modal.js:402
+#: includes/class-lrob-calendar-meta-boxes.php:221 admin/js/event-modal.js:396
 msgid "City"
 msgstr "Ville"
 
-#: includes/class-lrob-calendar-meta-boxes.php:224 admin/js/event-modal.js:406
+#: includes/class-lrob-calendar-meta-boxes.php:224 admin/js/event-modal.js:400
 msgid "Postal code"
 msgstr "Code postal"
 
@@ -998,7 +998,7 @@ msgstr "Code postal"
 msgid "Province / State"
 msgstr "Région / État"
 
-#: includes/class-lrob-calendar-meta-boxes.php:232 admin/js/event-modal.js:407
+#: includes/class-lrob-calendar-meta-boxes.php:232 admin/js/event-modal.js:401
 msgid "Country"
 msgstr "Pays"
 
@@ -1006,11 +1006,11 @@ msgstr "Pays"
 msgid "Coordinates"
 msgstr "Coordonnées"
 
-#: includes/class-lrob-calendar-meta-boxes.php:238 admin/js/event-modal.js:410
+#: includes/class-lrob-calendar-meta-boxes.php:238 admin/js/event-modal.js:404
 msgid "Latitude"
 msgstr "Latitude"
 
-#: includes/class-lrob-calendar-meta-boxes.php:239 admin/js/event-modal.js:411
+#: includes/class-lrob-calendar-meta-boxes.php:239 admin/js/event-modal.js:405
 msgid "Longitude"
 msgstr "Longitude"
 
@@ -1018,11 +1018,11 @@ msgstr "Longitude"
 msgid "Map Options"
 msgstr "Options de la carte"
 
-#: includes/class-lrob-calendar-meta-boxes.php:247 admin/js/event-modal.js:414
+#: includes/class-lrob-calendar-meta-boxes.php:247 admin/js/event-modal.js:408
 msgid "Show map"
 msgstr "Afficher la carte"
 
-#: includes/class-lrob-calendar-meta-boxes.php:252 admin/js/event-modal.js:415
+#: includes/class-lrob-calendar-meta-boxes.php:252 admin/js/event-modal.js:409
 msgid "Show coordinates"
 msgstr "Afficher les coordonnées"
 
@@ -1030,29 +1030,29 @@ msgstr "Afficher les coordonnées"
 msgid "Contact Name"
 msgstr "Nom du contact"
 
-#: includes/class-lrob-calendar-meta-boxes.php:269 admin/js/event-modal.js:424
+#: includes/class-lrob-calendar-meta-boxes.php:269 admin/js/event-modal.js:418
 msgid "Email"
 msgstr "E-mail"
 
-#: includes/class-lrob-calendar-meta-boxes.php:273 admin/js/event-modal.js:421
+#: includes/class-lrob-calendar-meta-boxes.php:273 admin/js/event-modal.js:415
 msgid "Phone"
 msgstr "Téléphone"
 
-#: includes/class-lrob-calendar-meta-boxes.php:277 admin/js/event-modal.js:425
+#: includes/class-lrob-calendar-meta-boxes.php:277 admin/js/event-modal.js:419
 msgid "Website"
 msgstr "Site web"
 
 #: includes/class-lrob-calendar-meta-boxes.php:281
 #: includes/class-lrob-calendar-single-event.php:151
-#: admin/js/event-modal.js:428
+#: admin/js/event-modal.js:422
 msgid "Cost"
 msgstr "Tarif"
 
-#: includes/class-lrob-calendar-meta-boxes.php:287 admin/js/event-modal.js:433
+#: includes/class-lrob-calendar-meta-boxes.php:287 admin/js/event-modal.js:427
 msgid "Free event"
 msgstr "Événement gratuit"
 
-#: includes/class-lrob-calendar-meta-boxes.php:292 admin/js/event-modal.js:435
+#: includes/class-lrob-calendar-meta-boxes.php:292 admin/js/event-modal.js:429
 msgid "Ticket URL"
 msgstr "URL de billetterie"
 
@@ -1146,7 +1146,7 @@ msgstr "Ajouter une catégorie"
 msgid "New Category Name"
 msgstr "Nom de la nouvelle catégorie"
 
-#: includes/class-lrob-calendar-post-types.php:107 admin/js/event-modal.js:441
+#: includes/class-lrob-calendar-post-types.php:107 admin/js/event-modal.js:435
 msgid "Categories"
 msgstr "Catégories"
 
@@ -1183,11 +1183,11 @@ msgstr "Ajouter une étiquette"
 msgid "New Tag Name"
 msgstr "Nom de la nouvelle étiquette"
 
-#: includes/class-lrob-calendar-post-types.php:134 admin/js/event-modal.js:446
+#: includes/class-lrob-calendar-post-types.php:134 admin/js/event-modal.js:440
 msgid "Tags"
 msgstr "Étiquettes"
 
-#: includes/class-lrob-calendar-single-event.php:58 admin/js/event-modal.js:372
+#: includes/class-lrob-calendar-single-event.php:58 admin/js/event-modal.js:365
 msgid "When"
 msgstr "Quand"
 
@@ -1200,7 +1200,7 @@ msgid "Where"
 msgstr "Où"
 
 #: includes/class-lrob-calendar-single-event.php:186
-#: admin/js/event-modal.js:418
+#: admin/js/event-modal.js:412
 msgid "Contact"
 msgstr "Contact"
 
@@ -1299,171 +1299,166 @@ msgstr ""
 msgid "Exception dates"
 msgstr "Dates d'exception"
 
-#: admin/js/event-modal.js:343 admin/js/event-modal.js:441
-#: admin/js/event-modal.js:446
+#: admin/js/event-modal.js:343 admin/js/event-modal.js:435
+#: admin/js/event-modal.js:440
 msgid "(optional)"
 msgstr "(optionnel)"
 
-#: admin/js/event-modal.js:353
-msgid "Open in WordPress editor"
-msgstr "Ouvrir dans l'éditeur WordPress"
-
-#: admin/js/event-modal.js:354
-msgid "Edit as simple text"
-msgstr "Modifier en texte simple"
-
-#: admin/js/event-modal.js:358
+#: admin/js/event-modal.js:351
 msgid "Title"
 msgstr "Titre"
 
-#: admin/js/event-modal.js:359
+#: admin/js/event-modal.js:352
 msgid "Event title"
 msgstr "Titre de l'événement"
 
-#: admin/js/event-modal.js:363
+#: admin/js/event-modal.js:356
 msgid "Type"
 msgstr "Type"
 
-#: admin/js/event-modal.js:365
+#: admin/js/event-modal.js:358
 msgid "Standard"
 msgstr "Standard"
 
-#: admin/js/event-modal.js:367
+#: admin/js/event-modal.js:360
 msgid "Instant"
 msgstr "Instantané"
 
-#: admin/js/event-modal.js:390
+#: admin/js/event-modal.js:385
 msgid "Description"
 msgstr "Description"
 
-#: admin/js/event-modal.js:403
+#: admin/js/event-modal.js:397
 msgid "State / Province"
 msgstr "État / Province"
 
-#: admin/js/event-modal.js:420
+#: admin/js/event-modal.js:414
 msgid "Contact name"
 msgstr "Nom du contact"
 
-#: admin/js/event-modal.js:431
+#: admin/js/event-modal.js:425
 msgid "Price"
 msgstr "Prix"
 
-#: admin/js/event-modal.js:432
+#: admin/js/event-modal.js:426
 msgid "e.g. 10 €"
 msgstr "ex. 10 €"
 
-#: admin/js/event-modal.js:438
+#: admin/js/event-modal.js:432
 msgid "Organization"
 msgstr "Organisation"
 
-#: admin/js/event-modal.js:443 admin/js/event-modal.js:707
+#: admin/js/event-modal.js:437 admin/js/event-modal.js:716
 msgid "Add category"
 msgstr "Ajouter une catégorie"
 
-#: admin/js/event-modal.js:448 admin/js/event-modal.js:707
+#: admin/js/event-modal.js:442 admin/js/event-modal.js:716
 msgid "Add tag"
 msgstr "Ajouter une étiquette"
 
-#: admin/js/event-modal.js:454
+#: admin/js/event-modal.js:448
 msgid "Status"
 msgstr "Statut"
 
-#: admin/js/event-modal.js:458
+#: admin/js/event-modal.js:452
 msgid "Featured image"
 msgstr "Image mise en avant"
 
-#: admin/js/event-modal.js:461
+#: admin/js/event-modal.js:455
 msgid "Set image"
 msgstr "Définir l'image"
 
-#: admin/js/event-modal.js:462
+#: admin/js/event-modal.js:456
 msgid "Remove"
 msgstr "Retirer"
 
-#: admin/js/event-modal.js:482
+#: admin/js/event-modal.js:476
 msgid "Edit event"
 msgstr "Modifier l'événement"
 
-#: admin/js/event-modal.js:487
+#: admin/js/event-modal.js:481
 msgid "Could not load the event."
 msgstr "Impossible de charger l'événement."
 
-#: admin/js/event-modal.js:489
+#: admin/js/event-modal.js:483
 msgid "New event"
 msgstr "Nouvel événement"
 
-#: admin/js/event-modal.js:501
+#: admin/js/event-modal.js:495
 msgid "→ WordPress editor"
 msgstr "→ Éditeur WordPress"
 
-#: admin/js/event-modal.js:509 admin/js/event-modal.js:713
+#: admin/js/event-modal.js:503 admin/js/event-modal.js:722
 msgid "Cancel"
 msgstr "Annuler"
 
-#: admin/js/event-modal.js:510
+#: admin/js/event-modal.js:504
 msgid "Save"
 msgstr "Enregistrer"
 
-#: admin/js/event-modal.js:528
+#: admin/js/event-modal.js:522
 msgid ""
 "You have unsaved changes that will be lost. Open the WordPress editor anyway?"
 msgstr ""
 "Vous avez des modifications non enregistrées qui seront perdues. Ouvrir "
 "quand même l'éditeur WordPress ?"
 
-#: admin/js/event-modal.js:594
+#: admin/js/event-modal.js:595
 msgid "Custom (advanced)"
 msgstr "Personnalisé (avancé)"
 
-#: admin/js/event-modal.js:625
+#: admin/js/event-modal.js:632
 msgid ""
-"This event was created with the WordPress block editor. Editing it here "
-"keeps only simple formatting (bold, italic, lists, links)."
+"Created with the block editor — editing here keeps only simple formatting."
 msgstr ""
-"Cet événement a été créé avec l'éditeur de blocs WordPress. Le modifier ici "
-"ne conserve que la mise en forme simple (gras, italique, listes, liens)."
+"Créé avec l'éditeur de blocs — l'édition ici ne garde que la mise en forme "
+"simple."
 
-#: admin/js/event-modal.js:669
+#: admin/js/event-modal.js:633
+msgid "Open in WordPress editor"
+msgstr "Ouvrir dans l'éditeur WordPress"
+
+#: admin/js/event-modal.js:678
 msgid "Please set a start date."
 msgstr "Veuillez définir une date de début."
 
-#: admin/js/event-modal.js:674
+#: admin/js/event-modal.js:683
 msgid "Saving…"
 msgstr "Enregistrement…"
 
-#: admin/js/event-modal.js:691
+#: admin/js/event-modal.js:700
 msgid "Could not save the event."
 msgstr "Impossible d'enregistrer l'événement."
 
-#: admin/js/event-modal.js:700
+#: admin/js/event-modal.js:709
 msgid "— No parent —"
 msgstr "— Aucun parent —"
 
-#: admin/js/event-modal.js:708
+#: admin/js/event-modal.js:717
 msgid "Name"
 msgstr "Nom"
 
-#: admin/js/event-modal.js:710
+#: admin/js/event-modal.js:719
 msgid "Parent"
 msgstr "Parent"
 
-#: admin/js/event-modal.js:714
+#: admin/js/event-modal.js:723
 msgid "Create"
 msgstr "Créer"
 
-#: admin/js/event-modal.js:732
+#: admin/js/event-modal.js:741
 msgid "Creating…"
 msgstr "Création…"
 
-#: admin/js/event-modal.js:747
+#: admin/js/event-modal.js:756
 msgid "Could not create."
 msgstr "Création impossible."
 
-#: admin/js/event-modal.js:776
+#: admin/js/event-modal.js:785
 msgid "Select image"
 msgstr "Sélectionner une image"
 
-#: admin/js/event-modal.js:831
+#: admin/js/event-modal.js:850
 msgid "Discard your changes?"
 msgstr "Abandonner vos modifications ?"
 
@@ -1831,6 +1826,9 @@ msgstr "Compact"
 #: blocks/single-event/edit.js:185
 msgid "Select an event in the sidebar."
 msgstr "Sélectionnez un événement dans la barre latérale."
+
+#~ msgid "Edit as simple text"
+#~ msgstr "Modifier en texte simple"
 
 #~ msgid "No categories yet."
 #~ msgstr "Aucune catégorie pour l'instant."

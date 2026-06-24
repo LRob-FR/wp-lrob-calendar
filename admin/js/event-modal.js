@@ -46,7 +46,7 @@
         function d(x) { return x.getFullYear() + '-' + pad(x.getMonth() + 1) + '-' + pad(x.getDate()); }
         function t(x) { return pad(x.getHours()) + ':' + pad(x.getMinutes()); }
         return {
-            id: null, title: '', content: '', status: 'draft',
+            id: null, title: '', content: '', status: 'publish',
             datetime: {
                 type: 'standard', timezone: cfg().defaultTimezone || 'UTC',
                 start_date: d(now), start_time: t(now), end_date: d(end), end_time: t(end)
@@ -347,13 +347,6 @@
 
     function bodyHtml() {
         return '' +
-        '<div class="lrob-modal-banner" hidden>' +
-            '<span class="lrob-modal-banner-text"></span>' +
-            '<span class="lrob-modal-banner-actions">' +
-                '<button type="button" class="button button-small lrob-banner-advanced">' + esc(__('Open in WordPress editor', 'lrob-calendar')) + '</button>' +
-                '<button type="button" class="button-link lrob-banner-dismiss">' + esc(__('Edit as simple text', 'lrob-calendar')) + '</button>' +
-            '</span>' +
-        '</div>' +
         '<div class="lrob-f-row">' +
             '<label class="lrob-f-label">' + esc(__('Title', 'lrob-calendar')) + '</label>' +
             '<input type="text" class="lrob-f-title widefat" placeholder="' + esc(__('Event title', 'lrob-calendar')) + '">' +
@@ -386,12 +379,13 @@
             '</div>' +
         '</div>' +
 
+        recurrenceHtml() +
+
         '<div class="lrob-f-row">' +
             '<label class="lrob-f-label">' + esc(__('Description', 'lrob-calendar')) + '</label>' +
             '<div class="lrob-f-desc"></div>' +
+            '<p class="lrob-desc-note" hidden><span class="lrob-desc-note-text"></span> <a href="#" class="lrob-desc-note-link"></a></p>' +
         '</div>' +
-
-        recurrenceHtml() +
 
         section(__('Location', 'lrob-calendar')) +
         '<div class="lrob-f-cols">' +
@@ -536,9 +530,16 @@
         });
         q('.lrob-r-freq').addEventListener('change', applyRecurrence);
 
-        // Gutenberg-content banner actions.
-        q('.lrob-banner-advanced').addEventListener('click', function () { q('.lrob-modal-advanced').click(); });
-        q('.lrob-banner-dismiss').addEventListener('click', function () { q('.lrob-modal-banner').hidden = true; });
+        // The block-editor note's link opens the WP editor.
+        q('.lrob-desc-note-link').addEventListener('click', function (e) { e.preventDefault(); q('.lrob-modal-advanced').click(); });
+
+        // Keep the end from preceding the start; default end to match the start.
+        q('.lrob-f-sd').addEventListener('change', syncEndMin);
+        q('.lrob-f-ed').addEventListener('change', syncEndMin);
+
+        // Native date/time inputs format per the element's lang — force the site
+        // locale so a FR site shows 24h, not AM/PM.
+        q('.lrob-modal').lang = cfg().locale || '';
 
         overlay.querySelectorAll('.lrob-f-add-term').forEach(function (b) {
             b.addEventListener('click', function () { openTermPopup(this.getAttribute('data-tax')); });
@@ -563,7 +564,7 @@
         q('.lrob-f-ed').value = dt.end_date || '';
         q('.lrob-f-et').value = dt.end_time || '';
         if (dt.timezone) q('.lrob-f-tz').value = dt.timezone;
-        q('.lrob-f-status').value = d.status && d.status !== 'auto-draft' ? d.status : 'draft';
+        q('.lrob-f-status').value = d.status && d.status !== 'auto-draft' ? d.status : 'publish';
 
         // Location / contact / cost.
         setVal('.lrob-x-venue', f.venue);
@@ -615,20 +616,28 @@
         ed = createEditor(q('.lrob-f-desc'), d.content || '');
 
         var adv = q('.lrob-modal-advanced');
-        if (d.editLink) { adv.href = d.editLink; adv.hidden = false; } else { adv.hidden = true; }
-
-        // Warn (non-destructively) when the content came from the block editor:
-        // editing here keeps only the simple formatting.
-        var banner = q('.lrob-modal-banner');
-        if (d.hasBlocks) {
-            q('.lrob-modal-banner-text').textContent =
-                __('This event was created with the WordPress block editor. Editing it here keeps only simple formatting (bold, italic, lists, links).', 'lrob-calendar');
-            banner.hidden = false;
+        if (d.editLink) {
+            adv.href = d.editLink;
         } else {
-            banner.hidden = true;
+            // Create mode: link to the classic new-event editor for those who
+            // prefer it (escape param so the redirect doesn't bounce it back).
+            var nl = cfg().newLink || '';
+            adv.href = nl + (nl.indexOf('?') > -1 ? '&' : '?') + 'lrob_classic=1';
+        }
+        adv.hidden = false;
+
+        // Subtle inline note, only when the content still holds block markup.
+        var note = q('.lrob-desc-note');
+        if (d.hasBlocks) {
+            q('.lrob-desc-note-text').textContent = __('Created with the block editor — editing here keeps only simple formatting.', 'lrob-calendar');
+            q('.lrob-desc-note-link').textContent = __('Open in WordPress editor', 'lrob-calendar');
+            note.hidden = false;
+        } else {
+            note.hidden = true;
         }
 
         applyTypeVisibility();
+        syncEndMin();
         dirty = false;
         q('.lrob-f-title').focus();
     }
@@ -806,6 +815,16 @@
         var timed = (type === 'standard');
         overlay.querySelectorAll('.lrob-f-st, .lrob-f-et').forEach(function (i) { i.style.display = timed ? '' : 'none'; });
         q('.lrob-f-end').style.display = (type === 'instant') ? 'none' : '';
+    }
+
+    // Constrain the end date to the start and default it to match, so a future
+    // start can't leave a stale past end date.
+    function syncEndMin() {
+        var sd = q('.lrob-f-sd').value;
+        var edEl = q('.lrob-f-ed');
+        if (!edEl) return;
+        if (sd) edEl.min = sd;
+        if (sd && (!edEl.value || edEl.value < sd)) edEl.value = sd;
     }
 
     function val(sel) { var e = q(sel); return e ? e.value : ''; }

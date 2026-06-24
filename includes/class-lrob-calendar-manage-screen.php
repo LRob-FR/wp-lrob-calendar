@@ -23,6 +23,27 @@ class LRob_Calendar_Manage_Screen {
         add_action('admin_enqueue_scripts', [$this, 'enqueue_assets']);
         // Make the custom screen the default landing for the Events menu.
         add_action('load-edit.php', [$this, 'maybe_redirect_to_manage']);
+        // "Add New" (classic) → the custom screen with the modal auto-opened.
+        add_action('load-post-new.php', [$this, 'maybe_redirect_new']);
+    }
+
+    /**
+     * Send the classic "Add New Event" action to the custom screen and flag it to
+     * pop the new-event modal. The block editor stays reachable via ?lrob_classic=1
+     * (used by the modal's "→ WordPress editor" link in create mode).
+     */
+    public function maybe_redirect_new(): void {
+        if (!current_user_can('edit_lrob_events')) {
+            return;
+        }
+        if (($_GET['post_type'] ?? '') !== LRob_Calendar_Post_Types::POST_TYPE) {
+            return;
+        }
+        if (isset($_GET['lrob_classic'])) {
+            return;
+        }
+        wp_safe_redirect(admin_url('edit.php?post_type=' . LRob_Calendar_Post_Types::POST_TYPE . '&page=' . self::SLUG . '&lrob_new=1'));
+        exit;
     }
 
     /**
@@ -140,6 +161,7 @@ class LRob_Calendar_Manage_Screen {
             'restRoot'     => esc_url_raw(rest_url(LRob_Calendar_Admin_REST::NAMESPACE . '/admin/events')),
             'nonce'        => wp_create_nonce('wp_rest'),
             'newLink'      => admin_url('post-new.php?post_type=' . LRob_Calendar_Post_Types::POST_TYPE),
+            'openNew'      => isset($_GET['lrob_new']),
             'canPublish'   => current_user_can('publish_lrob_events'),
             'dateFormat'   => get_option('date_format'),
             'timeFormat'   => get_option('time_format'),

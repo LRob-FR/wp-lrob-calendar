@@ -198,22 +198,17 @@ body.lrob-modal-open { overflow: hidden; }
 .lrob-modal-msg.is-error { color: #b32d2e; }
 .lrob-modal-foot-actions { display: flex; gap: 8px; }
 
-/* Block-editor content warning banner */
-.lrob-modal-banner {
+/* Subtle "this content came from the block editor" note under the description */
+.lrob-desc-note {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
     flex-wrap: wrap;
-    margin-bottom: 16px;
-    padding: 10px 12px;
-    background: #fcf3e6;
-    border: 1px solid #f0d8a8;
-    border-radius: 6px;
-    font-size: 13px;
-    color: #8a6116;
+    align-items: baseline;
+    gap: 6px;
+    margin: 6px 0 0;
+    font-size: 12px;
+    color: var(--lm-muted);
 }
-.lrob-modal-banner-actions { display: flex; align-items: center; gap: 10px; white-space: nowrap; }
+.lrob-desc-note-link { font-size: 12px; }
 
 /* Section headings */
 .lrob-modal-section {
