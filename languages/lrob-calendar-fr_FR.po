@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: LRob Calendar 1.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/lrob-calendar\n"
-"POT-Creation-Date: 2026-06-24T14:27:44+00:00\n"
+"POT-Creation-Date: 2026-06-25T15:20:09+00:00\n"
 "PO-Revision-Date: 2026-05-12 18:00+0200\n"
 "Last-Translator: Robin Labadie <claude@lrob.fr>\n"
 "Language-Team: French <claude@lrob.fr>\n"
@@ -46,32 +46,32 @@ msgstr "https://www.lrob.fr"
 msgid "View event"
 msgstr "Voir l'événement"
 
-#: blocks/events-list/render.php:87 admin/js/manage-events.js:223
+#: blocks/events-list/render.php:110 admin/js/manage-events.js:223
 msgid "No events found."
 msgstr "Aucun événement trouvé."
 
-#: blocks/events-list/render.php:105
+#: blocks/events-list/render.php:131
 msgid "Events list pagination"
 msgstr "Pagination de la liste d'événements"
 
-#: blocks/events-list/render.php:110
+#: blocks/events-list/render.php:136
 msgid "Previous page"
 msgstr "Page précédente"
 
 #. translators: 1: current page number, 2: total pages
-#: blocks/events-list/render.php:118
+#: blocks/events-list/render.php:144
 msgid "Page %1$d / %2$d"
 msgstr "Page %1$d / %2$d"
 
-#: blocks/events-list/render.php:124
+#: blocks/events-list/render.php:150
 msgid "Next page"
 msgstr "Page suivante"
 
-#: blocks/events-list/render.php:135 admin/js/manage-events.js:201
+#: blocks/events-list/render.php:161 admin/js/manage-events.js:201
 msgid "Previous"
 msgstr "Précédent"
 
-#: blocks/events-list/render.php:136 admin/js/manage-events.js:206
+#: blocks/events-list/render.php:162 admin/js/manage-events.js:206
 msgid "Next"
 msgstr "Suivant"
 
@@ -652,7 +652,14 @@ msgid ""
 msgstr ""
 "Si 1, inclut les événements déjà terminés (par défaut : à venir uniquement)."
 
-#: includes/class-lrob-calendar-blocks.php:358
+#: includes/class-lrob-calendar-blocks.php:344
+msgid ""
+"Cap occurrences returned per recurring event (0 = no cap, range-bounded)."
+msgstr ""
+"Limite le nombre d'occurrences renvoyées par événement récurrent (0 = sans "
+"limite, borné par la plage)."
+
+#: includes/class-lrob-calendar-blocks.php:366
 msgid "Event post ID."
 msgstr "Identifiant de l'article d'événement."
 

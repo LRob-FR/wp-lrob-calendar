@@ -492,7 +492,9 @@
                 e.stopPropagation();
                 var state = getState(container);
                 if (!state || !state.onNavigate) return;
-                var targetId = parseInt(nav.getAttribute('data-target-id'), 10);
+                // Keep as a string — recurring occurrences use a composite
+                // "<postId>:<start>" id that parseInt would corrupt.
+                var targetId = nav.getAttribute('data-target-id');
                 var direction = nav.classList.contains('lrob-cal-popup-nav--next') ? 'left' : 'right';
                 state.onNavigate(targetId, direction);
                 return;

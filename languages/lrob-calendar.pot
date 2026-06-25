@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-06-24T14:27:44+00:00\n"
+"POT-Creation-Date: 2026-06-25T15:20:32+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: lrob-calendar\n"
@@ -41,34 +41,34 @@ msgstr ""
 msgid "View event"
 msgstr ""
 
-#: blocks/events-list/render.php:87
+#: blocks/events-list/render.php:110
 #: admin/js/manage-events.js:223
 msgid "No events found."
 msgstr ""
 
-#: blocks/events-list/render.php:105
+#: blocks/events-list/render.php:131
 msgid "Events list pagination"
 msgstr ""
 
-#: blocks/events-list/render.php:110
+#: blocks/events-list/render.php:136
 msgid "Previous page"
 msgstr ""
 
 #. translators: 1: current page number, 2: total pages
-#: blocks/events-list/render.php:118
+#: blocks/events-list/render.php:144
 msgid "Page %1$d / %2$d"
 msgstr ""
 
-#: blocks/events-list/render.php:124
+#: blocks/events-list/render.php:150
 msgid "Next page"
 msgstr ""
 
-#: blocks/events-list/render.php:135
+#: blocks/events-list/render.php:161
 #: admin/js/manage-events.js:201
 msgid "Previous"
 msgstr ""
 
-#: blocks/events-list/render.php:136
+#: blocks/events-list/render.php:162
 #: admin/js/manage-events.js:206
 msgid "Next"
 msgstr ""
@@ -560,7 +560,11 @@ msgstr ""
 msgid "When 1, include events that have already ended (default: upcoming only)."
 msgstr ""
 
-#: includes/class-lrob-calendar-blocks.php:358
+#: includes/class-lrob-calendar-blocks.php:344
+msgid "Cap occurrences returned per recurring event (0 = no cap, range-bounded)."
+msgstr ""
+
+#: includes/class-lrob-calendar-blocks.php:366
 msgid "Event post ID."
 msgstr ""
 

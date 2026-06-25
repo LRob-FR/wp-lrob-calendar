@@ -340,6 +340,14 @@ class LRob_Calendar_Blocks {
                 'default'           => false,
                 'sanitize_callback' => 'rest_sanitize_boolean',
             ],
+            'max_per_event' => [
+                'description'       => __('Cap occurrences returned per recurring event (0 = no cap, range-bounded).', 'lrob-calendar'),
+                'type'              => 'integer',
+                'default'           => 0,
+                'minimum'           => 0,
+                'maximum'           => 500,
+                'sanitize_callback' => 'absint',
+            ],
         ];
 
         register_rest_route('lrob-calendar/v1', '/events', [
@@ -405,11 +413,15 @@ class LRob_Calendar_Blocks {
         // (not just the base/next instance). Non-recurring events pass through.
         $range_start = isset($args['start']) ? (int) $args['start'] : null;
         $range_end   = isset($args['end'])   ? (int) $args['end']   : null;
+        // Per-event cap (the agenda passes one so a daily/never-ending event
+        // doesn't flood the list); 0 = no cap, bounded only by the range.
+        $max_per_event = (int) $request->get_param('max_per_event');
+        $occ_limit     = $max_per_event > 0 ? $max_per_event : 500;
 
         $response = [];
         foreach ($events as $event) {
             if ($event->is_recurring()) {
-                $occurrences = $event->get_instances_in_range($range_start, $range_end, 500);
+                $occurrences = $event->get_instances_in_range($range_start, $range_end, $occ_limit);
                 if (!empty($occurrences)) {
                     foreach ($occurrences as $occ) {
                         $payload = LRob_Calendar_Block_Helpers::format_event_for_client($event, $occ);

@@ -66,6 +66,29 @@ if ($pagination) {
 
 $events = LRob_Calendar_Event::get_events($args);
 
+// Expand recurring events into their upcoming occurrences so the list shows the
+// next dates, not the (often past) base date — capped per event so a daily or
+// never-ending recurrence can't flood the list. Skipped when showing past
+// events (the base rows are kept as-is then).
+$occ_cutoff    = isset($base_args['start']) ? (int) $base_args['start'] : null;
+$max_per_event = max(1, (int) apply_filters('lrob_calendar_events_list_max_per_event', 3));
+
+$list_items = [];
+foreach ($events as $event) {
+    if ($occ_cutoff !== null && $event->is_recurring()) {
+        $occurrences = $event->get_instances_in_range($occ_cutoff, null, $max_per_event);
+        if (!empty($occurrences)) {
+            foreach ($occurrences as $occ) {
+                $list_items[] = ['event' => $event, 'start' => (int) $occ['start'], 'end' => (int) $occ['end']];
+            }
+            continue;
+        }
+    }
+    $list_items[] = ['event' => $event, 'start' => (int) $event->get('start'), 'end' => (int) $event->get('end')];
+}
+usort($list_items, static function ($a, $b) { return $a['start'] <=> $b['start']; });
+$list_items = array_slice($list_items, 0, $per_page);
+
 // "View details" popup mode requires the shared event-popup CSS + JS
 // module plus the events-list trigger script. The minimal template also
 // needs it: its rows carry a compact "i" trigger (their only path to the
@@ -83,12 +106,15 @@ if ($needs_popup) {
 $attributes['enablePopup'] = $needs_popup;
 ?>
 <div class="lrob-cal-events-list-wrapper">
-<?php if (empty($events)): ?>
+<?php if (empty($list_items)): ?>
     <p class="lrob-no-events"><?php esc_html_e('No events found.', 'lrob-calendar'); ?></p>
 <?php else: ?>
     <div class="lrob-events-list lrob-template-<?php echo esc_attr($attributes['template']); ?>">
-        <?php foreach ($events as $event):
-            echo LRob_Calendar_Block_Helpers::render_event_card($event, $attributes);
+        <?php foreach ($list_items as $list_item):
+            // Render the card at this specific occurrence's date.
+            $list_item['event']->set('start', $list_item['start']);
+            $list_item['event']->set('end', $list_item['end']);
+            echo LRob_Calendar_Block_Helpers::render_event_card($list_item['event'], $attributes);
         endforeach; ?>
     </div>
 <?php endif;

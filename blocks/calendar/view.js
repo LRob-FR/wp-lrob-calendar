@@ -250,6 +250,10 @@
         var url = this.apiUrl + '?range_start=' + Math.floor(rangeStart) + '&range_end=' + Math.floor(rangeEnd) + '&limit=500&include_past=1';
         if (this.category) url += '&category=' + this.category;
         if (this.tag) url += '&tag=' + this.tag;
+        // Agenda is a flat forward list over a wide window, so cap occurrences
+        // per recurring event (a daily/never-ending event would otherwise flood
+        // it). The month/week grid wants every in-range occurrence, so no cap.
+        if (this.view === 'agenda') url += '&max_per_event=' + (this.agendaMaxPerEvent || 6);
         
         $.ajax({
             url: url,

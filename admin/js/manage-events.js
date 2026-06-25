@@ -322,13 +322,15 @@
     fetchEvents();
 
     // Arrived via the classic "Add New" → pop the new-event modal, then drop the
-    // flag from the URL so a refresh doesn't reopen it.
-    if (cfg.openNew && window.LrobEventModal) {
+    // flag from the URL so a refresh doesn't reopen it. Read the URL directly
+    // (robust regardless of how the localized flag is serialized).
+    var qp = new URLSearchParams(window.location.search);
+    if ((qp.get('lrob_new') || cfg.openNew) && window.LrobEventModal) {
         window.LrobEventModal.open(null, fetchEvents);
         if (window.history && window.history.replaceState) {
-            var u = new URL(window.location.href);
-            u.searchParams.delete('lrob_new');
-            window.history.replaceState({}, '', u.toString());
+            qp.delete('lrob_new');
+            var base = window.location.pathname + (qp.toString() ? '?' + qp.toString() : '');
+            window.history.replaceState({}, '', base);
         }
     }
 })(window.lrobCalendarManage, window.wp && window.wp.i18n);
