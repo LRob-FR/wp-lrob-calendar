@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: LRob Calendar 1.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/lrob-calendar\n"
-"POT-Creation-Date: 2026-06-25T15:20:09+00:00\n"
+"POT-Creation-Date: 2026-06-25T15:42:43+00:00\n"
 "PO-Revision-Date: 2026-05-12 18:00+0200\n"
 "Last-Translator: Robin Labadie <claude@lrob.fr>\n"
 "Language-Team: French <claude@lrob.fr>\n"
@@ -46,32 +46,32 @@ msgstr "https://www.lrob.fr"
 msgid "View event"
 msgstr "Voir l'événement"
 
-#: blocks/events-list/render.php:110 admin/js/manage-events.js:223
+#: blocks/events-list/render.php:112 admin/js/manage-events.js:232
 msgid "No events found."
 msgstr "Aucun événement trouvé."
 
-#: blocks/events-list/render.php:131
+#: blocks/events-list/render.php:133
 msgid "Events list pagination"
 msgstr "Pagination de la liste d'événements"
 
-#: blocks/events-list/render.php:136
+#: blocks/events-list/render.php:138
 msgid "Previous page"
 msgstr "Page précédente"
 
 #. translators: 1: current page number, 2: total pages
-#: blocks/events-list/render.php:144
+#: blocks/events-list/render.php:146
 msgid "Page %1$d / %2$d"
 msgstr "Page %1$d / %2$d"
 
-#: blocks/events-list/render.php:150
+#: blocks/events-list/render.php:152
 msgid "Next page"
 msgstr "Page suivante"
 
-#: blocks/events-list/render.php:161 admin/js/manage-events.js:201
+#: blocks/events-list/render.php:163 admin/js/manage-events.js:210
 msgid "Previous"
 msgstr "Précédent"
 
-#: blocks/events-list/render.php:162 admin/js/manage-events.js:206
+#: blocks/events-list/render.php:164 admin/js/manage-events.js:215
 msgid "Next"
 msgstr "Suivant"
 
@@ -82,6 +82,11 @@ msgstr "Aucun événement sélectionné."
 #: blocks/single-event/render.php:23
 msgid "Event not found."
 msgstr "Événement introuvable."
+
+#. translators: appended to a duplicated event's title
+#: includes/class-lrob-calendar-admin-rest.php:375
+msgid "(copy)"
+msgstr "(copie)"
 
 #: includes/class-lrob-calendar-admin.php:41
 #: includes/class-lrob-calendar-admin.php:42
@@ -532,7 +537,7 @@ msgstr "Lieu"
 #: includes/class-lrob-calendar-admin.php:910
 #: includes/class-lrob-calendar-block-helpers.php:552
 #: includes/class-lrob-calendar-blocks.php:214
-#: includes/class-lrob-calendar-blocks.php:270 admin/js/manage-events.js:179
+#: includes/class-lrob-calendar-blocks.php:270 admin/js/manage-events.js:190
 msgid "Recurring"
 msgstr "Récurrent"
 
@@ -613,7 +618,7 @@ msgid "No upcoming events."
 msgstr "Aucun événement à venir."
 
 #: includes/class-lrob-calendar-blocks.php:269 admin/js/event-modal.js:359
-#: admin/js/manage-events.js:117
+#: admin/js/manage-events.js:119
 msgid "All day"
 msgstr "Toute la journée"
 
@@ -820,27 +825,27 @@ msgid "All statuses"
 msgstr "Tous les statuts"
 
 #: includes/class-lrob-calendar-manage-screen.php:173
-#: admin/js/manage-events.js:87
+#: admin/js/manage-events.js:89
 msgid "Published"
 msgstr "Publié"
 
 #: includes/class-lrob-calendar-manage-screen.php:174
-#: admin/js/manage-events.js:88
+#: admin/js/manage-events.js:90
 msgid "Draft"
 msgstr "Brouillon"
 
 #: includes/class-lrob-calendar-manage-screen.php:175
-#: admin/js/manage-events.js:89
+#: admin/js/manage-events.js:91
 msgid "Pending"
 msgstr "En attente"
 
 #: includes/class-lrob-calendar-manage-screen.php:176
-#: admin/js/manage-events.js:90
+#: admin/js/manage-events.js:92
 msgid "Scheduled"
 msgstr "Planifié"
 
 #: includes/class-lrob-calendar-manage-screen.php:177
-#: admin/js/manage-events.js:91
+#: admin/js/manage-events.js:93
 msgid "Private"
 msgstr "Privé"
 
@@ -1063,7 +1068,7 @@ msgstr "Événement gratuit"
 msgid "Ticket URL"
 msgstr "URL de billetterie"
 
-#: includes/class-lrob-calendar-post-types.php:23 admin/js/manage-events.js:144
+#: includes/class-lrob-calendar-post-types.php:23 admin/js/manage-events.js:146
 msgid "Events"
 msgstr "Événements"
 
@@ -1355,11 +1360,11 @@ msgstr "ex. 10 €"
 msgid "Organization"
 msgstr "Organisation"
 
-#: admin/js/event-modal.js:437 admin/js/event-modal.js:716
+#: admin/js/event-modal.js:437 admin/js/event-modal.js:713
 msgid "Add category"
 msgstr "Ajouter une catégorie"
 
-#: admin/js/event-modal.js:442 admin/js/event-modal.js:716
+#: admin/js/event-modal.js:442 admin/js/event-modal.js:713
 msgid "Add tag"
 msgstr "Ajouter une étiquette"
 
@@ -1395,7 +1400,7 @@ msgstr "Nouvel événement"
 msgid "→ WordPress editor"
 msgstr "→ Éditeur WordPress"
 
-#: admin/js/event-modal.js:503 admin/js/event-modal.js:722
+#: admin/js/event-modal.js:503 admin/js/event-modal.js:719
 msgid "Cancel"
 msgstr "Annuler"
 
@@ -1410,134 +1415,142 @@ msgstr ""
 "Vous avez des modifications non enregistrées qui seront perdues. Ouvrir "
 "quand même l'éditeur WordPress ?"
 
-#: admin/js/event-modal.js:595
+#: admin/js/event-modal.js:592
 msgid "Custom (advanced)"
 msgstr "Personnalisé (avancé)"
 
-#: admin/js/event-modal.js:632
+#: admin/js/event-modal.js:630
 msgid ""
 "Created with the block editor — editing here keeps only simple formatting."
 msgstr ""
 "Créé avec l'éditeur de blocs — l'édition ici ne garde que la mise en forme "
 "simple."
 
-#: admin/js/event-modal.js:633
-msgid "Open in WordPress editor"
-msgstr "Ouvrir dans l'éditeur WordPress"
-
-#: admin/js/event-modal.js:678
+#: admin/js/event-modal.js:675
 msgid "Please set a start date."
 msgstr "Veuillez définir une date de début."
 
-#: admin/js/event-modal.js:683
+#: admin/js/event-modal.js:680
 msgid "Saving…"
 msgstr "Enregistrement…"
 
-#: admin/js/event-modal.js:700
+#: admin/js/event-modal.js:697
 msgid "Could not save the event."
 msgstr "Impossible d'enregistrer l'événement."
 
-#: admin/js/event-modal.js:709
+#: admin/js/event-modal.js:706
 msgid "— No parent —"
 msgstr "— Aucun parent —"
 
-#: admin/js/event-modal.js:717
+#: admin/js/event-modal.js:714
 msgid "Name"
 msgstr "Nom"
 
-#: admin/js/event-modal.js:719
+#: admin/js/event-modal.js:716
 msgid "Parent"
 msgstr "Parent"
 
-#: admin/js/event-modal.js:723
+#: admin/js/event-modal.js:720
 msgid "Create"
 msgstr "Créer"
 
-#: admin/js/event-modal.js:741
+#: admin/js/event-modal.js:738
 msgid "Creating…"
 msgstr "Création…"
 
-#: admin/js/event-modal.js:756
+#: admin/js/event-modal.js:753
 msgid "Could not create."
 msgstr "Création impossible."
 
-#: admin/js/event-modal.js:785
+#: admin/js/event-modal.js:782
 msgid "Select image"
 msgstr "Sélectionner une image"
 
-#: admin/js/event-modal.js:850
+#: admin/js/event-modal.js:847
 msgid "Discard your changes?"
 msgstr "Abandonner vos modifications ?"
 
-#: admin/js/manage-events.js:92
+#: admin/js/manage-events.js:94
 msgid "Trash"
 msgstr "Corbeille"
 
-#: admin/js/manage-events.js:133
+#: admin/js/manage-events.js:135
 msgid "All categories"
 msgstr "Toutes les catégories"
 
-#: admin/js/manage-events.js:134
+#: admin/js/manage-events.js:136
 msgid "All tags"
 msgstr "Toutes les étiquettes"
 
-#: admin/js/manage-events.js:136
+#: admin/js/manage-events.js:138
 msgid "Date (soonest first)"
 msgstr "Date (plus proche d'abord)"
 
-#: admin/js/manage-events.js:137
+#: admin/js/manage-events.js:139
 msgid "Date (latest first)"
 msgstr "Date (plus lointaine d'abord)"
 
-#: admin/js/manage-events.js:138
+#: admin/js/manage-events.js:140
 msgid "Title (A→Z)"
 msgstr "Titre (A→Z)"
 
-#: admin/js/manage-events.js:139
+#: admin/js/manage-events.js:141
 msgid "Recently modified"
 msgstr "Modifié récemment"
 
-#: admin/js/manage-events.js:146
+#: admin/js/manage-events.js:148
 msgid "+ New event"
 msgstr "+ Nouvel événement"
 
-#: admin/js/manage-events.js:152
+#: admin/js/manage-events.js:154
 msgid "Search events…"
 msgstr "Rechercher des événements…"
 
-#: admin/js/manage-events.js:154
+#: admin/js/manage-events.js:156
 msgid "Clear search"
 msgstr "Effacer la recherche"
 
-#: admin/js/manage-events.js:178
+#: admin/js/manage-events.js:164
+msgid "Show past events"
+msgstr "Afficher les événements passés"
+
+#: admin/js/manage-events.js:189
 msgid "(no title)"
 msgstr "(sans titre)"
 
-#: admin/js/manage-events.js:189
+#: admin/js/manage-events.js:200
 msgid "Edit"
 msgstr "Modifier"
 
-#: admin/js/manage-events.js:191
+#: admin/js/manage-events.js:201
+msgid "Duplicate"
+msgstr "Dupliquer"
+
+#: admin/js/manage-events.js:202
 msgid "Move to trash"
 msgstr "Déplacer vers la corbeille"
 
-#: admin/js/manage-events.js:203
+#: admin/js/manage-events.js:212
 msgid "Page"
 msgstr "Page"
 
-#: admin/js/manage-events.js:204 blocks/events-list/edit.js:182
+#: admin/js/manage-events.js:213 blocks/events-list/edit.js:182
 msgid "events"
 msgstr "événements"
 
-#: admin/js/manage-events.js:228
+#: admin/js/manage-events.js:237
 msgid "Could not load events."
 msgstr "Impossible de charger les événements."
 
-#: admin/js/manage-events.js:298
+#: admin/js/manage-events.js:326
+msgid "Could not duplicate the event."
+msgstr "Impossible de dupliquer l'événement."
+
+#: admin/js/manage-events.js:329
 msgid "Move this event to the trash?"
 msgstr "Déplacer cet événement vers la corbeille ?"
 
-#: admin/js/manage-events.js:304
+#: admin/js/manage-events.js:335
 msgid "Could not delete the event."
 msgstr "Impossible de supprimer l'événement."
 
@@ -1833,6 +1846,9 @@ msgstr "Compact"
 #: blocks/single-event/edit.js:185
 msgid "Select an event in the sidebar."
 msgstr "Sélectionnez un événement dans la barre latérale."
+
+#~ msgid "Open in WordPress editor"
+#~ msgstr "Ouvrir dans l'éditeur WordPress"
 
 #~ msgid "Edit as simple text"
 #~ msgstr "Modifier en texte simple"

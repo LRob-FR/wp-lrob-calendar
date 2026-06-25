@@ -384,7 +384,7 @@
         '<div class="lrob-f-row">' +
             '<label class="lrob-f-label">' + esc(__('Description', 'lrob-calendar')) + '</label>' +
             '<div class="lrob-f-desc"></div>' +
-            '<p class="lrob-desc-note" hidden><span class="lrob-desc-note-text"></span> <a href="#" class="lrob-desc-note-link"></a></p>' +
+            '<p class="lrob-desc-note" hidden></p>' +
         '</div>' +
 
         section(__('Location', 'lrob-calendar')) +
@@ -530,9 +530,6 @@
         });
         q('.lrob-r-freq').addEventListener('change', applyRecurrence);
 
-        // The block-editor note's link opens the WP editor.
-        q('.lrob-desc-note-link').addEventListener('click', function (e) { e.preventDefault(); q('.lrob-modal-advanced').click(); });
-
         // Keep the end from preceding the start; default end to match the start.
         q('.lrob-f-sd').addEventListener('change', syncEndMin);
         q('.lrob-f-ed').addEventListener('change', syncEndMin);
@@ -627,10 +624,10 @@
         adv.hidden = false;
 
         // Subtle inline note, only when the content still holds block markup.
+        // The path to the full editor is the header link (no duplicate here).
         var note = q('.lrob-desc-note');
         if (d.hasBlocks) {
-            q('.lrob-desc-note-text').textContent = __('Created with the block editor — editing here keeps only simple formatting.', 'lrob-calendar');
-            q('.lrob-desc-note-link').textContent = __('Open in WordPress editor', 'lrob-calendar');
+            note.textContent = __('Created with the block editor — editing here keeps only simple formatting.', 'lrob-calendar');
             note.hidden = false;
         } else {
             note.hidden = true;

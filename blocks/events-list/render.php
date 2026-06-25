@@ -86,7 +86,9 @@ foreach ($events as $event) {
     }
     $list_items[] = ['event' => $event, 'start' => (int) $event->get('start'), 'end' => (int) $event->get('end')];
 }
-usort($list_items, static function ($a, $b) { return $a['start'] <=> $b['start']; });
+usort($list_items, static function ($a, $b) use ($effective_order) {
+    return $effective_order === 'DESC' ? ($b['start'] <=> $a['start']) : ($a['start'] <=> $b['start']);
+});
 $list_items = array_slice($list_items, 0, $per_page);
 
 // "View details" popup mode requires the shared event-popup CSS + JS

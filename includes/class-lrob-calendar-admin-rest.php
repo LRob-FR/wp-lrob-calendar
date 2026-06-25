@@ -61,6 +61,12 @@ class LRob_Calendar_Admin_REST {
             'permission_callback' => [$this, 'can_edit_events'],
         ]);
 
+        register_rest_route(self::NAMESPACE, '/admin/events/(?P<id>\d+)/duplicate', [
+            'methods'             => WP_REST_Server::CREATABLE,
+            'callback'            => [$this, 'duplicate_event'],
+            'permission_callback' => [$this, 'can_edit_events'],
+        ]);
+
         register_rest_route(self::NAMESPACE, '/admin/events/(?P<id>\d+)', [
             [
                 'methods'             => WP_REST_Server::READABLE,
@@ -107,6 +113,7 @@ class LRob_Calendar_Admin_REST {
         $status   = sanitize_key((string) $request->get_param('status')) ?: 'any';
         $category = (int) $request->get_param('category');
         $tag      = (int) $request->get_param('tag');
+        $past     = rest_sanitize_boolean($request->get_param('past'));
 
         $orderby  = in_array($request->get_param('orderby'), ['start', 'title', 'modified'], true)
             ? $request->get_param('orderby') : 'start';
@@ -122,6 +129,18 @@ class LRob_Calendar_Admin_REST {
         } else {
             $where[]  = 'p.post_status = %s';
             $params[] = $status;
+        }
+
+        // Upcoming only by default: base ends today or later, or a recurring
+        // event still has a future occurrence. Past events are opt-in.
+        if (!$past) {
+            $instances_table = LRob_Calendar_Database::get_instances_table();
+            $cutoff = (new DateTimeImmutable('today', wp_timezone()))->getTimestamp();
+            $where[]  = "(e.end >= %d OR (e.recurrence_rules <> '' AND EXISTS (
+                SELECT 1 FROM {$instances_table} ix WHERE ix.post_id = e.post_id AND ix.end >= %d
+            )))";
+            $params[] = $cutoff;
+            $params[] = $cutoff;
         }
 
         if ($search !== '') {
@@ -339,6 +358,59 @@ class LRob_Calendar_Admin_REST {
         if (method_exists('LRob_Calendar_Blocks', 'bump_rest_cache_version')) {
             LRob_Calendar_Blocks::bump_rest_cache_version();
         }
+    }
+
+    /* ── Duplicate ───────────────────────────────────────────────────────── */
+
+    public function duplicate_event(WP_REST_Request $request): WP_REST_Response {
+        $src_id = (int) $request['id'];
+        $src    = get_post($src_id);
+        if (!$src || $src->post_type !== LRob_Calendar_Post_Types::POST_TYPE) {
+            return new WP_REST_Response(['error' => 'not_found'], 404);
+        }
+
+        $new_id = wp_insert_post([
+            'post_type'    => LRob_Calendar_Post_Types::POST_TYPE,
+            /* translators: appended to a duplicated event's title */
+            'post_title'   => trim($src->post_title . ' ' . __('(copy)', 'lrob-calendar')),
+            'post_content' => $src->post_content,
+            'post_excerpt' => $src->post_excerpt,
+            'post_status'  => 'draft', // copies start as drafts
+        ], true);
+
+        if (is_wp_error($new_id)) {
+            return new WP_REST_Response(['error' => $new_id->get_error_message()], 400);
+        }
+        $new_id = (int) $new_id;
+
+        // Copy the custom event fields (fresh iCal UID so the copy is distinct).
+        $src_event = new LRob_Calendar_Event($src_id);
+        $new_event = new LRob_Calendar_Event($new_id);
+        foreach ($src_event->get_all() as $key => $value) {
+            if ($key !== 'post_id' && $key !== 'ical_uid') {
+                $new_event->set($key, $value);
+            }
+        }
+        $new_event->set('ical_uid', '');
+        $new_event->save();
+
+        // Taxonomies + featured image.
+        foreach ([LRob_Calendar_Post_Types::TAX_CATEGORY, LRob_Calendar_Post_Types::TAX_TAG] as $tax) {
+            $terms = wp_get_object_terms($src_id, $tax, ['fields' => 'ids']);
+            if (!is_wp_error($terms)) {
+                wp_set_object_terms($new_id, $terms, $tax);
+            }
+        }
+        $thumb = get_post_thumbnail_id($src_id);
+        if ($thumb) {
+            set_post_thumbnail($new_id, $thumb);
+        }
+
+        if (method_exists('LRob_Calendar_Blocks', 'bump_rest_cache_version')) {
+            LRob_Calendar_Blocks::bump_rest_cache_version();
+        }
+
+        return new WP_REST_Response($this->serialize_full(new LRob_Calendar_Event($new_id)), 201);
     }
 
     /* ── Quick term creation (categories/tags from the editor) ───────────── */

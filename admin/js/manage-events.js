@@ -20,6 +20,7 @@
         tag: 0,
         orderby: 'start',
         order: 'ASC',
+        past: false,
         paged: 1,
         perPage: 20
     };
@@ -37,6 +38,7 @@
             tag: state.tag,
             orderby: state.orderby,
             order: state.order,
+            past: state.past ? 1 : 0,
             paged: state.paged,
             per_page: state.perPage
         });
@@ -158,8 +160,17 @@
                 '<select class="lrob-manage-filter" data-filter="tag">' + optionList(tagOpts, state.tag) + '</select>' +
                 '<select class="lrob-manage-filter" data-filter="order">' +
                     optionList(orderOpts, state.orderby + '|' + state.order) + '</select>' +
+                '<label class="lrob-manage-pasttoggle"><input type="checkbox" class="lrob-manage-past"' +
+                    (state.past ? ' checked' : '') + '> ' + esc(__('Show past events', 'lrob-calendar')) + '</label>' +
             '</div>' +
             '<div class="lrob-manage-body"></div>';
+    }
+
+    function iconAction(action, icon, label, id, extra) {
+        return '<button type="button" class="button button-small lrob-manage-icon-btn' + (extra || '') + '" ' +
+            'data-action="' + action + '" data-id="' + esc(id) + '" ' +
+            'title="' + esc(label) + '" aria-label="' + esc(label) + '">' +
+            '<span class="dashicons dashicons-' + icon + '"></span></button>';
     }
 
     function rowHtml(ev) {
@@ -186,11 +197,9 @@
                     (cats ? '<div class="lrob-manage-chips">' + cats + '</div>' : '') +
                 '</div>' +
                 '<div class="lrob-manage-actions">' +
-                    '<button type="button" class="button button-small" data-action="edit" data-id="' + esc(ev.id) + '">' + esc(__('Edit', 'lrob-calendar')) + '</button>' +
-                    '<button type="button" class="button button-small lrob-manage-icon-btn lrob-manage-del" data-action="delete" data-id="' + esc(ev.id) + '" ' +
-                        'title="' + esc(__('Move to trash', 'lrob-calendar')) + '" aria-label="' + esc(__('Move to trash', 'lrob-calendar')) + '">' +
-                        '<span class="dashicons dashicons-trash"></span>' +
-                    '</button>' +
+                    iconAction('edit', 'edit', __('Edit', 'lrob-calendar'), ev.id) +
+                    iconAction('duplicate', 'admin-page', __('Duplicate', 'lrob-calendar'), ev.id) +
+                    iconAction('delete', 'trash', __('Move to trash', 'lrob-calendar'), ev.id, ' lrob-manage-del') +
                 '</div>' +
             '</li>';
     }
@@ -265,6 +274,15 @@
             });
         });
 
+        var pastBox = root.querySelector('.lrob-manage-past');
+        if (pastBox) {
+            pastBox.addEventListener('change', function () {
+                state.past = this.checked;
+                state.paged = 1;
+                fetchEvents();
+            });
+        }
+
         syncSearchClear();
     }
 
@@ -294,6 +312,19 @@
                 var ev = data.events.filter(function (x) { return String(x.id) === String(id); })[0];
                 if (ev && ev.editLink) window.location.href = ev.editLink;
             }
+        } else if (action === 'duplicate') {
+            btn.disabled = true;
+            fetch(cfg.restRoot + '/' + id + '/duplicate', {
+                method: 'POST',
+                headers: { 'X-WP-Nonce': cfg.nonce },
+                credentials: 'same-origin'
+            })
+                .then(function (r) { return r.ok ? r.json() : Promise.reject(r); })
+                .then(function () { fetchEvents(); })
+                .catch(function () {
+                    btn.disabled = false;
+                    window.alert(__('Could not duplicate the event.', 'lrob-calendar'));
+                });
         } else if (action === 'delete') {
             if (!window.confirm(__('Move this event to the trash?', 'lrob-calendar'))) return;
             btn.disabled = true;
