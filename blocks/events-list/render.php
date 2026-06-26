@@ -27,7 +27,10 @@ $style       = in_array($attributes['paginationStyle'] ?? 'arrows', ['arrows', '
 $today         = (new DateTimeImmutable('today', wp_timezone()))->getTimestamp();
 $show_past     = !empty($attributes['showPast']);
 $past_limit    = $show_past ? max(0, (int) ($attributes['pastLimit'] ?? 1)) : 0;
-$max_per_event = max(1, (int) apply_filters('lrob_calendar_events_list_max_per_event', 3));
+// Cap occurrences per recurring event so a daily/never-ending series can't
+// monopolise the list, but high enough that recurring events are clearly
+// visible. The chronological slice to $per_page below bounds the overall count.
+$max_per_event = max(1, (int) apply_filters('lrob_calendar_events_list_max_per_event', 10));
 // Order applies to the merged list: chronological (ASC) by default; 'desc' flips.
 $order_attr      = strtolower((string) ($attributes['order'] ?? 'auto'));
 $effective_order = ($order_attr === 'desc') ? 'DESC' : 'ASC';
@@ -70,6 +73,11 @@ foreach (LRob_Calendar_Event::get_events($up_args) as $event) {
     }
     $list_items[] = ['event' => $event, 'start' => (int) $event->get('start'), 'end' => (int) $event->get('end')];
 }
+
+// Keep only the soonest $per_page upcoming items (recurring occurrences now fill
+// the available slots instead of being hard-capped at a handful).
+usort($list_items, static function ($a, $b) { return $a['start'] <=> $b['start']; });
+$list_items = array_slice($list_items, 0, $per_page);
 
 // Most-recent past events — extra rows that never displace the upcoming set.
 // First page only (they belong at the top of the list).

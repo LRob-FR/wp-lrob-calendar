@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: LRob Calendar 1.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/lrob-calendar\n"
-"POT-Creation-Date: 2026-06-26T21:33:35+00:00\n"
+"POT-Creation-Date: 2026-06-26T21:39:53+00:00\n"
 "PO-Revision-Date: 2026-05-12 18:00+0200\n"
 "Last-Translator: Robin Labadie <claude@lrob.fr>\n"
 "Language-Team: French <claude@lrob.fr>\n"
@@ -46,32 +46,32 @@ msgstr "https://www.lrob.fr"
 msgid "View event"
 msgstr "Voir l'événement"
 
-#: blocks/events-list/render.php:114 admin/js/manage-events.js:235
+#: blocks/events-list/render.php:122 admin/js/manage-events.js:235
 msgid "No events found."
 msgstr "Aucun événement trouvé."
 
-#: blocks/events-list/render.php:135
+#: blocks/events-list/render.php:143
 msgid "Events list pagination"
 msgstr "Pagination de la liste d'événements"
 
-#: blocks/events-list/render.php:140
+#: blocks/events-list/render.php:148
 msgid "Previous page"
 msgstr "Page précédente"
 
 #. translators: 1: current page number, 2: total pages
-#: blocks/events-list/render.php:148
+#: blocks/events-list/render.php:156
 msgid "Page %1$d / %2$d"
 msgstr "Page %1$d / %2$d"
 
-#: blocks/events-list/render.php:154
+#: blocks/events-list/render.php:162
 msgid "Next page"
 msgstr "Page suivante"
 
-#: blocks/events-list/render.php:165 admin/js/manage-events.js:213
+#: blocks/events-list/render.php:173 admin/js/manage-events.js:213
 msgid "Previous"
 msgstr "Précédent"
 
-#: blocks/events-list/render.php:166 admin/js/manage-events.js:218
+#: blocks/events-list/render.php:174 admin/js/manage-events.js:218
 msgid "Next"
 msgstr "Suivant"
 
@@ -185,7 +185,8 @@ msgid ""
 msgstr ""
 "Vous migrez depuis un autre plugin de calendrier ? Exportez ses événements "
 "vers un fichier JSON, puis importez ce fichier avec l'encart Importer ci-"
-"dessus. Le plugin source doit être actif sur ce site pour pouvoir en exporter."
+"dessus. Le plugin source doit être actif sur ce site pour pouvoir en "
+"exporter."
 
 #: includes/class-lrob-calendar-admin.php:246
 msgid "Not detected on this site"

@@ -40,8 +40,8 @@
                                 ? __('Events per page', 'lrob-calendar')
                                 : __('Number of Events', 'lrob-calendar'),
                             value: attributes.limit,
-                            onChange: (value) => setAttributes({ limit: value }),
-                            min: 1, max: 50
+                            onChange: (value) => setAttributes({ limit: value || 1 }),
+                            min: 1, max: 100
                         }),
                         el(ToggleControl, {
                             label: __('Enable pagination', 'lrob-calendar'),
