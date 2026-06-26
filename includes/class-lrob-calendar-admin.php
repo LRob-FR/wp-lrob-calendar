@@ -151,7 +151,7 @@ class LRob_Calendar_Admin {
         
         ?>
         <div class="wrap">
-            <h1><?php esc_html_e('Import / Export Events', 'lrob-calendar'); ?></h1>
+            <h1><?php esc_html_e('Import / Export Events', 'lrob-calendar'); echo self::page_credit_html(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></h1>
 
             <?php echo $message; // already escaped above (esc_html__ in success/error notices) ?>
 
@@ -260,6 +260,18 @@ class LRob_Calendar_Admin {
      * Small "by LRob" credit + version block shown at the bottom of each
      * plugin admin page. Centralized so a single edit updates every page.
      */
+    /**
+     * Small "by LRob" credit appended to each admin page <h1>. Inline-styled so
+     * it works on pages that don't enqueue the plugin's admin CSS. Matches the
+     * house style shared across LRob plugins.
+     */
+    public static function page_credit_html(): string {
+        return ' <small class="lrob-cal-page-credit" style="font-size:0.55em;font-weight:400;color:#646970;margin-left:8px;vertical-align:middle;letter-spacing:0.02em;">'
+            . esc_html__('by', 'lrob-calendar') . ' '
+            . '<a href="https://www.lrob.fr" target="_blank" rel="noopener noreferrer" style="color:#2271b1;text-decoration:none;">LRob</a>'
+            . '</small>';
+    }
+
     private function render_credit_footer(): void {
         ?>
         <p class="lrob-calendar-credit"
@@ -404,7 +416,7 @@ class LRob_Calendar_Admin {
         
         ?>
         <div class="wrap">
-            <h1><?php esc_html_e('Calendar Settings', 'lrob-calendar'); ?></h1>
+            <h1><?php esc_html_e('Calendar Settings', 'lrob-calendar'); echo self::page_credit_html(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></h1>
             
             <form method="post" action="">
                 <?php wp_nonce_field('lrob_calendar_settings', 'lrob_settings_nonce'); ?>

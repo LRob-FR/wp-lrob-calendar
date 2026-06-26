@@ -1,8 +1,9 @@
-# 📅 LRob – Calendar
+# 📅 LRob — Calendar
 
-A clean, fast, and friendly **event calendar for WordPress** — recurring events,
-a beautiful month grid & agenda, and a modern in-page editor. No bloat, no page
-builder required.
+### A clean, fast event calendar for WordPress — without the bloat.
+
+> Recurring events, a beautiful month grid & agenda, click-to-preview popups, and
+> a modern in-page editor. No page builder required, no SaaS, no clutter.
 
 **Plugin homepage:** [lrob.fr/wordpress/plugins/lrob-calendar](https://www.lrob.fr/wordpress/plugins/lrob-calendar/)
 
@@ -140,11 +141,26 @@ See [**CHANGELOG.md**](CHANGELOG.md).
 
 ---
 
-## ❤️ Credits
+## 💬 Feedback & contributions
 
-Built with care by [**LRob**](https://www.lrob.fr/) — WordPress specialists
-dedicated to simplicity, performance, and clean design.
+Bug reports, feature ideas and pull requests welcome on the
+[GitHub issue tracker](https://github.com/LRob-FR/wp-lrob-calendar/issues).
 
-## ⚖️ License
+---
 
-GPL-2.0-or-later · © LRob
+## 📜 License & credits
+
+Plugin code: **GPL-2.0-or-later**. See [`LICENSE`](./LICENSE).
+
+### Built by
+
+**[LRob](https://www.lrob.fr)** — WordPress web hosting specialist based in
+Orléans, France.
+
+- 📦 Plugin home: <https://www.lrob.fr/wordpress/plugins/lrob-calendar/>
+- 🐛 Issues: <https://github.com/LRob-FR/wp-lrob-calendar/issues>
+- 💼 Hosting service: <https://www.lrob.fr>
+
+---
+
+> *Your events. Your site. No SaaS.*

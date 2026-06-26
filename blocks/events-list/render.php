@@ -123,7 +123,7 @@ $attributes['enablePopup'] = $needs_popup;
     </div>
 <?php endif;
 
-if ($pagination && !empty($events) && $total_pages > 1):
+if ($pagination && !empty($list_items) && $total_pages > 1):
     $prev_url = $current_page > 1
         ? esc_url(add_query_arg(LROB_CALENDAR_PAGE_PARAM, $current_page - 1))
         : null;
@@ -168,7 +168,7 @@ if ($pagination && !empty($events) && $total_pages > 1):
         endif; ?>
     </nav>
 <?php endif; ?>
-<?php if ($needs_popup && !empty($events)): ?>
+<?php if ($needs_popup && !empty($list_items)): ?>
     <div class="lrob-cal-popup lrob-events-list-popup"
          role="dialog"
          aria-modal="true"

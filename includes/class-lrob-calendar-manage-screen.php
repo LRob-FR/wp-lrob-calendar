@@ -191,6 +191,7 @@ class LRob_Calendar_Manage_Screen {
             'nonce'        => wp_create_nonce('wp_rest'),
             'newLink'      => admin_url('post-new.php?post_type=' . LRob_Calendar_Post_Types::POST_TYPE),
             'openNew'      => isset($_GET['lrob_new']),
+            'pageCredit'   => LRob_Calendar_Admin::page_credit_html(),
             'canPublish'   => current_user_can('publish_lrob_events'),
             'dateFormat'   => get_option('date_format'),
             'timeFormat'   => get_option('time_format'),
