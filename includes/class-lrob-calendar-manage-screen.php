@@ -83,7 +83,15 @@ class LRob_Calendar_Manage_Screen {
         }
 
         $manage_idx = null;
-        $tax_prefixes = [
+        // Everything the custom screen replaces is dropped from the menu (the
+        // native pages stay reachable by direct URL). "Add New" goes too — the
+        // WordPress admin-bar "+ New" still creates events (it redirects into the
+        // custom screen's modal).
+        $remove_exact = [
+            $parent,                                                          // All Events (classic list)
+            'post-new.php?post_type=' . LRob_Calendar_Post_Types::POST_TYPE,  // Add New
+        ];
+        $remove_prefixes = [
             'edit-tags.php?taxonomy=' . LRob_Calendar_Post_Types::TAX_CATEGORY,
             'edit-tags.php?taxonomy=' . LRob_Calendar_Post_Types::TAX_TAG,
         ];
@@ -91,16 +99,16 @@ class LRob_Calendar_Manage_Screen {
             $slug = $item[2] ?? '';
             if ($slug === self::SLUG) {
                 $manage_idx = $i;
+                continue;
             }
-            if ($slug === $parent) {
-                $submenu[$parent][$i][2] = $parent . '&lrob_classic=1';
-                $submenu[$parent][$i][0] = __('All Events (classic)', 'lrob-calendar');
+            if (in_array($slug, $remove_exact, true)) {
+                unset($submenu[$parent][$i]);
+                continue;
             }
-            // Categories/Tags are now managed in-screen — drop their menu links
-            // (the native screens stay reachable by direct URL if ever needed).
-            foreach ($tax_prefixes as $prefix) {
+            foreach ($remove_prefixes as $prefix) {
                 if (strpos($slug, $prefix) === 0) {
                     unset($submenu[$parent][$i]);
+                    break;
                 }
             }
         }

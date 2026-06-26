@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: LRob Calendar 1.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/lrob-calendar\n"
-"POT-Creation-Date: 2026-06-26T11:45:49+00:00\n"
+"POT-Creation-Date: 2026-06-26T16:26:19+00:00\n"
 "PO-Revision-Date: 2026-05-12 18:00+0200\n"
 "Last-Translator: Robin Labadie <claude@lrob.fr>\n"
 "Language-Team: French <claude@lrob.fr>\n"
@@ -46,7 +46,7 @@ msgstr "https://www.lrob.fr"
 msgid "View event"
 msgstr "Voir l'événement"
 
-#: blocks/events-list/render.php:114 admin/js/manage-events.js:237
+#: blocks/events-list/render.php:114 admin/js/manage-events.js:235
 msgid "No events found."
 msgstr "Aucun événement trouvé."
 
@@ -67,11 +67,11 @@ msgstr "Page %1$d / %2$d"
 msgid "Next page"
 msgstr "Page suivante"
 
-#: blocks/events-list/render.php:165 admin/js/manage-events.js:215
+#: blocks/events-list/render.php:165 admin/js/manage-events.js:213
 msgid "Previous"
 msgstr "Précédent"
 
-#: blocks/events-list/render.php:166 admin/js/manage-events.js:220
+#: blocks/events-list/render.php:166 admin/js/manage-events.js:218
 msgid "Next"
 msgstr "Suivant"
 
@@ -537,7 +537,7 @@ msgstr "Lieu"
 #: includes/class-lrob-calendar-admin.php:910
 #: includes/class-lrob-calendar-block-helpers.php:552
 #: includes/class-lrob-calendar-blocks.php:214
-#: includes/class-lrob-calendar-blocks.php:270 admin/js/manage-events.js:195
+#: includes/class-lrob-calendar-blocks.php:270 admin/js/manage-events.js:193
 msgid "Recurring"
 msgstr "Récurrent"
 
@@ -575,7 +575,6 @@ msgstr "Voir moins"
 
 #: includes/class-lrob-calendar-blocks.php:210
 #: includes/class-lrob-calendar-blocks.php:259 admin/js/event-modal.js:496
-#: admin/js/terms-manager.js:43 admin/js/terms-manager.js:53
 msgid "Close"
 msgstr "Fermer"
 
@@ -812,45 +811,41 @@ msgstr ""
 "(%s). Elles pourraient ne pas être accessibles depuis votre site en "
 "production après migration."
 
-#: includes/class-lrob-calendar-manage-screen.php:97
-msgid "All Events (classic)"
-msgstr "Tous les événements (classique)"
-
-#: includes/class-lrob-calendar-manage-screen.php:118
-#: includes/class-lrob-calendar-manage-screen.php:119
+#: includes/class-lrob-calendar-manage-screen.php:126
+#: includes/class-lrob-calendar-manage-screen.php:127
 msgid "Manage Events"
 msgstr "Gérer les événements"
 
-#: includes/class-lrob-calendar-manage-screen.php:193
+#: includes/class-lrob-calendar-manage-screen.php:201
 msgid "All statuses"
 msgstr "Tous les statuts"
 
-#: includes/class-lrob-calendar-manage-screen.php:194
+#: includes/class-lrob-calendar-manage-screen.php:202
 #: admin/js/manage-events.js:89
 msgid "Published"
 msgstr "Publié"
 
-#: includes/class-lrob-calendar-manage-screen.php:195
+#: includes/class-lrob-calendar-manage-screen.php:203
 #: admin/js/manage-events.js:90
 msgid "Draft"
 msgstr "Brouillon"
 
-#: includes/class-lrob-calendar-manage-screen.php:196
+#: includes/class-lrob-calendar-manage-screen.php:204
 #: admin/js/manage-events.js:91
 msgid "Pending"
 msgstr "En attente"
 
-#: includes/class-lrob-calendar-manage-screen.php:197
+#: includes/class-lrob-calendar-manage-screen.php:205
 #: admin/js/manage-events.js:92
 msgid "Scheduled"
 msgstr "Planifié"
 
-#: includes/class-lrob-calendar-manage-screen.php:198
+#: includes/class-lrob-calendar-manage-screen.php:206
 #: admin/js/manage-events.js:93
 msgid "Private"
 msgstr "Privé"
 
-#: includes/class-lrob-calendar-manage-screen.php:229
+#: includes/class-lrob-calendar-manage-screen.php:237
 msgid "This screen requires JavaScript."
 msgstr "Cet écran nécessite JavaScript."
 
@@ -1160,7 +1155,7 @@ msgid "New Category Name"
 msgstr "Nom de la nouvelle catégorie"
 
 #: includes/class-lrob-calendar-post-types.php:107 admin/js/event-modal.js:435
-#: admin/js/terms-manager.js:47
+#: admin/js/terms-manager.js:33
 msgid "Categories"
 msgstr "Catégories"
 
@@ -1198,7 +1193,7 @@ msgid "New Tag Name"
 msgstr "Nom de la nouvelle étiquette"
 
 #: includes/class-lrob-calendar-post-types.php:134 admin/js/event-modal.js:440
-#: admin/js/terms-manager.js:48
+#: admin/js/terms-manager.js:34
 msgid "Tags"
 msgstr "Étiquettes"
 
@@ -1363,11 +1358,11 @@ msgstr "ex. 10 €"
 msgid "Organization"
 msgstr "Organisation"
 
-#: admin/js/event-modal.js:437 admin/js/event-modal.js:713
+#: admin/js/event-modal.js:437 admin/js/event-modal.js:720
 msgid "Add category"
 msgstr "Ajouter une catégorie"
 
-#: admin/js/event-modal.js:442 admin/js/event-modal.js:713
+#: admin/js/event-modal.js:442 admin/js/event-modal.js:720
 msgid "Add tag"
 msgstr "Ajouter une étiquette"
 
@@ -1403,12 +1398,12 @@ msgstr "Nouvel événement"
 msgid "→ WordPress editor"
 msgstr "→ Éditeur WordPress"
 
-#: admin/js/event-modal.js:503 admin/js/event-modal.js:719
-#: admin/js/terms-manager.js:194
+#: admin/js/event-modal.js:503 admin/js/event-modal.js:726
+#: admin/js/terms-manager.js:177
 msgid "Cancel"
 msgstr "Annuler"
 
-#: admin/js/event-modal.js:504 admin/js/terms-manager.js:193
+#: admin/js/event-modal.js:504 admin/js/terms-manager.js:176
 msgid "Save"
 msgstr "Enregistrer"
 
@@ -1419,59 +1414,59 @@ msgstr ""
 "Vous avez des modifications non enregistrées qui seront perdues. Ouvrir "
 "quand même l'éditeur WordPress ?"
 
-#: admin/js/event-modal.js:592
+#: admin/js/event-modal.js:599
 msgid "Custom (advanced)"
 msgstr "Personnalisé (avancé)"
 
-#: admin/js/event-modal.js:630
+#: admin/js/event-modal.js:637
 msgid ""
 "Created with the block editor — editing here keeps only simple formatting."
 msgstr ""
 "Créé avec l'éditeur de blocs — l'édition ici ne garde que la mise en forme "
 "simple."
 
-#: admin/js/event-modal.js:675
+#: admin/js/event-modal.js:682
 msgid "Please set a start date."
 msgstr "Veuillez définir une date de début."
 
-#: admin/js/event-modal.js:680 admin/js/terms-manager.js:156
-#: admin/js/terms-manager.js:206
+#: admin/js/event-modal.js:687 admin/js/terms-manager.js:138
+#: admin/js/terms-manager.js:194
 msgid "Saving…"
 msgstr "Enregistrement…"
 
-#: admin/js/event-modal.js:697
+#: admin/js/event-modal.js:704
 msgid "Could not save the event."
 msgstr "Impossible d'enregistrer l'événement."
 
-#: admin/js/event-modal.js:706 admin/js/terms-manager.js:140
+#: admin/js/event-modal.js:713 admin/js/terms-manager.js:122
 msgid "— No parent —"
 msgstr "— Aucun parent —"
 
-#: admin/js/event-modal.js:714
+#: admin/js/event-modal.js:721
 msgid "Name"
 msgstr "Nom"
 
-#: admin/js/event-modal.js:716
+#: admin/js/event-modal.js:723
 msgid "Parent"
 msgstr "Parent"
 
-#: admin/js/event-modal.js:720
+#: admin/js/event-modal.js:727
 msgid "Create"
 msgstr "Créer"
 
-#: admin/js/event-modal.js:738
+#: admin/js/event-modal.js:745
 msgid "Creating…"
 msgstr "Création…"
 
-#: admin/js/event-modal.js:753
+#: admin/js/event-modal.js:760
 msgid "Could not create."
 msgstr "Création impossible."
 
-#: admin/js/event-modal.js:782
+#: admin/js/event-modal.js:789
 msgid "Select image"
 msgstr "Sélectionner une image"
 
-#: admin/js/event-modal.js:847
+#: admin/js/event-modal.js:854
 msgid "Discard your changes?"
 msgstr "Abandonner vos modifications ?"
 
@@ -1503,107 +1498,107 @@ msgstr "Titre (A→Z)"
 msgid "Recently modified"
 msgstr "Modifié récemment"
 
-#: admin/js/manage-events.js:149 admin/js/terms-manager.js:42
-msgid "Categories & tags"
-msgstr "Catégories & étiquettes"
-
-#: admin/js/manage-events.js:152
+#: admin/js/manage-events.js:148
 msgid "+ New event"
 msgstr "+ Nouvel événement"
 
-#: admin/js/manage-events.js:159
+#: admin/js/manage-events.js:154
 msgid "Search events…"
 msgstr "Rechercher des événements…"
 
-#: admin/js/manage-events.js:161
+#: admin/js/manage-events.js:156
 msgid "Clear search"
 msgstr "Effacer la recherche"
 
-#: admin/js/manage-events.js:169
+#: admin/js/manage-events.js:164
 msgid "Show past events"
 msgstr "Afficher les événements passés"
 
-#: admin/js/manage-events.js:194
+#: admin/js/manage-events.js:192
 msgid "(no title)"
 msgstr "(sans titre)"
 
-#: admin/js/manage-events.js:205 admin/js/terms-manager.js:125
+#: admin/js/manage-events.js:203 admin/js/terms-manager.js:107
 msgid "Edit"
 msgstr "Modifier"
 
-#: admin/js/manage-events.js:206
+#: admin/js/manage-events.js:204
 msgid "Duplicate"
 msgstr "Dupliquer"
 
-#: admin/js/manage-events.js:207
+#: admin/js/manage-events.js:205
 msgid "Move to trash"
 msgstr "Déplacer vers la corbeille"
 
-#: admin/js/manage-events.js:217
+#: admin/js/manage-events.js:215
 msgid "Page"
 msgstr "Page"
 
-#: admin/js/manage-events.js:218 blocks/events-list/edit.js:190
+#: admin/js/manage-events.js:216 blocks/events-list/edit.js:190
 msgid "events"
 msgstr "événements"
 
-#: admin/js/manage-events.js:242
+#: admin/js/manage-events.js:240
 msgid "Could not load events."
 msgstr "Impossible de charger les événements."
 
-#: admin/js/manage-events.js:335
+#: admin/js/manage-events.js:334
 msgid "Could not duplicate the event."
 msgstr "Impossible de dupliquer l'événement."
 
-#: admin/js/manage-events.js:338
+#: admin/js/manage-events.js:337
 msgid "Move this event to the trash?"
 msgstr "Déplacer cet événement vers la corbeille ?"
 
-#: admin/js/manage-events.js:344
+#: admin/js/manage-events.js:343
 msgid "Could not delete the event."
 msgstr "Impossible de supprimer l'événement."
 
-#: admin/js/terms-manager.js:78
+#: admin/js/terms-manager.js:32
+msgid "Categories & tags"
+msgstr "Catégories & étiquettes"
+
+#: admin/js/terms-manager.js:60
 msgid "New category"
 msgstr "Nouvelle catégorie"
 
-#: admin/js/terms-manager.js:78
+#: admin/js/terms-manager.js:60
 msgid "New tag"
 msgstr "Nouvelle étiquette"
 
-#: admin/js/terms-manager.js:80
+#: admin/js/terms-manager.js:62
 msgid "Add"
 msgstr "Ajouter"
 
-#: admin/js/terms-manager.js:88
+#: admin/js/terms-manager.js:70
 msgid "Loading…"
 msgstr "Chargement…"
 
-#: admin/js/terms-manager.js:98
+#: admin/js/terms-manager.js:80
 msgid "Could not load terms."
 msgstr "Impossible de charger les termes."
 
-#: admin/js/terms-manager.js:115
+#: admin/js/terms-manager.js:97
 msgid "None yet."
 msgstr "Aucun pour l'instant."
 
-#: admin/js/terms-manager.js:126
+#: admin/js/terms-manager.js:108
 msgid "Delete"
 msgstr "Supprimer"
 
-#: admin/js/terms-manager.js:160 admin/js/terms-manager.js:207
+#: admin/js/terms-manager.js:143 admin/js/terms-manager.js:195
 msgid "Could not save."
 msgstr "Enregistrement impossible."
 
-#: admin/js/terms-manager.js:173
+#: admin/js/terms-manager.js:156
 msgid "Delete this term? Events keep their other terms."
 msgstr "Supprimer ce terme ? Les événements conservent leurs autres termes."
 
-#: admin/js/terms-manager.js:174
+#: admin/js/terms-manager.js:157
 msgid "Deleting…"
 msgstr "Suppression…"
 
-#: admin/js/terms-manager.js:175
+#: admin/js/terms-manager.js:158
 msgid "Could not delete."
 msgstr "Suppression impossible."
 
@@ -1909,6 +1904,9 @@ msgstr "Compact"
 #: blocks/single-event/edit.js:185
 msgid "Select an event in the sidebar."
 msgstr "Sélectionnez un événement dans la barre latérale."
+
+#~ msgid "All Events (classic)"
+#~ msgstr "Tous les événements (classique)"
 
 #~ msgid "Open in WordPress editor"
 #~ msgstr "Ouvrir dans l'éditeur WordPress"

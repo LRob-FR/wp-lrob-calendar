@@ -12,7 +12,11 @@
 /* ─── Base card ──────────────────────────────────────────────────────────── */
 
 .lrob-event-card {
-    color: var(--lrob-cal-text);
+    /* The list/full/minimal cards are transparent (they sit on the theme's
+       background), so inherit the theme's text colour — hard-coding near-black
+       made titles unreadable on dark themes. The grid template below re-asserts
+       a dark colour because it paints its own light surface. */
+    color: inherit;
     line-height: var(--lrob-cal-line-comfortable);
     background: transparent;
     border: 0;
@@ -22,9 +26,11 @@
 }
 
 /* Grid template keeps the card chrome — image-on-top format reads better
-   with a real card boundary. */
+   with a real card boundary. It paints its own light surface, so keep the
+   plugin's dark text on it. */
 .lrob-event-card.lrob-event-grid {
     background: var(--lrob-cal-surface);
+    color: var(--lrob-cal-text);
     border: 1px solid var(--lrob-cal-border);
     border-radius: var(--lrob-cal-radius-lg);
     box-shadow: var(--lrob-cal-shadow-card);
@@ -142,7 +148,9 @@
     font-size: 1.1em;
     line-height: var(--lrob-cal-line-tight);
     font-weight: var(--lrob-cal-font-weight-semibold);
-    color: var(--lrob-cal-text);
+    /* Inherit so the theme decides (readable on light + dark). On the grid
+       template the card re-asserts the plugin's dark text on its light surface. */
+    color: inherit;
 }
 
 .lrob-event-card.lrob-event-full .lrob-event-title {

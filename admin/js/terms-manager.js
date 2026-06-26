@@ -1,21 +1,20 @@
 /**
- * Categories & tags manager (v1.2) — a modal opened from the Manage Events
- * screen so authors never need the stock WordPress taxonomy screens. Lists,
- * creates, renames, recolors (categories) and deletes terms over the admin REST
- * endpoints. Reuses the .lrob-modal-* styles from the editor modal.
+ * Categories & tags manager (v1.2) — a panel mounted in the Manage Events
+ * screen's side column (no modal, no button) so authors never need the stock
+ * WordPress taxonomy screens. Lists, creates, renames, recolors (categories)
+ * and deletes terms over the admin REST endpoints.
  */
 (function (i18n) {
     var __ = (i18n && i18n.__) ? i18n.__ : function (s) { return s; };
     function cfg() { return window.lrobCalendarManage || {}; }
     function termsUrl() { return (cfg().restRoot || '').replace(/\/events$/, '/terms'); }
 
-    var overlay = null;
-    var onCloseCb = null;
+    var root = null;
+    var onChangeCb = null;
     var data = { category: [], tag: [] };
 
     function esc(s) { var d = document.createElement('div'); d.textContent = (s == null ? '' : String(s)); return d.innerHTML; }
-    function el(html) { var t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstChild; }
-    function q(s) { return overlay.querySelector(s); }
+    function q(s) { return root.querySelector(s); }
 
     function req(method, path, body) {
         var headers = { 'X-WP-Nonce': cfg().nonce };
@@ -26,58 +25,41 @@
         }).then(function (r) { return r.ok ? r.json() : Promise.reject(r); });
     }
 
-    function open(onClose) {
-        onCloseCb = onClose;
-        buildShell();
-        document.body.appendChild(overlay);
-        document.body.classList.add('lrob-modal-open');
+    function mount(container, onChange) {
+        root = container;
+        onChangeCb = onChange;
+        root.innerHTML =
+            '<h2 class="lrob-side-title">' + esc(__('Categories & tags', 'lrob-calendar')) + '</h2>' +
+            sectionHtml('category', __('Categories', 'lrob-calendar')) +
+            sectionHtml('tag', __('Tags', 'lrob-calendar')) +
+            '<p class="lrob-side-msg" aria-live="polite"></p>';
+
+        root.querySelectorAll('.lrob-terms-create').forEach(function (b) {
+            b.addEventListener('click', function () { createTerm(this.closest('.lrob-terms-section').getAttribute('data-tax')); });
+        });
+        // Enter-to-add in the name field.
+        root.querySelectorAll('.lrob-terms-newname').forEach(function (inp) {
+            inp.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter') { e.preventDefault(); createTerm(this.closest('.lrob-terms-section').getAttribute('data-tax')); }
+            });
+        });
+        root.addEventListener('click', onListClick);
+
         loadAll();
     }
 
-    function buildShell() {
-        overlay = el(
-            '<div class="lrob-modal-overlay">' +
-                '<div class="lrob-modal lrob-terms-modal" role="dialog" aria-modal="true">' +
-                    '<header class="lrob-modal-head">' +
-                        '<h2 class="lrob-modal-title">' + esc(__('Categories & tags', 'lrob-calendar')) + '</h2>' +
-                        '<button type="button" class="lrob-modal-close" aria-label="' + esc(__('Close', 'lrob-calendar')) + '">&times;</button>' +
-                    '</header>' +
-                    '<div class="lrob-modal-body">' +
-                        '<div class="lrob-terms-cols">' +
-                            sectionHtml('category', __('Categories', 'lrob-calendar')) +
-                            sectionHtml('tag', __('Tags', 'lrob-calendar')) +
-                        '</div>' +
-                    '</div>' +
-                    '<footer class="lrob-modal-foot">' +
-                        '<span class="lrob-modal-msg" aria-live="polite"></span>' +
-                        '<button type="button" class="button lrob-modal-cancel">' + esc(__('Close', 'lrob-calendar')) + '</button>' +
-                    '</footer>' +
-                '</div>' +
-            '</div>'
-        );
-
-        q('.lrob-modal-close').addEventListener('click', close);
-        q('.lrob-modal-cancel').addEventListener('click', close);
-        overlay.addEventListener('mousedown', function (e) { if (e.target === overlay) close(); });
-        document.addEventListener('keydown', onKey);
-
-        overlay.querySelectorAll('.lrob-terms-create').forEach(function (b) {
-            b.addEventListener('click', function () { createTerm(this.closest('.lrob-terms-section').getAttribute('data-tax')); });
-        });
-
-        overlay.addEventListener('click', onListClick);
-    }
+    function changed() { if (typeof onChangeCb === 'function') onChangeCb(); }
 
     function sectionHtml(tax, title) {
         var isCat = (tax === 'category');
         return '<section class="lrob-terms-section" data-tax="' + tax + '">' +
-            '<h3 class="lrob-modal-section">' + esc(title) + '</h3>' +
+            '<h3 class="lrob-side-section">' + esc(title) + '</h3>' +
             '<ul class="lrob-terms-list"></ul>' +
             '<div class="lrob-terms-add">' +
                 (isCat ? '<input type="color" class="lrob-terms-newcolor" value="#3a87ad">' : '') +
                 '<input type="text" class="lrob-terms-newname" placeholder="' + esc(isCat ? __('New category', 'lrob-calendar') : __('New tag', 'lrob-calendar')) + '">' +
                 (isCat ? '<select class="lrob-terms-newparent"></select>' : '') +
-                '<button type="button" class="button button-primary lrob-terms-create">' + esc(__('Add', 'lrob-calendar')) + '</button>' +
+                '<button type="button" class="button lrob-terms-create">' + esc(__('Add', 'lrob-calendar')) + '</button>' +
             '</div>' +
         '</section>';
     }
@@ -157,6 +139,7 @@
         req('POST', '', body).then(function () {
             section.querySelector('.lrob-terms-newname').value = '';
             loadAll();
+            changed();
         }).catch(function () { message(__('Could not save.', 'lrob-calendar'), true); });
     }
 
@@ -172,7 +155,7 @@
         if (act === 'del') {
             if (!window.confirm(__('Delete this term? Events keep their other terms.', 'lrob-calendar'))) return;
             message(__('Deleting…', 'lrob-calendar'));
-            req('DELETE', '/' + id).then(loadAll).catch(function () { message(__('Could not delete.', 'lrob-calendar'), true); });
+            req('DELETE', '/' + id).then(function () { loadAll(); changed(); }).catch(function () { message(__('Could not delete.', 'lrob-calendar'), true); });
         } else if (act === 'edit') {
             editRow(row, tax, id);
         } else if (act === 'save') {
@@ -193,7 +176,12 @@
                 iconBtn('save', 'yes', __('Save', 'lrob-calendar')) +
                 iconBtn('cancel', 'no-alt', __('Cancel', 'lrob-calendar')) +
             '</span>';
-        row.querySelector('.lrob-terms-editname').focus();
+        var nameInput = row.querySelector('.lrob-terms-editname');
+        nameInput.focus();
+        nameInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') { e.preventDefault(); saveRow(row, tax, id); }
+            else if (e.key === 'Escape') { renderSection(tax); }
+        });
     }
 
     function saveRow(row, tax, id) {
@@ -204,26 +192,17 @@
         }
         if (!body.name) { row.querySelector('.lrob-terms-editname').focus(); return; }
         message(__('Saving…', 'lrob-calendar'));
-        req('PUT', '/' + id, body).then(loadAll).catch(function () { message(__('Could not save.', 'lrob-calendar'), true); });
+        req('PUT', '/' + id, body).then(function () { loadAll(); changed(); }).catch(function () { message(__('Could not save.', 'lrob-calendar'), true); });
     }
 
     /* ── Utils ───────────────────────────────────────────────────────────── */
 
     function message(text, isError) {
-        var m = q('.lrob-modal-msg');
+        var m = q('.lrob-side-msg');
         if (!m) return;
         m.textContent = text || '';
         m.classList.toggle('is-error', !!isError);
     }
-    function onKey(e) { if (e.key === 'Escape') close(); }
-    function close() {
-        if (!overlay) return;
-        document.removeEventListener('keydown', onKey);
-        overlay.remove();
-        overlay = null;
-        document.body.classList.remove('lrob-modal-open');
-        if (typeof onCloseCb === 'function') onCloseCb();
-    }
 
-    window.LrobTermsManager = { open: open };
+    window.LrobTermsManager = { mount: mount };
 })(window.wp && window.wp.i18n);

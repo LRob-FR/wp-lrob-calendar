@@ -534,9 +534,16 @@
         q('.lrob-f-sd').addEventListener('change', syncEndMin);
         q('.lrob-f-ed').addEventListener('change', syncEndMin);
 
-        // Native date/time inputs format per the element's lang — force the site
-        // locale so a FR site shows 24h, not AM/PM.
-        q('.lrob-modal').lang = cfg().locale || '';
+        // Native date/time inputs format per the element's lang. When the site
+        // uses 24h time (time_format has H/G) force a 24h locale so the input
+        // never shows AM/PM, even if the browser/OS locale is a 12h one. Set it
+        // on the inputs directly (some browsers don't inherit it for formatting).
+        var is24 = /[HG]/.test(cfg().timeFormat || '');
+        var inputLang = is24 ? 'en-GB' : (cfg().locale || 'en-US');
+        q('.lrob-modal').setAttribute('lang', inputLang);
+        ['.lrob-f-sd', '.lrob-f-st', '.lrob-f-ed', '.lrob-f-et', '.lrob-r-until'].forEach(function (s) {
+            var i = q(s); if (i) i.setAttribute('lang', inputLang);
+        });
 
         overlay.querySelectorAll('.lrob-f-add-term').forEach(function (b) {
             b.addEventListener('click', function () { openTermPopup(this.getAttribute('data-tax')); });

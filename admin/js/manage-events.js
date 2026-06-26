@@ -144,14 +144,9 @@
         return '' +
             '<div class="lrob-manage-header">' +
                 '<h1 class="lrob-manage-title">' + esc(__('Events', 'lrob-calendar')) + '</h1>' +
-                '<div class="lrob-manage-header-actions">' +
-                    '<button type="button" class="button lrob-manage-terms" data-action="terms">' +
-                        esc(__('Categories & tags', 'lrob-calendar')) +
-                    '</button>' +
-                    '<button type="button" class="button button-primary lrob-manage-new" data-action="new">' +
-                        esc(__('+ New event', 'lrob-calendar')) +
-                    '</button>' +
-                '</div>' +
+                '<button type="button" class="button button-primary lrob-manage-new" data-action="new">' +
+                    esc(__('+ New event', 'lrob-calendar')) +
+                '</button>' +
             '</div>' +
             '<div class="lrob-manage-toolbar">' +
                 '<div class="lrob-manage-search-wrap">' +
@@ -168,7 +163,10 @@
                 '<label class="lrob-manage-pasttoggle"><input type="checkbox" class="lrob-manage-past"' +
                     (state.past ? ' checked' : '') + '> ' + esc(__('Show past events', 'lrob-calendar')) + '</label>' +
             '</div>' +
-            '<div class="lrob-manage-body"></div>';
+            '<div class="lrob-manage-layout">' +
+                '<div class="lrob-manage-body"></div>' +
+                '<aside class="lrob-manage-side"></aside>' +
+            '</div>';
     }
 
     function iconAction(action, icon, label, id, extra) {
@@ -252,6 +250,11 @@
     function mount() {
         root.innerHTML = chromeHtml();
 
+        // Persistent categories & tags panel in the side column.
+        if (window.LrobTermsManager) {
+            window.LrobTermsManager.mount(root.querySelector('.lrob-manage-side'), fetchEvents);
+        }
+
         var search = root.querySelector('.lrob-manage-search');
         search.addEventListener('input', function () {
             clearTimeout(searchTimer);
@@ -309,10 +312,6 @@
                 window.LrobEventModal.open(null, fetchEvents);
             } else {
                 window.location.href = cfg.newLink; // fallback
-            }
-        } else if (action === 'terms') {
-            if (window.LrobTermsManager) {
-                window.LrobTermsManager.open(fetchEvents); // refresh chips/counts on close
             }
         } else if (action === 'edit') {
             if (window.LrobEventModal) {

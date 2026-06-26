@@ -105,6 +105,63 @@
     border-color: #b32d2e;
 }
 
+/* Two-column layout: events list + categories/tags side panel */
+.lrob-manage-layout {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+}
+.lrob-manage-body { flex: 1; min-width: 0; }
+.lrob-manage-side {
+    flex: 0 0 300px;
+    max-width: 300px;
+    background: var(--lrm-bg);
+    border: 1px solid var(--lrm-border);
+    border-radius: var(--lrm-radius);
+    padding: 16px;
+}
+.lrob-side-title { margin: 0 0 12px; font-size: 15px; font-weight: 600; }
+.lrob-side-section { margin: 16px 0 8px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.03em; color: var(--lrm-muted); }
+.lrob-side-section:first-of-type { margin-top: 0; }
+.lrob-side-msg { font-size: 12px; color: var(--lrm-muted); min-height: 14px; margin: 8px 0 0; }
+.lrob-side-msg.is-error { color: #b32d2e; }
+
+@media (max-width: 900px) {
+    .lrob-manage-layout { flex-direction: column; }
+    .lrob-manage-side { flex: none; width: 100%; max-width: 100%; }
+}
+
+/* Categories & tags panel */
+.lrob-terms-list {
+    list-style: none;
+    margin: 0 0 8px;
+    padding: 0;
+    border: 1px solid var(--lrm-border);
+    border-radius: 6px;
+}
+.lrob-terms-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 8px;
+    border-top: 1px solid #f0f0f1;
+}
+.lrob-terms-row:first-child { border-top: 0; }
+.lrob-terms-color { width: 14px; height: 14px; border-radius: 3px; flex: none; border: 1px solid rgba(0, 0, 0, 0.1); }
+.lrob-terms-name { flex: 1; min-width: 0; font-size: 13px; }
+.lrob-terms-count { color: var(--lrm-muted); font-size: 11px; }
+.lrob-terms-row-actions { display: flex; gap: 2px; flex: none; }
+.lrob-terms-iconbtn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 26px; height: 24px; padding: 0; min-height: 0; line-height: 0;
+}
+.lrob-terms-iconbtn .dashicons { font-size: 14px; width: 14px; height: 14px; line-height: 14px; margin: 0; }
+.lrob-terms-empty { padding: 8px; color: var(--lrm-muted); font-style: italic; font-size: 12px; list-style: none; }
+.lrob-terms-add { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; margin-bottom: 6px; }
+.lrob-terms-newname, .lrob-terms-editname { flex: 1; min-width: 90px; height: 28px; }
+.lrob-terms-newparent { flex: 1 1 100%; height: 28px; }
+.lrob-terms-newcolor, .lrob-terms-editcolor { width: 30px; height: 28px; padding: 0; flex: none; }
+
 /* Body */
 .lrob-manage-body.is-loading {
     opacity: 0.5;
