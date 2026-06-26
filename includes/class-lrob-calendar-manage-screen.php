@@ -83,13 +83,25 @@ class LRob_Calendar_Manage_Screen {
         }
 
         $manage_idx = null;
+        $tax_prefixes = [
+            'edit-tags.php?taxonomy=' . LRob_Calendar_Post_Types::TAX_CATEGORY,
+            'edit-tags.php?taxonomy=' . LRob_Calendar_Post_Types::TAX_TAG,
+        ];
         foreach ($submenu[$parent] as $i => $item) {
-            if (($item[2] ?? '') === self::SLUG) {
+            $slug = $item[2] ?? '';
+            if ($slug === self::SLUG) {
                 $manage_idx = $i;
             }
-            if (($item[2] ?? '') === $parent) {
+            if ($slug === $parent) {
                 $submenu[$parent][$i][2] = $parent . '&lrob_classic=1';
                 $submenu[$parent][$i][0] = __('All Events (classic)', 'lrob-calendar');
+            }
+            // Categories/Tags are now managed in-screen — drop their menu links
+            // (the native screens stay reachable by direct URL if ever needed).
+            foreach ($tax_prefixes as $prefix) {
+                if (strpos($slug, $prefix) === 0) {
+                    unset($submenu[$parent][$i]);
+                }
             }
         }
 
@@ -147,9 +159,18 @@ class LRob_Calendar_Manage_Screen {
         wp_set_script_translations('lrob-calendar-event-modal', 'lrob-calendar', LROB_CALENDAR_PATH . 'languages');
 
         wp_enqueue_script(
+            'lrob-calendar-terms',
+            LROB_CALENDAR_URL . 'admin/js/terms-manager.js',
+            ['wp-i18n'],
+            LROB_CALENDAR_VERSION,
+            true
+        );
+        wp_set_script_translations('lrob-calendar-terms', 'lrob-calendar', LROB_CALENDAR_PATH . 'languages');
+
+        wp_enqueue_script(
             'lrob-calendar-manage',
             LROB_CALENDAR_URL . 'admin/js/manage-events.js',
-            ['wp-i18n', 'lrob-calendar-event-modal'],
+            ['wp-i18n', 'lrob-calendar-event-modal', 'lrob-calendar-terms'],
             LROB_CALENDAR_VERSION,
             true
         );

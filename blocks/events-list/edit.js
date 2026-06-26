@@ -82,6 +82,14 @@
                             label: __('Show Past Events', 'lrob-calendar'),
                             checked: attributes.showPast,
                             onChange: (value) => setAttributes({ showPast: value })
+                        }),
+                        attributes.showPast && el(RangeControl, {
+                            label: __('Number of past events', 'lrob-calendar'),
+                            help: __('Shown in addition to upcoming events, so they never push upcoming ones out.', 'lrob-calendar'),
+                            value: attributes.pastLimit,
+                            onChange: (value) => setAttributes({ pastLimit: value }),
+                            min: 0,
+                            max: 20
                         })
                     ),
                     el(PanelBody, { title: __('Display Options', 'lrob-calendar'), initialOpen: false },

@@ -144,9 +144,14 @@
         return '' +
             '<div class="lrob-manage-header">' +
                 '<h1 class="lrob-manage-title">' + esc(__('Events', 'lrob-calendar')) + '</h1>' +
-                '<button type="button" class="button button-primary lrob-manage-new" data-action="new">' +
-                    esc(__('+ New event', 'lrob-calendar')) +
-                '</button>' +
+                '<div class="lrob-manage-header-actions">' +
+                    '<button type="button" class="button lrob-manage-terms" data-action="terms">' +
+                        esc(__('Categories & tags', 'lrob-calendar')) +
+                    '</button>' +
+                    '<button type="button" class="button button-primary lrob-manage-new" data-action="new">' +
+                        esc(__('+ New event', 'lrob-calendar')) +
+                    '</button>' +
+                '</div>' +
             '</div>' +
             '<div class="lrob-manage-toolbar">' +
                 '<div class="lrob-manage-search-wrap">' +
@@ -304,6 +309,10 @@
                 window.LrobEventModal.open(null, fetchEvents);
             } else {
                 window.location.href = cfg.newLink; // fallback
+            }
+        } else if (action === 'terms') {
+            if (window.LrobTermsManager) {
+                window.LrobTermsManager.open(fetchEvents); // refresh chips/counts on close
             }
         } else if (action === 'edit') {
             if (window.LrobEventModal) {

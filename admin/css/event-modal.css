@@ -272,6 +272,40 @@ body.lrob-modal-open { overflow: hidden; }
 .lrob-r-custom-note { font-size: 12px; color: var(--lm-muted); }
 .lrob-r-custom-note code { background: #f0f0f1; padding: 1px 6px; border-radius: 3px; word-break: break-all; }
 
+/* Categories & tags manager (reuses .lrob-modal-*) */
+.lrob-terms-cols { display: flex; gap: 28px; flex-wrap: wrap; }
+.lrob-terms-section { flex: 1 1 280px; min-width: 0; }
+.lrob-terms-list {
+    list-style: none;
+    margin: 0 0 12px;
+    padding: 0;
+    max-height: 320px;
+    overflow-y: auto;
+    border: 1px solid var(--lm-border);
+    border-radius: 6px;
+}
+.lrob-terms-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border-top: 1px solid #f0f0f1;
+}
+.lrob-terms-row:first-child { border-top: 0; }
+.lrob-terms-color { width: 14px; height: 14px; border-radius: 3px; flex: none; border: 1px solid rgba(0,0,0,0.1); }
+.lrob-terms-name { flex: 1; min-width: 0; }
+.lrob-terms-count { color: var(--lm-muted); font-size: 12px; }
+.lrob-terms-row-actions { display: flex; gap: 4px; flex: none; }
+.lrob-terms-iconbtn {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 28px; height: 26px; padding: 0; min-height: 0; line-height: 0;
+}
+.lrob-terms-iconbtn .dashicons { font-size: 15px; width: 15px; height: 15px; line-height: 15px; margin: 0; }
+.lrob-terms-empty { padding: 10px; color: var(--lm-muted); font-style: italic; }
+.lrob-terms-add { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.lrob-terms-newname, .lrob-terms-editname { flex: 1; min-width: 110px; height: 30px; }
+.lrob-terms-newcolor, .lrob-terms-editcolor { width: 34px; height: 30px; padding: 0; flex: none; }
+
 @media (max-width: 600px) {
     .lrob-modal-overlay { padding: 0; }
     .lrob-modal { max-width: 100%; min-height: 100vh; max-height: 100vh; border-radius: 0; }

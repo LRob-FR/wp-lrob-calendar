@@ -27,6 +27,7 @@
     font-size: 23px;
     font-weight: 400;
 }
+.lrob-manage-header-actions { display: flex; gap: 8px; align-items: center; }
 
 /* Toolbar */
 .lrob-manage-toolbar {

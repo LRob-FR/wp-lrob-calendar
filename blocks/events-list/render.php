@@ -20,63 +20,47 @@ $style       = in_array($attributes['paginationStyle'] ?? 'arrows', ['arrows', '
     ? $attributes['paginationStyle']
     : 'arrows';
 
-// Resolve effective sort direction:
-//   - 'auto' picks ASC when hiding past (show soonest upcoming first)
-//     and DESC when showing past (most recent first, oldest at bottom).
-//   - Explicit 'ASC' / 'DESC' override the auto behavior.
-$order_attr = strtolower((string) ($attributes['order'] ?? 'auto'));
-if ($order_attr === 'asc' || $order_attr === 'desc') {
-    $effective_order = strtoupper($order_attr);
-} else {
-    $effective_order = $attributes['showPast'] ? 'DESC' : 'ASC';
-}
+// The list always fills with upcoming events (recurring expanded to their next
+// dates). Past events are an OPTIONAL, separately-capped addition so they can
+// never crowd out the upcoming ones — controlled by the "Show past events"
+// toggle and its count.
+$today         = (new DateTimeImmutable('today', wp_timezone()))->getTimestamp();
+$show_past     = !empty($attributes['showPast']);
+$past_limit    = $show_past ? max(0, (int) ($attributes['pastLimit'] ?? 1)) : 0;
+$max_per_event = max(1, (int) apply_filters('lrob_calendar_events_list_max_per_event', 3));
+// Order applies to the merged list: chronological (ASC) by default; 'desc' flips.
+$order_attr      = strtolower((string) ($attributes['order'] ?? 'auto'));
+$effective_order = ($order_attr === 'desc') ? 'DESC' : 'ASC';
 
-$base_args = [
-    'order' => $effective_order,
-];
-
-if (!$attributes['showPast']) {
-    // "Today's events" — events that have already ended today should still
-    // count as upcoming. Cutoff is midnight at the start of the site's local
-    // day, not the precise current second.
-    $base_args['start'] = (new DateTimeImmutable('today', wp_timezone()))->getTimestamp();
-}
+$common = [];
 if ($attributes['category']) {
-    $base_args['category'] = (int) $attributes['category'];
+    $common['category'] = (int) $attributes['category'];
 }
 if ($attributes['tag']) {
-    $base_args['tag'] = (int) $attributes['tag'];
+    $common['tag'] = (int) $attributes['tag'];
 }
 
+// Upcoming query (paginated). Cutoff is local midnight so events still running
+// today count as upcoming.
+$up_args = array_merge($common, ['start' => $today, 'order' => 'ASC']);
 if ($pagination) {
     $current_page = isset($_GET[LROB_CALENDAR_PAGE_PARAM]) ? max(1, (int) $_GET[LROB_CALENDAR_PAGE_PARAM]) : 1;
-    $total        = LRob_Calendar_Event::count_events($base_args);
+    $total        = LRob_Calendar_Event::count_events($up_args);
     $total_pages  = max(1, (int) ceil($total / $per_page));
     if ($current_page > $total_pages) {
         $current_page = $total_pages;
     }
-
-    $args = array_merge($base_args, [
-        'limit'  => $per_page,
-        'offset' => ($current_page - 1) * $per_page,
-    ]);
+    $up_args['limit']  = $per_page;
+    $up_args['offset'] = ($current_page - 1) * $per_page;
 } else {
-    $args = array_merge($base_args, ['limit' => $per_page]);
+    $current_page    = 1;
+    $up_args['limit'] = $per_page;
 }
 
-$events = LRob_Calendar_Event::get_events($args);
-
-// Expand recurring events into their upcoming occurrences so the list shows the
-// next dates, not the (often past) base date — capped per event so a daily or
-// never-ending recurrence can't flood the list. Skipped when showing past
-// events (the base rows are kept as-is then).
-$occ_cutoff    = isset($base_args['start']) ? (int) $base_args['start'] : null;
-$max_per_event = max(1, (int) apply_filters('lrob_calendar_events_list_max_per_event', 3));
-
 $list_items = [];
-foreach ($events as $event) {
-    if ($occ_cutoff !== null && $event->is_recurring()) {
-        $occurrences = $event->get_instances_in_range($occ_cutoff, null, $max_per_event);
+foreach (LRob_Calendar_Event::get_events($up_args) as $event) {
+    if ($event->is_recurring()) {
+        $occurrences = $event->get_instances_in_range($today, null, $max_per_event);
         if (!empty($occurrences)) {
             foreach ($occurrences as $occ) {
                 $list_items[] = ['event' => $event, 'start' => (int) $occ['start'], 'end' => (int) $occ['end']];
@@ -86,10 +70,28 @@ foreach ($events as $event) {
     }
     $list_items[] = ['event' => $event, 'start' => (int) $event->get('start'), 'end' => (int) $event->get('end')];
 }
+
+// Most-recent past events — extra rows that never displace the upcoming set.
+// First page only (they belong at the top of the list).
+if ($past_limit > 0 && $current_page === 1) {
+    $past_args = array_merge($common, ['end' => $today - 1, 'order' => 'DESC', 'limit' => $past_limit * 3 + 5]);
+    $past_items = [];
+    foreach (LRob_Calendar_Event::get_events($past_args) as $event) {
+        // Recurring events are covered by the upcoming set; keep only truly ended.
+        if ($event->is_recurring() || (int) $event->get('end') >= $today) {
+            continue;
+        }
+        $past_items[] = ['event' => $event, 'start' => (int) $event->get('start'), 'end' => (int) $event->get('end')];
+        if (count($past_items) >= $past_limit) {
+            break;
+        }
+    }
+    $list_items = array_merge($past_items, $list_items);
+}
+
 usort($list_items, static function ($a, $b) use ($effective_order) {
     return $effective_order === 'DESC' ? ($b['start'] <=> $a['start']) : ($a['start'] <=> $b['start']);
 });
-$list_items = array_slice($list_items, 0, $per_page);
 
 // "View details" popup mode requires the shared event-popup CSS + JS
 // module plus the events-list trigger script. The minimal template also

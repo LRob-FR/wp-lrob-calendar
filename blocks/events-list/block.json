@@ -14,6 +14,7 @@
         "category":        { "type": "number",  "default": 0 },
         "tag":             { "type": "number",  "default": 0 },
         "showPast":        { "type": "boolean", "default": true },
+        "pastLimit":       { "type": "number",  "default": 1 },
         "order":           { "type": "string",  "default": "auto" },
         "template":        { "type": "string",  "default": "list" },
         "showImages":      { "type": "boolean", "default": true },

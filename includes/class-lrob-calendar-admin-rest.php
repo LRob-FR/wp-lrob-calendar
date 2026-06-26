@@ -56,9 +56,29 @@ class LRob_Calendar_Admin_REST {
         ]);
 
         register_rest_route(self::NAMESPACE, '/admin/terms', [
-            'methods'             => WP_REST_Server::CREATABLE,
-            'callback'            => [$this, 'create_term'],
-            'permission_callback' => [$this, 'can_edit_events'],
+            [
+                'methods'             => WP_REST_Server::READABLE,
+                'callback'            => [$this, 'list_terms'],
+                'permission_callback' => [$this, 'can_edit_events'],
+            ],
+            [
+                'methods'             => WP_REST_Server::CREATABLE,
+                'callback'            => [$this, 'create_term'],
+                'permission_callback' => [$this, 'can_edit_events'],
+            ],
+        ]);
+
+        register_rest_route(self::NAMESPACE, '/admin/terms/(?P<id>\d+)', [
+            [
+                'methods'             => WP_REST_Server::EDITABLE,
+                'callback'            => [$this, 'update_term'],
+                'permission_callback' => [$this, 'can_edit_events'],
+            ],
+            [
+                'methods'             => WP_REST_Server::DELETABLE,
+                'callback'            => [$this, 'delete_term'],
+                'permission_callback' => [$this, 'can_edit_events'],
+            ],
         ]);
 
         register_rest_route(self::NAMESPACE, '/admin/events/(?P<id>\d+)/duplicate', [
@@ -415,22 +435,77 @@ class LRob_Calendar_Admin_REST {
 
     /* ── Quick term creation (categories/tags from the editor) ───────────── */
 
-    public function create_term(WP_REST_Request $request): WP_REST_Response {
-        $body   = $request->get_json_params() ?: $request->get_params();
-        $name   = sanitize_text_field($body['name'] ?? '');
-        $parent = (int) ($body['parent'] ?? 0);
-
-        // Accept both the short keys the editor uses ("category"/"tag") and the
-        // full taxonomy names.
+    /** Resolve "category"/"tag"/full names to a supported taxonomy, or '' if invalid. */
+    private function resolve_taxonomy($value): string {
         $map = [
             'category' => LRob_Calendar_Post_Types::TAX_CATEGORY,
             'tag'      => LRob_Calendar_Post_Types::TAX_TAG,
         ];
-        $taxonomy = sanitize_key($body['taxonomy'] ?? '');
-        $taxonomy = $map[$taxonomy] ?? $taxonomy;
-
+        $tax = sanitize_key((string) $value);
+        $tax = $map[$tax] ?? $tax;
         $allowed = [LRob_Calendar_Post_Types::TAX_CATEGORY, LRob_Calendar_Post_Types::TAX_TAG];
-        if (!in_array($taxonomy, $allowed, true)) {
+        return in_array($tax, $allowed, true) ? $tax : '';
+    }
+
+    private function serialize_term(WP_Term $term, string $taxonomy): array {
+        $row = [
+            'id'     => (int) $term->term_id,
+            'name'   => $term->name,
+            'slug'   => $term->slug,
+            'parent' => (int) $term->parent,
+            'count'  => (int) $term->count,
+        ];
+        if ($taxonomy === LRob_Calendar_Post_Types::TAX_CATEGORY) {
+            $row['color'] = $this->get_term_color((int) $term->term_id);
+        }
+        return $row;
+    }
+
+    private function get_term_color(int $term_id): string {
+        global $wpdb;
+        $table = LRob_Calendar_Database::get_category_meta_table();
+        $color = $wpdb->get_var($wpdb->prepare("SELECT color FROM {$table} WHERE term_id = %d", $term_id));
+        return $color ? (string) $color : '';
+    }
+
+    private function save_term_color(int $term_id, string $color): void {
+        global $wpdb;
+        $color = sanitize_hex_color($color) ?: '';
+        $table = LRob_Calendar_Database::get_category_meta_table();
+        $exists = $wpdb->get_var($wpdb->prepare("SELECT term_id FROM {$table} WHERE term_id = %d", $term_id));
+        if ($exists) {
+            $wpdb->update($table, ['color' => $color], ['term_id' => $term_id]);
+        } else {
+            $wpdb->insert($table, ['term_id' => $term_id, 'color' => $color, 'image' => '']);
+        }
+        if (method_exists('LRob_Calendar_Block_Helpers', 'invalidate_category_color')) {
+            LRob_Calendar_Block_Helpers::invalidate_category_color($term_id);
+        }
+    }
+
+    public function list_terms(WP_REST_Request $request): WP_REST_Response {
+        $taxonomy = $this->resolve_taxonomy($request->get_param('taxonomy'));
+        if (!$taxonomy) {
+            return new WP_REST_Response(['error' => 'invalid_taxonomy'], 400);
+        }
+        $terms = get_terms(['taxonomy' => $taxonomy, 'hide_empty' => false]);
+        if (is_wp_error($terms)) {
+            return new WP_REST_Response([]);
+        }
+        $out = [];
+        foreach ($terms as $term) {
+            $out[] = $this->serialize_term($term, $taxonomy);
+        }
+        return new WP_REST_Response($out);
+    }
+
+    public function create_term(WP_REST_Request $request): WP_REST_Response {
+        $body     = $request->get_json_params() ?: $request->get_params();
+        $taxonomy = $this->resolve_taxonomy($body['taxonomy'] ?? '');
+        $name     = sanitize_text_field($body['name'] ?? '');
+        $parent   = (int) ($body['parent'] ?? 0);
+
+        if (!$taxonomy) {
             return new WP_REST_Response(['error' => 'invalid_taxonomy'], 400);
         }
         if ($name === '') {
@@ -456,13 +531,61 @@ class LRob_Calendar_Admin_REST {
             }
         }
 
-        $term = get_term((int) $result['term_id'], $taxonomy);
-        return new WP_REST_Response([
-            'id'       => (int) $term->term_id,
-            'name'     => $term->name,
-            'parent'   => (int) $term->parent,
-            'taxonomy' => $taxonomy,
-        ], 201);
+        $term_id = (int) $result['term_id'];
+        if ($taxonomy === LRob_Calendar_Post_Types::TAX_CATEGORY && isset($body['color'])) {
+            $this->save_term_color($term_id, (string) $body['color']);
+        }
+
+        return new WP_REST_Response($this->serialize_term(get_term($term_id, $taxonomy), $taxonomy), 201);
+    }
+
+    public function update_term(WP_REST_Request $request): WP_REST_Response {
+        $term_id = (int) $request['id'];
+        $body    = $request->get_json_params() ?: $request->get_params();
+        $term    = get_term($term_id);
+        if (!$term || is_wp_error($term)) {
+            return new WP_REST_Response(['error' => 'not_found'], 404);
+        }
+        $taxonomy = $this->resolve_taxonomy($term->taxonomy);
+        if (!$taxonomy) {
+            return new WP_REST_Response(['error' => 'invalid_taxonomy'], 400);
+        }
+
+        $args = [];
+        if (array_key_exists('name', $body)) {
+            $args['name'] = sanitize_text_field($body['name']);
+        }
+        if (array_key_exists('parent', $body) && $taxonomy === LRob_Calendar_Post_Types::TAX_CATEGORY) {
+            $args['parent'] = (int) $body['parent'];
+        }
+        if (!empty($args)) {
+            $res = wp_update_term($term_id, $taxonomy, $args);
+            if (is_wp_error($res)) {
+                return new WP_REST_Response(['error' => $res->get_error_message()], 400);
+            }
+        }
+        if ($taxonomy === LRob_Calendar_Post_Types::TAX_CATEGORY && array_key_exists('color', $body)) {
+            $this->save_term_color($term_id, (string) $body['color']);
+        }
+
+        return new WP_REST_Response($this->serialize_term(get_term($term_id, $taxonomy), $taxonomy));
+    }
+
+    public function delete_term(WP_REST_Request $request): WP_REST_Response {
+        $term_id = (int) $request['id'];
+        $term    = get_term($term_id);
+        if (!$term || is_wp_error($term)) {
+            return new WP_REST_Response(['error' => 'not_found'], 404);
+        }
+        $taxonomy = $this->resolve_taxonomy($term->taxonomy);
+        if (!$taxonomy) {
+            return new WP_REST_Response(['error' => 'invalid_taxonomy'], 400);
+        }
+        $res = wp_delete_term($term_id, $taxonomy);
+        if (is_wp_error($res) || !$res) {
+            return new WP_REST_Response(['error' => 'delete_failed'], 400);
+        }
+        return new WP_REST_Response(['deleted' => true, 'id' => $term_id]);
     }
 
     /* ── Delete ──────────────────────────────────────────────────────────── */

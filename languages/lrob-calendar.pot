@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-06-25T15:47:51+00:00\n"
+"POT-Creation-Date: 2026-06-26T11:48:43+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: lrob-calendar\n"
@@ -41,35 +41,35 @@ msgstr ""
 msgid "View event"
 msgstr ""
 
-#: blocks/events-list/render.php:112
-#: admin/js/manage-events.js:232
+#: blocks/events-list/render.php:114
+#: admin/js/manage-events.js:237
 msgid "No events found."
 msgstr ""
 
-#: blocks/events-list/render.php:133
+#: blocks/events-list/render.php:135
 msgid "Events list pagination"
 msgstr ""
 
-#: blocks/events-list/render.php:138
+#: blocks/events-list/render.php:140
 msgid "Previous page"
 msgstr ""
 
 #. translators: 1: current page number, 2: total pages
-#: blocks/events-list/render.php:146
+#: blocks/events-list/render.php:148
 msgid "Page %1$d / %2$d"
 msgstr ""
 
-#: blocks/events-list/render.php:152
+#: blocks/events-list/render.php:154
 msgid "Next page"
 msgstr ""
 
-#: blocks/events-list/render.php:163
-#: admin/js/manage-events.js:210
+#: blocks/events-list/render.php:165
+#: admin/js/manage-events.js:215
 msgid "Previous"
 msgstr ""
 
-#: blocks/events-list/render.php:164
-#: admin/js/manage-events.js:215
+#: blocks/events-list/render.php:166
+#: admin/js/manage-events.js:220
 msgid "Next"
 msgstr ""
 
@@ -82,7 +82,7 @@ msgid "Event not found."
 msgstr ""
 
 #. translators: appended to a duplicated event's title
-#: includes/class-lrob-calendar-admin-rest.php:375
+#: includes/class-lrob-calendar-admin-rest.php:395
 msgid "(copy)"
 msgstr ""
 
@@ -354,7 +354,7 @@ msgid "Show whole image (natural aspect)"
 msgstr ""
 
 #: includes/class-lrob-calendar-admin.php:563
-#: blocks/events-list/edit.js:109
+#: blocks/events-list/edit.js:117
 #: blocks/single-event/edit.js:133
 msgid "Crop to fill"
 msgstr ""
@@ -440,7 +440,7 @@ msgstr ""
 #: includes/class-lrob-calendar-admin.php:887
 #: includes/class-lrob-calendar-meta-boxes.php:38
 #: admin/js/event-modal.js:390
-#: blocks/events-list/edit.js:137
+#: blocks/events-list/edit.js:145
 #: blocks/single-event/edit.js:150
 msgid "Location"
 msgstr ""
@@ -449,7 +449,7 @@ msgstr ""
 #: includes/class-lrob-calendar-block-helpers.php:552
 #: includes/class-lrob-calendar-blocks.php:214
 #: includes/class-lrob-calendar-blocks.php:270
-#: admin/js/manage-events.js:190
+#: admin/js/manage-events.js:195
 msgid "Recurring"
 msgstr ""
 
@@ -488,6 +488,8 @@ msgstr ""
 #: includes/class-lrob-calendar-blocks.php:210
 #: includes/class-lrob-calendar-blocks.php:259
 #: admin/js/event-modal.js:496
+#: admin/js/terms-manager.js:43
+#: admin/js/terms-manager.js:53
 msgid "Close"
 msgstr ""
 
@@ -672,45 +674,45 @@ msgstr ""
 msgid "Imported image(s) reference a private or localhost host (%s). They may not be reachable from your live site after migration."
 msgstr ""
 
-#: includes/class-lrob-calendar-manage-screen.php:92
+#: includes/class-lrob-calendar-manage-screen.php:97
 msgid "All Events (classic)"
 msgstr ""
 
-#: includes/class-lrob-calendar-manage-screen.php:106
-#: includes/class-lrob-calendar-manage-screen.php:107
+#: includes/class-lrob-calendar-manage-screen.php:118
+#: includes/class-lrob-calendar-manage-screen.php:119
 msgid "Manage Events"
 msgstr ""
 
-#: includes/class-lrob-calendar-manage-screen.php:172
+#: includes/class-lrob-calendar-manage-screen.php:193
 msgid "All statuses"
 msgstr ""
 
-#: includes/class-lrob-calendar-manage-screen.php:173
+#: includes/class-lrob-calendar-manage-screen.php:194
 #: admin/js/manage-events.js:89
 msgid "Published"
 msgstr ""
 
-#: includes/class-lrob-calendar-manage-screen.php:174
+#: includes/class-lrob-calendar-manage-screen.php:195
 #: admin/js/manage-events.js:90
 msgid "Draft"
 msgstr ""
 
-#: includes/class-lrob-calendar-manage-screen.php:175
+#: includes/class-lrob-calendar-manage-screen.php:196
 #: admin/js/manage-events.js:91
 msgid "Pending"
 msgstr ""
 
-#: includes/class-lrob-calendar-manage-screen.php:176
+#: includes/class-lrob-calendar-manage-screen.php:197
 #: admin/js/manage-events.js:92
 msgid "Scheduled"
 msgstr ""
 
-#: includes/class-lrob-calendar-manage-screen.php:177
+#: includes/class-lrob-calendar-manage-screen.php:198
 #: admin/js/manage-events.js:93
 msgid "Private"
 msgstr ""
 
-#: includes/class-lrob-calendar-manage-screen.php:208
+#: includes/class-lrob-calendar-manage-screen.php:229
 msgid "This screen requires JavaScript."
 msgstr ""
 
@@ -1055,6 +1057,7 @@ msgstr ""
 
 #: includes/class-lrob-calendar-post-types.php:107
 #: admin/js/event-modal.js:435
+#: admin/js/terms-manager.js:47
 msgid "Categories"
 msgstr ""
 
@@ -1094,6 +1097,7 @@ msgstr ""
 
 #: includes/class-lrob-calendar-post-types.php:134
 #: admin/js/event-modal.js:440
+#: admin/js/terms-manager.js:48
 msgid "Tags"
 msgstr ""
 
@@ -1293,10 +1297,12 @@ msgstr ""
 
 #: admin/js/event-modal.js:503
 #: admin/js/event-modal.js:719
+#: admin/js/terms-manager.js:194
 msgid "Cancel"
 msgstr ""
 
 #: admin/js/event-modal.js:504
+#: admin/js/terms-manager.js:193
 msgid "Save"
 msgstr ""
 
@@ -1317,6 +1323,8 @@ msgid "Please set a start date."
 msgstr ""
 
 #: admin/js/event-modal.js:680
+#: admin/js/terms-manager.js:156
+#: admin/js/terms-manager.js:206
 msgid "Saving…"
 msgstr ""
 
@@ -1325,6 +1333,7 @@ msgid "Could not save the event."
 msgstr ""
 
 #: admin/js/event-modal.js:706
+#: admin/js/terms-manager.js:140
 msgid "— No parent —"
 msgstr ""
 
@@ -1384,61 +1393,112 @@ msgstr ""
 msgid "Recently modified"
 msgstr ""
 
-#: admin/js/manage-events.js:148
+#: admin/js/manage-events.js:149
+#: admin/js/terms-manager.js:42
+msgid "Categories & tags"
+msgstr ""
+
+#: admin/js/manage-events.js:152
 msgid "+ New event"
 msgstr ""
 
-#: admin/js/manage-events.js:154
+#: admin/js/manage-events.js:159
 msgid "Search events…"
 msgstr ""
 
-#: admin/js/manage-events.js:156
+#: admin/js/manage-events.js:161
 msgid "Clear search"
 msgstr ""
 
-#: admin/js/manage-events.js:164
+#: admin/js/manage-events.js:169
 msgid "Show past events"
 msgstr ""
 
-#: admin/js/manage-events.js:189
+#: admin/js/manage-events.js:194
 msgid "(no title)"
 msgstr ""
 
-#: admin/js/manage-events.js:200
+#: admin/js/manage-events.js:205
+#: admin/js/terms-manager.js:125
 msgid "Edit"
 msgstr ""
 
-#: admin/js/manage-events.js:201
+#: admin/js/manage-events.js:206
 msgid "Duplicate"
 msgstr ""
 
-#: admin/js/manage-events.js:202
+#: admin/js/manage-events.js:207
 msgid "Move to trash"
 msgstr ""
 
-#: admin/js/manage-events.js:212
+#: admin/js/manage-events.js:217
 msgid "Page"
 msgstr ""
 
-#: admin/js/manage-events.js:213
-#: blocks/events-list/edit.js:182
+#: admin/js/manage-events.js:218
+#: blocks/events-list/edit.js:190
 msgid "events"
 msgstr ""
 
-#: admin/js/manage-events.js:237
+#: admin/js/manage-events.js:242
 msgid "Could not load events."
 msgstr ""
 
-#: admin/js/manage-events.js:326
+#: admin/js/manage-events.js:335
 msgid "Could not duplicate the event."
 msgstr ""
 
-#: admin/js/manage-events.js:329
+#: admin/js/manage-events.js:338
 msgid "Move this event to the trash?"
 msgstr ""
 
-#: admin/js/manage-events.js:335
+#: admin/js/manage-events.js:344
 msgid "Could not delete the event."
+msgstr ""
+
+#: admin/js/terms-manager.js:78
+msgid "New category"
+msgstr ""
+
+#: admin/js/terms-manager.js:78
+msgid "New tag"
+msgstr ""
+
+#: admin/js/terms-manager.js:80
+msgid "Add"
+msgstr ""
+
+#: admin/js/terms-manager.js:88
+msgid "Loading…"
+msgstr ""
+
+#: admin/js/terms-manager.js:98
+msgid "Could not load terms."
+msgstr ""
+
+#: admin/js/terms-manager.js:115
+msgid "None yet."
+msgstr ""
+
+#: admin/js/terms-manager.js:126
+msgid "Delete"
+msgstr ""
+
+#: admin/js/terms-manager.js:160
+#: admin/js/terms-manager.js:207
+msgid "Could not save."
+msgstr ""
+
+#: admin/js/terms-manager.js:173
+msgid "Delete this term? Events keep their other terms."
+msgstr ""
+
+#: admin/js/terms-manager.js:174
+msgid "Deleting…"
+msgstr ""
+
+#: admin/js/terms-manager.js:175
+msgid "Could not delete."
 msgstr ""
 
 #: blocks/calendar/edit.js:25
@@ -1558,156 +1618,164 @@ msgid "Show Past Events"
 msgstr ""
 
 #: blocks/events-list/edit.js:87
+msgid "Number of past events"
+msgstr ""
+
+#: blocks/events-list/edit.js:88
+msgid "Shown in addition to upcoming events, so they never push upcoming ones out."
+msgstr ""
+
+#: blocks/events-list/edit.js:95
 msgid "Display Options"
 msgstr ""
 
-#: blocks/events-list/edit.js:89
+#: blocks/events-list/edit.js:97
 msgid "Show Images"
 msgstr ""
 
-#: blocks/events-list/edit.js:94
+#: blocks/events-list/edit.js:102
 #: blocks/single-event/edit.js:118
 msgid "Image position"
 msgstr ""
 
-#: blocks/events-list/edit.js:97
+#: blocks/events-list/edit.js:105
 #: blocks/single-event/edit.js:121
 msgid "Right column"
 msgstr ""
 
-#: blocks/events-list/edit.js:98
+#: blocks/events-list/edit.js:106
 #: blocks/single-event/edit.js:122
 msgid "Left column"
 msgstr ""
 
-#: blocks/events-list/edit.js:99
+#: blocks/events-list/edit.js:107
 #: blocks/single-event/edit.js:123
 msgid "Below content (full width)"
 msgstr ""
 
-#: blocks/events-list/edit.js:101
+#: blocks/events-list/edit.js:109
 #: blocks/single-event/edit.js:125
 msgid "Vertical/portrait images look best in a side column. Wide/landscape images look best below the content."
 msgstr ""
 
-#: blocks/events-list/edit.js:105
+#: blocks/events-list/edit.js:113
 #: blocks/single-event/edit.js:129
 msgid "Image display"
 msgstr ""
 
-#: blocks/events-list/edit.js:108
+#: blocks/events-list/edit.js:116
 #: blocks/single-event/edit.js:132
 msgid "Show whole image"
 msgstr ""
 
-#: blocks/events-list/edit.js:114
+#: blocks/events-list/edit.js:122
 #: blocks/single-event/edit.js:138
 msgid "Image height"
 msgstr ""
 
-#: blocks/events-list/edit.js:117
+#: blocks/events-list/edit.js:125
 #: blocks/single-event/edit.js:141
 msgid "Small"
 msgstr ""
 
-#: blocks/events-list/edit.js:118
+#: blocks/events-list/edit.js:126
 #: blocks/single-event/edit.js:142
 msgid "Medium"
 msgstr ""
 
-#: blocks/events-list/edit.js:119
+#: blocks/events-list/edit.js:127
 #: blocks/single-event/edit.js:143
 msgid "Large"
 msgstr ""
 
-#: blocks/events-list/edit.js:120
+#: blocks/events-list/edit.js:128
 #: blocks/single-event/edit.js:144
 msgid "Natural"
 msgstr ""
 
-#: blocks/events-list/edit.js:122
+#: blocks/events-list/edit.js:130
 #: blocks/single-event/edit.js:146
 msgid "Natural fills the card width at the image's own aspect ratio."
 msgstr ""
 
-#: blocks/events-list/edit.js:126
+#: blocks/events-list/edit.js:134
 msgid "Event description"
 msgstr ""
 
-#: blocks/events-list/edit.js:129
+#: blocks/events-list/edit.js:137
 msgid "Show inline in each row"
 msgstr ""
 
-#: blocks/events-list/edit.js:130
+#: blocks/events-list/edit.js:138
 msgid "Hidden — show \"Details\" button (opens popup)"
 msgstr ""
 
-#: blocks/events-list/edit.js:131
-#: blocks/events-list/edit.js:142
-#: blocks/events-list/edit.js:153
+#: blocks/events-list/edit.js:139
+#: blocks/events-list/edit.js:150
+#: blocks/events-list/edit.js:161
 #: blocks/single-event/edit.js:155
 #: blocks/single-event/edit.js:165
 msgid "Don’t show"
 msgstr ""
 
-#: blocks/events-list/edit.js:133
+#: blocks/events-list/edit.js:141
 msgid "Inline puts the description in the row. The button mode opens the full event in a popup card on click."
 msgstr ""
 
-#: blocks/events-list/edit.js:140
+#: blocks/events-list/edit.js:148
 #: blocks/single-event/edit.js:153
 msgid "Full address (multi-line)"
 msgstr ""
 
-#: blocks/events-list/edit.js:141
+#: blocks/events-list/edit.js:149
 #: blocks/single-event/edit.js:154
 msgid "Compact (venue, city)"
 msgstr ""
 
-#: blocks/events-list/edit.js:144
+#: blocks/events-list/edit.js:152
 msgid "The popup always shows the full address; this only affects the row."
 msgstr ""
 
-#: blocks/events-list/edit.js:148
+#: blocks/events-list/edit.js:156
 #: blocks/single-event/edit.js:160
 msgid "Contact info"
 msgstr ""
 
-#: blocks/events-list/edit.js:151
+#: blocks/events-list/edit.js:159
 #: blocks/single-event/edit.js:163
 msgid "Name, email, phone, website"
 msgstr ""
 
-#: blocks/events-list/edit.js:152
+#: blocks/events-list/edit.js:160
 #: blocks/single-event/edit.js:164
 msgid "Name only"
 msgstr ""
 
-#: blocks/events-list/edit.js:155
+#: blocks/events-list/edit.js:163
 msgid "The popup always shows full contact info; this only affects the row."
 msgstr ""
 
-#: blocks/events-list/edit.js:159
+#: blocks/events-list/edit.js:167
 msgid "Show Categories"
 msgstr ""
 
-#: blocks/events-list/edit.js:164
+#: blocks/events-list/edit.js:172
 msgid "Filters"
 msgstr ""
 
-#: blocks/events-list/edit.js:166
+#: blocks/events-list/edit.js:174
 msgid "Category"
 msgstr ""
 
-#: blocks/events-list/edit.js:172
+#: blocks/events-list/edit.js:180
 msgid "Tag"
 msgstr ""
 
-#: blocks/events-list/edit.js:182
+#: blocks/events-list/edit.js:190
 msgid "Events List"
 msgstr ""
 
-#: blocks/events-list/edit.js:193
+#: blocks/events-list/edit.js:201
 msgid "more events"
 msgstr ""
 
