@@ -42,7 +42,9 @@ class LRob_Calendar_Post_Types {
             'public'              => $public,
             'publicly_queryable'  => $public,
             'show_ui'             => true,
-            'show_in_menu'        => true,
+            // No auto CPT menu — the plugin provides its own top-level "Calendar"
+            // menu (admin.php?page=lrob-calendar) via LRob_Calendar_Manage_Screen.
+            'show_in_menu'        => false,
             'show_in_rest'        => true,
             'query_var'           => $public,
             'rewrite'             => $public ? ['slug' => 'event', 'with_front' => false] : false,

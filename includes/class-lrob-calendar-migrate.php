@@ -59,6 +59,20 @@ class LRob_Calendar_Migrate {
     }
 
     /**
+     * Every supported migration source, present or not, so the UI can advertise
+     * the feature even when the source plugin isn't installed. `count` is null
+     * when the source plugin isn't detected on this site.
+     *
+     * @return array<int, array{key:string,label:string,count:int|null}>
+     */
+    public function get_all_sources(): array {
+        return [
+            ['key' => self::SOURCE_TEC,   'label' => 'The Events Calendar',       'count' => $this->tec_event_count()],
+            ['key' => self::SOURCE_AI1EC, 'label' => 'All-in-One Event Calendar', 'count' => $this->ai1ec_event_count()],
+        ];
+    }
+
+    /**
      * Build the canonical export array for a foreign source.
      *
      * @throws InvalidArgumentException When the source key is unknown.

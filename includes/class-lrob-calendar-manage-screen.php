@@ -15,16 +15,37 @@ if (!defined('ABSPATH')) {
 
 class LRob_Calendar_Manage_Screen {
 
-    const SLUG = 'lrob-calendar-manage';
+    const SLUG = 'lrob-calendar';
 
     public function __construct() {
-        add_action('admin_menu', [$this, 'add_menu_page']);
-        add_action('admin_menu', [$this, 'promote_in_menu'], 999);
+        // Priority 9 so the top-level menu exists before LRob_Calendar_Admin
+        // (priority 10) attaches the Import/Export + Settings submenus to it.
+        add_action('admin_menu', [$this, 'register_menu'], 9);
         add_action('admin_enqueue_scripts', [$this, 'enqueue_assets']);
-        // Make the custom screen the default landing for the Events menu.
+        // Stray landings on the classic CPT screens bounce to the custom screen.
         add_action('load-edit.php', [$this, 'maybe_redirect_to_manage']);
-        // "Add New" (classic) → the custom screen with the modal auto-opened.
         add_action('load-post-new.php', [$this, 'maybe_redirect_new']);
+    }
+
+    /**
+     * Top-level "Calendar" menu → the custom screen (admin.php?page=lrob-calendar).
+     * The auto-created first submenu is relabelled "Events".
+     */
+    public function register_menu(): void {
+        add_menu_page(
+            __('Calendar', 'lrob-calendar'),
+            __('Calendar', 'lrob-calendar'),
+            'edit_lrob_events',
+            self::SLUG,
+            [$this, 'render'],
+            'dashicons-calendar-alt',
+            26
+        );
+
+        global $submenu;
+        if (isset($submenu[self::SLUG][0][0])) {
+            $submenu[self::SLUG][0][0] = __('Events', 'lrob-calendar');
+        }
     }
 
     /**
@@ -42,14 +63,13 @@ class LRob_Calendar_Manage_Screen {
         if (isset($_GET['lrob_classic'])) {
             return;
         }
-        wp_safe_redirect(admin_url('edit.php?post_type=' . LRob_Calendar_Post_Types::POST_TYPE . '&page=' . self::SLUG . '&lrob_new=1'));
+        wp_safe_redirect(admin_url('admin.php?page=' . self::SLUG . '&lrob_new=1'));
         exit;
     }
 
     /**
-     * The Events top-level menu (and "All Events") both point at edit.php — the
-     * classic list. Redirect that bare landing to the custom screen so it becomes
-     * the default, while keeping the classic list reachable via an escape param.
+     * Bare landings on the classic event list bounce to the custom screen. The
+     * list stays reachable with ?lrob_classic=1 for power users.
      */
     public function maybe_redirect_to_manage(): void {
         if (!current_user_can('edit_lrob_events')) {
@@ -61,78 +81,18 @@ class LRob_Calendar_Manage_Screen {
         if (isset($_GET['lrob_classic'])) {
             return; // explicit classic-list request
         }
-        // Only the plain menu landing — never a filtered/searched/bulk view.
+        // Only the plain landing — never a filtered/searched/bulk view.
         $keys = array_keys($_GET);
         sort($keys);
         if ($keys !== ['post_type']) {
             return;
         }
-        wp_safe_redirect(admin_url('edit.php?post_type=' . LRob_Calendar_Post_Types::POST_TYPE . '&page=' . self::SLUG));
+        wp_safe_redirect(admin_url('admin.php?page=' . self::SLUG));
         exit;
     }
 
-    /**
-     * Reorder the Events submenu: "Manage Events" first, and rewrite the classic
-     * "All Events" link to carry the escape param so it survives the redirect.
-     */
-    public function promote_in_menu(): void {
-        global $submenu;
-        $parent = 'edit.php?post_type=' . LRob_Calendar_Post_Types::POST_TYPE;
-        if (empty($submenu[$parent])) {
-            return;
-        }
-
-        $manage_idx = null;
-        // Everything the custom screen replaces is dropped from the menu (the
-        // native pages stay reachable by direct URL). "Add New" goes too — the
-        // WordPress admin-bar "+ New" still creates events (it redirects into the
-        // custom screen's modal).
-        $remove_exact = [
-            $parent,                                                          // All Events (classic list)
-            'post-new.php?post_type=' . LRob_Calendar_Post_Types::POST_TYPE,  // Add New
-        ];
-        $remove_prefixes = [
-            'edit-tags.php?taxonomy=' . LRob_Calendar_Post_Types::TAX_CATEGORY,
-            'edit-tags.php?taxonomy=' . LRob_Calendar_Post_Types::TAX_TAG,
-        ];
-        foreach ($submenu[$parent] as $i => $item) {
-            $slug = $item[2] ?? '';
-            if ($slug === self::SLUG) {
-                $manage_idx = $i;
-                continue;
-            }
-            if (in_array($slug, $remove_exact, true)) {
-                unset($submenu[$parent][$i]);
-                continue;
-            }
-            foreach ($remove_prefixes as $prefix) {
-                if (strpos($slug, $prefix) === 0) {
-                    unset($submenu[$parent][$i]);
-                    break;
-                }
-            }
-        }
-
-        if ($manage_idx !== null) {
-            $item = $submenu[$parent][$manage_idx];
-            unset($submenu[$parent][$manage_idx]);
-            array_unshift($submenu[$parent], $item);
-        }
-    }
-
-    public function add_menu_page(): void {
-        add_submenu_page(
-            'edit.php?post_type=' . LRob_Calendar_Post_Types::POST_TYPE,
-            __('Manage Events', 'lrob-calendar'),
-            __('Manage Events', 'lrob-calendar'),
-            'edit_lrob_events',
-            self::SLUG,
-            [$this, 'render']
-        );
-    }
-
     private function is_screen(string $hook): bool {
-        return $hook === LRob_Calendar_Post_Types::POST_TYPE . '_page_' . self::SLUG;
+        return $hook === 'toplevel_page_' . self::SLUG;
     }
 
     public function enqueue_assets(string $hook): void {

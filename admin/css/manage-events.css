@@ -13,14 +13,15 @@
     margin-top: 12px;
 }
 
-/* Header */
+/* Header — title with the "+ New event" button beside it (WordPress style). */
 .lrob-manage-header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 16px;
+    flex-wrap: wrap;
+    gap: 4px 12px;
     margin-bottom: 16px;
 }
+.lrob-manage-new { flex: none; }
 .lrob-manage-title {
     margin: 0;
     padding: 0;

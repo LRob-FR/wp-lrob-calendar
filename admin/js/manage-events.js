@@ -143,7 +143,7 @@
 
         return '' +
             '<div class="lrob-manage-header">' +
-                '<h1 class="lrob-manage-title">' + esc(__('Events', 'lrob-calendar')) + (cfg.pageCredit || '') + '</h1>' +
+                '<h1 class="lrob-manage-title">' + esc(__('Calendar', 'lrob-calendar')) + (cfg.pageCredit || '') + '</h1>' +
                 '<button type="button" class="button button-primary lrob-manage-new" data-action="new">' +
                     esc(__('+ New event', 'lrob-calendar')) +
                 '</button>' +

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: LRob Calendar 1.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/lrob-calendar\n"
-"POT-Creation-Date: 2026-06-26T16:41:02+00:00\n"
+"POT-Creation-Date: 2026-06-26T21:33:35+00:00\n"
 "PO-Revision-Date: 2026-05-12 18:00+0200\n"
 "Last-Translator: Robin Labadie <claude@lrob.fr>\n"
 "Language-Team: French <claude@lrob.fr>\n"
@@ -88,129 +88,135 @@ msgstr "Événement introuvable."
 msgid "(copy)"
 msgstr "(copie)"
 
-#: includes/class-lrob-calendar-admin.php:41
-#: includes/class-lrob-calendar-admin.php:42
+#: includes/class-lrob-calendar-admin.php:43
+#: includes/class-lrob-calendar-admin.php:44
 msgid "Import / Export"
 msgstr "Import / Export"
 
-#: includes/class-lrob-calendar-admin.php:50
-#: includes/class-lrob-calendar-admin.php:51
+#: includes/class-lrob-calendar-admin.php:52
+#: includes/class-lrob-calendar-admin.php:53
 msgid "Settings"
 msgstr "Réglages"
 
-#: includes/class-lrob-calendar-admin.php:112
-#: includes/class-lrob-calendar-admin.php:799
-#: includes/class-lrob-calendar-admin.php:838
+#: includes/class-lrob-calendar-admin.php:116
+#: includes/class-lrob-calendar-admin.php:807
+#: includes/class-lrob-calendar-admin.php:846
 msgid "Select Image"
 msgstr "Sélectionner une image"
 
-#: includes/class-lrob-calendar-admin.php:113
+#: includes/class-lrob-calendar-admin.php:117
 msgid "Use this image"
 msgstr "Utiliser cette image"
 
-#: includes/class-lrob-calendar-admin.php:128
+#: includes/class-lrob-calendar-admin.php:132
 msgid "Export completed successfully."
 msgstr "Export terminé avec succès."
 
 #. translators: %d: number of events imported
-#: includes/class-lrob-calendar-admin.php:133
+#: includes/class-lrob-calendar-admin.php:137
 msgid "%d events imported successfully."
 msgstr "%d événements importés avec succès."
 
-#: includes/class-lrob-calendar-admin.php:136
+#: includes/class-lrob-calendar-admin.php:140
 msgid "Import failed. Please check your file format."
 msgstr "L'import a échoué. Veuillez vérifier le format de votre fichier."
 
-#: includes/class-lrob-calendar-admin.php:139
+#: includes/class-lrob-calendar-admin.php:143
 msgid ""
 "Migration export failed. The source plugin may be inactive or unsupported."
 msgstr ""
 "L'export de migration a échoué. Le plugin source est peut-être inactif ou "
 "non pris en charge."
 
-#: includes/class-lrob-calendar-admin.php:154
+#: includes/class-lrob-calendar-admin.php:158
 msgid "Import / Export Events"
 msgstr "Importer / Exporter des événements"
 
-#: includes/class-lrob-calendar-admin.php:160
+#: includes/class-lrob-calendar-admin.php:164
 msgid "Export"
 msgstr "Exporter"
 
-#: includes/class-lrob-calendar-admin.php:161
+#: includes/class-lrob-calendar-admin.php:165
 msgid "Export all events, categories and tags to a JSON file."
 msgstr ""
 "Exporter tous les événements, catégories et étiquettes vers un fichier JSON."
 
-#: includes/class-lrob-calendar-admin.php:167
+#: includes/class-lrob-calendar-admin.php:171
 msgid "Include recurring event instances"
 msgstr "Inclure les occurrences des événements récurrents"
 
-#: includes/class-lrob-calendar-admin.php:172
-#: includes/class-lrob-calendar-admin.php:250
+#: includes/class-lrob-calendar-admin.php:176
+#: includes/class-lrob-calendar-admin.php:258
 msgid "Export to JSON"
 msgstr "Exporter en JSON"
 
-#: includes/class-lrob-calendar-admin.php:179
+#: includes/class-lrob-calendar-admin.php:183
 msgid "Import"
 msgstr "Importer"
 
-#: includes/class-lrob-calendar-admin.php:180
+#: includes/class-lrob-calendar-admin.php:184
 msgid ""
-"Import events from a JSON file (LRob Calendar or All-in-One Event Calendar "
-"format)."
+"Import events from a JSON file — a LRob Calendar export, or an All-in-One "
+"Event Calendar export. To bring events over from The Events Calendar or All-"
+"in-One Event Calendar, use the migration box below first."
 msgstr ""
-"Importer des événements depuis un fichier JSON (format LRob Calendar ou All-"
-"in-One Event Calendar)."
+"Importer des événements depuis un fichier JSON — un export LRob Calendar, ou "
+"un export All-in-One Event Calendar. Pour récupérer les événements de The "
+"Events Calendar ou d'All-in-One Event Calendar, utilisez d'abord l'encart de "
+"migration ci-dessous."
 
-#: includes/class-lrob-calendar-admin.php:189
+#: includes/class-lrob-calendar-admin.php:193
 msgid "Skip existing events (match by title)"
 msgstr "Ignorer les événements existants (correspondance par titre)"
 
-#: includes/class-lrob-calendar-admin.php:194
+#: includes/class-lrob-calendar-admin.php:198
 msgid "Import from JSON"
 msgstr "Importer depuis JSON"
 
-#: includes/class-lrob-calendar-admin.php:233
+#: includes/class-lrob-calendar-admin.php:234
 msgid "Migrate from another plugin"
 msgstr "Migrer depuis un autre plugin"
 
-#: includes/class-lrob-calendar-admin.php:234
+#: includes/class-lrob-calendar-admin.php:235
 msgid ""
-"Detected event data from another calendar plugin. Export it to a JSON file, "
-"then import that file with the Import box above. The source plugin must stay "
-"active during the export."
+"Moving from another calendar plugin? Export its events to a JSON file, then "
+"import that file with the Import box above. The source plugin must be active "
+"on this site to export from it."
 msgstr ""
-"Des données d'événements provenant d'un autre plugin de calendrier ont été "
-"détectées. Exportez-les vers un fichier JSON, puis importez ce fichier avec "
-"l'encart Importer ci-dessus. Le plugin source doit rester actif pendant "
-"l'export."
+"Vous migrez depuis un autre plugin de calendrier ? Exportez ses événements "
+"vers un fichier JSON, puis importez ce fichier avec l'encart Importer ci-"
+"dessus. Le plugin source doit être actif sur ce site pour pouvoir en exporter."
+
+#: includes/class-lrob-calendar-admin.php:246
+msgid "Not detected on this site"
+msgstr "Non détecté sur ce site"
 
 #. translators: %d: number of events found
-#: includes/class-lrob-calendar-admin.php:242
+#: includes/class-lrob-calendar-admin.php:249
 msgid "%d event"
 msgid_plural "%d events"
 msgstr[0] "%d événement"
 msgstr[1] "%d événements"
 
-#: includes/class-lrob-calendar-admin.php:270
+#: includes/class-lrob-calendar-admin.php:278
 msgid "by"
 msgstr "par"
 
 #. translators: 1: plugin name with link to author, 2: version number
-#: includes/class-lrob-calendar-admin.php:282
+#: includes/class-lrob-calendar-admin.php:290
 msgid "%1$s — version %2$s"
 msgstr "%1$s — version %2$s"
 
-#: includes/class-lrob-calendar-admin.php:288
+#: includes/class-lrob-calendar-admin.php:296
 msgid "Source on GitHub"
 msgstr "Code source sur GitHub"
 
-#: includes/class-lrob-calendar-admin.php:290
+#: includes/class-lrob-calendar-admin.php:298
 msgid "Report an issue"
 msgstr "Signaler un problème"
 
 #. translators: %d: number of existing events
-#: includes/class-lrob-calendar-admin.php:310
+#: includes/class-lrob-calendar-admin.php:318
 msgid ""
 "There is already %d event in your calendar. Tick the confirmation box below "
 "and click \"Insert demo events\" again to add the demo events anyway."
@@ -227,62 +233,62 @@ msgstr[1] ""
 "pour les ajouter quand même."
 
 #. translators: %d: number of events created
-#: includes/class-lrob-calendar-admin.php:324
+#: includes/class-lrob-calendar-admin.php:332
 msgid "%d demo event inserted."
 msgid_plural "%d demo events inserted."
 msgstr[0] "%d événement de démo inséré."
 msgstr[1] "%d événements de démo insérés."
 
-#: includes/class-lrob-calendar-admin.php:394
+#: includes/class-lrob-calendar-admin.php:402
 msgid "Settings saved."
 msgstr "Réglages enregistrés."
 
-#: includes/class-lrob-calendar-admin.php:412
+#: includes/class-lrob-calendar-admin.php:420
 msgid "Sunday"
 msgstr "Dimanche"
 
-#: includes/class-lrob-calendar-admin.php:413
+#: includes/class-lrob-calendar-admin.php:421
 msgid "Monday"
 msgstr "Lundi"
 
-#: includes/class-lrob-calendar-admin.php:414
+#: includes/class-lrob-calendar-admin.php:422
 msgid "Saturday"
 msgstr "Samedi"
 
-#: includes/class-lrob-calendar-admin.php:419 blocks/calendar/edit.js:23
+#: includes/class-lrob-calendar-admin.php:427 blocks/calendar/edit.js:23
 msgid "Calendar Settings"
 msgstr "Réglages du calendrier"
 
-#: includes/class-lrob-calendar-admin.php:426
+#: includes/class-lrob-calendar-admin.php:434
 msgid "Default Timezone"
 msgstr "Fuseau horaire par défaut"
 
-#: includes/class-lrob-calendar-admin.php:431
+#: includes/class-lrob-calendar-admin.php:439
 msgid "Default timezone for new events."
 msgstr "Fuseau horaire par défaut pour les nouveaux événements."
 
-#: includes/class-lrob-calendar-admin.php:435
+#: includes/class-lrob-calendar-admin.php:443
 msgid "First day of the week"
 msgstr "Premier jour de la semaine"
 
 #. translators: %s: the auto-detected first day of the week (e.g. Sunday or Monday)
-#: includes/class-lrob-calendar-admin.php:442
+#: includes/class-lrob-calendar-admin.php:450
 msgid "Auto — follow site language (currently %s)"
 msgstr "Auto — selon la langue du site (actuellement %s)"
 
-#: includes/class-lrob-calendar-admin.php:451
+#: includes/class-lrob-calendar-admin.php:459
 msgid "Day shown in the first column of the calendar grid."
 msgstr "Jour affiché dans la première colonne de la grille du calendrier."
 
-#: includes/class-lrob-calendar-admin.php:455
+#: includes/class-lrob-calendar-admin.php:463
 msgid "Public event pages"
 msgstr "Pages publiques des événements"
 
-#: includes/class-lrob-calendar-admin.php:459
+#: includes/class-lrob-calendar-admin.php:467
 msgid "Disable dedicated pages for events and categories"
 msgstr "Désactiver les pages dédiées pour les événements et les catégories"
 
-#: includes/class-lrob-calendar-admin.php:462
+#: includes/class-lrob-calendar-admin.php:470
 msgid ""
 "When disabled, events and their taxonomies are only accessible through the "
 "calendar. Direct URLs return 404, and frontend links are stripped from "
@@ -292,15 +298,15 @@ msgstr ""
 "le calendrier. L'accès direct aux URL renvoie une erreur 404, et les liens "
 "sont retirés des blocs et de l'infobulle du calendrier."
 
-#: includes/class-lrob-calendar-admin.php:468
+#: includes/class-lrob-calendar-admin.php:476
 msgid "Maximum event age"
 msgstr "Ancienneté maximale des événements"
 
-#: includes/class-lrob-calendar-admin.php:473
+#: includes/class-lrob-calendar-admin.php:481
 msgid "months"
 msgstr "mois"
 
-#: includes/class-lrob-calendar-admin.php:475
+#: includes/class-lrob-calendar-admin.php:483
 msgid ""
 "Queries that don't set their own date range will ignore events older than "
 "this. Use 0 for no limit. Helps performance on sites with thousands of "
@@ -310,19 +316,19 @@ msgstr ""
 "événements plus anciens. Utilisez 0 pour ne pas limiter. Améliore les "
 "performances sur les sites comportant des milliers d'événements historiques."
 
-#: includes/class-lrob-calendar-admin.php:481
+#: includes/class-lrob-calendar-admin.php:489
 msgid "Recurrence limits"
 msgstr "Limites de récurrence"
 
-#: includes/class-lrob-calendar-admin.php:487
+#: includes/class-lrob-calendar-admin.php:495
 msgid "max instances per event"
 msgstr "occurrences max par événement"
 
-#: includes/class-lrob-calendar-admin.php:493
+#: includes/class-lrob-calendar-admin.php:501
 msgid "max years ahead"
 msgstr "années max à l'avance"
 
-#: includes/class-lrob-calendar-admin.php:496
+#: includes/class-lrob-calendar-admin.php:504
 msgid ""
 "Safety caps for recurring-event instance generation. Raise these for events "
 "that repeat daily over many years (default 500 / 5 = ~1.4 years of a daily "
@@ -332,11 +338,11 @@ msgstr ""
 "récurrents. À augmenter pour des événements quotidiens sur plusieurs années "
 "(500 / 5 par défaut = environ 1,4 an pour un événement quotidien)."
 
-#: includes/class-lrob-calendar-admin.php:502
+#: includes/class-lrob-calendar-admin.php:510
 msgid "Appearance"
 msgstr "Apparence"
 
-#: includes/class-lrob-calendar-admin.php:504
+#: includes/class-lrob-calendar-admin.php:512
 msgid ""
 "Brand colors used by the calendar, popup, event cards, and CTA buttons. "
 "Leave empty to use the defaults. Per-category colors are configured on each "
@@ -347,12 +353,12 @@ msgstr ""
 "par défaut. Les couleurs par catégorie se configurent sur chaque catégorie "
 "et ne sont pas affectées."
 
-#: includes/class-lrob-calendar-admin.php:508
-#: includes/class-lrob-calendar-admin.php:538
+#: includes/class-lrob-calendar-admin.php:516
+#: includes/class-lrob-calendar-admin.php:546
 msgid "Primary color"
 msgstr "Couleur principale"
 
-#: includes/class-lrob-calendar-admin.php:515
+#: includes/class-lrob-calendar-admin.php:523
 msgid ""
 "Used for CTA buttons, today indicator, active states, and accent links. "
 "Default: clean blue."
@@ -360,29 +366,29 @@ msgstr ""
 "Utilisée pour les boutons d'action, l'indicateur du jour, les états actifs "
 "et les liens d'accentuation. Par défaut : bleu sobre."
 
-#: includes/class-lrob-calendar-admin.php:520
+#: includes/class-lrob-calendar-admin.php:528
 msgid "Secondary color"
 msgstr "Couleur secondaire"
 
-#: includes/class-lrob-calendar-admin.php:527
+#: includes/class-lrob-calendar-admin.php:535
 msgid "Optional. Used sparingly for secondary accents. Default: neutral slate."
 msgstr ""
 "Optionnel. Utilisée avec parcimonie pour les accents secondaires. Par "
 "défaut : gris ardoise neutre."
 
-#: includes/class-lrob-calendar-admin.php:533
+#: includes/class-lrob-calendar-admin.php:541
 msgid "Date pill color (uncategorized events)"
 msgstr "Couleur de la date (événements sans catégorie)"
 
-#: includes/class-lrob-calendar-admin.php:537
+#: includes/class-lrob-calendar-admin.php:545
 msgid "Random per-event color"
 msgstr "Couleur aléatoire par événement"
 
-#: includes/class-lrob-calendar-admin.php:539
+#: includes/class-lrob-calendar-admin.php:547
 msgid "Use a specific color (below)"
 msgstr "Utiliser une couleur précise (ci-dessous)"
 
-#: includes/class-lrob-calendar-admin.php:542
+#: includes/class-lrob-calendar-admin.php:550
 msgid ""
 "Background tint and text color for the date block on events that have no "
 "category set. Events WITH a category always use that category color."
@@ -391,25 +397,25 @@ msgstr ""
 "catégorie. Les événements AVEC catégorie utilisent toujours la couleur de "
 "cette catégorie."
 
-#: includes/class-lrob-calendar-admin.php:547
+#: includes/class-lrob-calendar-admin.php:555
 msgid "Custom uncategorized color"
 msgstr "Couleur personnalisée"
 
-#: includes/class-lrob-calendar-admin.php:554
+#: includes/class-lrob-calendar-admin.php:562
 msgid "Only used when the mode above is set to “Use a specific color”."
 msgstr ""
 "Utilisée uniquement si le mode ci-dessus est « Utiliser une couleur "
 "précise »."
 
-#: includes/class-lrob-calendar-admin.php:559
+#: includes/class-lrob-calendar-admin.php:567
 msgid "Popup featured image"
 msgstr "Image à la une dans la fenêtre"
 
-#: includes/class-lrob-calendar-admin.php:563
+#: includes/class-lrob-calendar-admin.php:571
 msgid "Show the event's featured image in the popup card"
 msgstr "Afficher l'image à la une de l'événement dans la fenêtre"
 
-#: includes/class-lrob-calendar-admin.php:566
+#: includes/class-lrob-calendar-admin.php:574
 msgid ""
 "Applies to both the calendar popup and the events-list \"View details\" "
 "popup. Off = no image in the popup."
@@ -417,20 +423,20 @@ msgstr ""
 "S'applique à la fenêtre du calendrier et à la fenêtre « Voir les détails » "
 "de la liste d'événements. Désactivé = pas d'image dans la fenêtre."
 
-#: includes/class-lrob-calendar-admin.php:571
+#: includes/class-lrob-calendar-admin.php:579
 msgid "Popup image fit"
 msgstr "Ajustement de l'image dans la fenêtre"
 
-#: includes/class-lrob-calendar-admin.php:574
+#: includes/class-lrob-calendar-admin.php:582
 msgid "Show whole image (natural aspect)"
 msgstr "Afficher l'image entière (proportions d'origine)"
 
-#: includes/class-lrob-calendar-admin.php:575 blocks/events-list/edit.js:117
+#: includes/class-lrob-calendar-admin.php:583 blocks/events-list/edit.js:117
 #: blocks/single-event/edit.js:133
 msgid "Crop to fill"
 msgstr "Recadrer pour remplir"
 
-#: includes/class-lrob-calendar-admin.php:578
+#: includes/class-lrob-calendar-admin.php:586
 msgid ""
 "How images render inside the popup. \"Show whole image\" preserves the "
 "original aspect ratio."
@@ -438,15 +444,15 @@ msgstr ""
 "Comment les images s'affichent dans la fenêtre. « Afficher l'image entière » "
 "préserve les proportions d'origine."
 
-#: includes/class-lrob-calendar-admin.php:583
+#: includes/class-lrob-calendar-admin.php:591
 msgid "Branding"
 msgstr "Marquage"
 
-#: includes/class-lrob-calendar-admin.php:587
+#: includes/class-lrob-calendar-admin.php:595
 msgid "Show a small \"Calendar by LRob\" credit at the bottom of each block"
 msgstr "Afficher un petit crédit « Calendrier par LRob » en bas de chaque bloc"
 
-#: includes/class-lrob-calendar-admin.php:590
+#: includes/class-lrob-calendar-admin.php:598
 msgid ""
 "Helps spread the word about the plugin. Tiny, low-contrast, links to the "
 "LRob website. Disable freely if you prefer no attribution."
@@ -454,28 +460,28 @@ msgstr ""
 "Aide à faire connaître l'extension. Discret, peu contrasté, renvoie vers le "
 "site LRob. Décochez librement si vous préférez sans attribution."
 
-#: includes/class-lrob-calendar-admin.php:596
+#: includes/class-lrob-calendar-admin.php:604
 msgid "Other"
 msgstr "Autres"
 
-#: includes/class-lrob-calendar-admin.php:599
+#: includes/class-lrob-calendar-admin.php:607
 msgid "Date & Time Format"
 msgstr "Format de date et d'heure"
 
 #. translators: %1$s: opening anchor tag, %2$s: closing anchor tag
-#: includes/class-lrob-calendar-admin.php:605
+#: includes/class-lrob-calendar-admin.php:613
 msgid "Date and time formats follow your %1$sWordPress settings%2$s."
 msgstr "Les formats de date et d'heure suivent vos %1$sréglages WordPress%2$s."
 
-#: includes/class-lrob-calendar-admin.php:617
+#: includes/class-lrob-calendar-admin.php:625
 msgid "Save Settings"
 msgstr "Enregistrer les réglages"
 
-#: includes/class-lrob-calendar-admin.php:628
+#: includes/class-lrob-calendar-admin.php:636
 msgid "Demo events"
 msgstr "Événements de démo"
 
-#: includes/class-lrob-calendar-admin.php:630
+#: includes/class-lrob-calendar-admin.php:638
 msgid ""
 "Inserts a handful of sample events spread across the current and upcoming "
 "month. Useful for previewing the plugin's look on a fresh install, or for "
@@ -488,7 +494,7 @@ msgstr ""
 "« [DÉMO] » dans son titre et renvoie vers lrob.fr."
 
 #. translators: %d: existing event count
-#: includes/class-lrob-calendar-admin.php:641
+#: includes/class-lrob-calendar-admin.php:649
 msgid ""
 "I understand my calendar already contains %d event(s); add the demo events "
 "anyway."
@@ -496,16 +502,16 @@ msgstr ""
 "Je comprends que mon calendrier contient déjà %d événement(s) ; ajouter "
 "quand même les événements de démo."
 
-#: includes/class-lrob-calendar-admin.php:650
+#: includes/class-lrob-calendar-admin.php:658
 msgid "Insert demo events"
 msgstr "Insérer les événements de démo"
 
-#: includes/class-lrob-calendar-admin.php:670
+#: includes/class-lrob-calendar-admin.php:678
 msgid "GitHub"
 msgstr "GitHub"
 
 #. translators: %s: human-readable file size (e.g. "12 MB")
-#: includes/class-lrob-calendar-admin.php:758
+#: includes/class-lrob-calendar-admin.php:766
 msgid ""
 "Large import file (%s). If the page times out, increase your PHP "
 "memory_limit / max_execution_time."
@@ -513,32 +519,32 @@ msgstr ""
 "Fichier d'import volumineux (%s). Si la page expire, augmentez le "
 "memory_limit / max_execution_time de PHP."
 
-#: includes/class-lrob-calendar-admin.php:791
-#: includes/class-lrob-calendar-admin.php:823
+#: includes/class-lrob-calendar-admin.php:799
+#: includes/class-lrob-calendar-admin.php:831
 msgid "Color"
 msgstr "Couleur"
 
-#: includes/class-lrob-calendar-admin.php:795
-#: includes/class-lrob-calendar-admin.php:829
+#: includes/class-lrob-calendar-admin.php:803
+#: includes/class-lrob-calendar-admin.php:837
 msgid "Image"
 msgstr "Image"
 
-#: includes/class-lrob-calendar-admin.php:802
-#: includes/class-lrob-calendar-admin.php:841
+#: includes/class-lrob-calendar-admin.php:810
+#: includes/class-lrob-calendar-admin.php:849
 msgid "Remove Image"
 msgstr "Retirer l'image"
 
-#: includes/class-lrob-calendar-admin.php:898
+#: includes/class-lrob-calendar-admin.php:906
 msgid "Date"
 msgstr "Date"
 
-#: includes/class-lrob-calendar-admin.php:899
+#: includes/class-lrob-calendar-admin.php:907
 #: includes/class-lrob-calendar-meta-boxes.php:38 admin/js/event-modal.js:390
 #: blocks/events-list/edit.js:145 blocks/single-event/edit.js:150
 msgid "Location"
 msgstr "Lieu"
 
-#: includes/class-lrob-calendar-admin.php:922
+#: includes/class-lrob-calendar-admin.php:930
 #: includes/class-lrob-calendar-block-helpers.php:552
 #: includes/class-lrob-calendar-blocks.php:214
 #: includes/class-lrob-calendar-blocks.php:270 admin/js/manage-events.js:193
@@ -815,41 +821,47 @@ msgstr ""
 "(%s). Elles pourraient ne pas être accessibles depuis votre site en "
 "production après migration."
 
-#: includes/class-lrob-calendar-manage-screen.php:126
-#: includes/class-lrob-calendar-manage-screen.php:127
-msgid "Manage Events"
-msgstr "Gérer les événements"
+#: includes/class-lrob-calendar-manage-screen.php:36
+#: includes/class-lrob-calendar-manage-screen.php:37
+#: includes/class-lrob-calendar-post-types.php:25 admin/js/manage-events.js:146
+msgid "Calendar"
+msgstr "Calendrier"
 
-#: includes/class-lrob-calendar-manage-screen.php:202
+#: includes/class-lrob-calendar-manage-screen.php:47
+#: includes/class-lrob-calendar-post-types.php:23
+msgid "Events"
+msgstr "Événements"
+
+#: includes/class-lrob-calendar-manage-screen.php:162
 msgid "All statuses"
 msgstr "Tous les statuts"
 
-#: includes/class-lrob-calendar-manage-screen.php:203
+#: includes/class-lrob-calendar-manage-screen.php:163
 #: admin/js/manage-events.js:89
 msgid "Published"
 msgstr "Publié"
 
-#: includes/class-lrob-calendar-manage-screen.php:204
+#: includes/class-lrob-calendar-manage-screen.php:164
 #: admin/js/manage-events.js:90
 msgid "Draft"
 msgstr "Brouillon"
 
-#: includes/class-lrob-calendar-manage-screen.php:205
+#: includes/class-lrob-calendar-manage-screen.php:165
 #: admin/js/manage-events.js:91
 msgid "Pending"
 msgstr "En attente"
 
-#: includes/class-lrob-calendar-manage-screen.php:206
+#: includes/class-lrob-calendar-manage-screen.php:166
 #: admin/js/manage-events.js:92
 msgid "Scheduled"
 msgstr "Planifié"
 
-#: includes/class-lrob-calendar-manage-screen.php:207
+#: includes/class-lrob-calendar-manage-screen.php:167
 #: admin/js/manage-events.js:93
 msgid "Private"
 msgstr "Privé"
 
-#: includes/class-lrob-calendar-manage-screen.php:238
+#: includes/class-lrob-calendar-manage-screen.php:198
 msgid "This screen requires JavaScript."
 msgstr "Cet écran nécessite JavaScript."
 
@@ -1068,17 +1080,9 @@ msgstr "Événement gratuit"
 msgid "Ticket URL"
 msgstr "URL de billetterie"
 
-#: includes/class-lrob-calendar-post-types.php:23 admin/js/manage-events.js:146
-msgid "Events"
-msgstr "Événements"
-
 #: includes/class-lrob-calendar-post-types.php:24
 msgid "Event"
 msgstr "Événement"
-
-#: includes/class-lrob-calendar-post-types.php:25
-msgid "Calendar"
-msgstr "Calendrier"
 
 #: includes/class-lrob-calendar-post-types.php:26
 msgid "Add Event"
@@ -1117,86 +1121,86 @@ msgstr "Aucun événement dans la corbeille"
 msgid "All Events"
 msgstr "Tous les événements"
 
-#: includes/class-lrob-calendar-post-types.php:97
+#: includes/class-lrob-calendar-post-types.php:99
 msgid "Event Categories"
 msgstr "Catégories d'événements"
 
-#: includes/class-lrob-calendar-post-types.php:98
+#: includes/class-lrob-calendar-post-types.php:100
 msgid "Event Category"
 msgstr "Catégorie d'événement"
 
-#: includes/class-lrob-calendar-post-types.php:99
+#: includes/class-lrob-calendar-post-types.php:101
 msgid "Search Categories"
 msgstr "Rechercher des catégories"
 
-#: includes/class-lrob-calendar-post-types.php:100 blocks/calendar/edit.js:13
+#: includes/class-lrob-calendar-post-types.php:102 blocks/calendar/edit.js:13
 #: blocks/events-list/edit.js:13
 msgid "All Categories"
 msgstr "Toutes les catégories"
 
-#: includes/class-lrob-calendar-post-types.php:101
+#: includes/class-lrob-calendar-post-types.php:103
 msgid "Parent Category"
 msgstr "Catégorie parente"
 
-#: includes/class-lrob-calendar-post-types.php:102
+#: includes/class-lrob-calendar-post-types.php:104
 msgid "Parent Category:"
 msgstr "Catégorie parente :"
 
-#: includes/class-lrob-calendar-post-types.php:103
+#: includes/class-lrob-calendar-post-types.php:105
 msgid "Edit Category"
 msgstr "Modifier la catégorie"
 
-#: includes/class-lrob-calendar-post-types.php:104
+#: includes/class-lrob-calendar-post-types.php:106
 msgid "Update Category"
 msgstr "Mettre à jour la catégorie"
 
-#: includes/class-lrob-calendar-post-types.php:105
+#: includes/class-lrob-calendar-post-types.php:107
 msgid "Add New Category"
 msgstr "Ajouter une catégorie"
 
-#: includes/class-lrob-calendar-post-types.php:106
+#: includes/class-lrob-calendar-post-types.php:108
 msgid "New Category Name"
 msgstr "Nom de la nouvelle catégorie"
 
-#: includes/class-lrob-calendar-post-types.php:107 admin/js/event-modal.js:435
+#: includes/class-lrob-calendar-post-types.php:109 admin/js/event-modal.js:435
 #: admin/js/terms-manager.js:33
 msgid "Categories"
 msgstr "Catégories"
 
-#: includes/class-lrob-calendar-post-types.php:126
+#: includes/class-lrob-calendar-post-types.php:128
 msgid "Event Tags"
 msgstr "Étiquettes d'événements"
 
-#: includes/class-lrob-calendar-post-types.php:127
+#: includes/class-lrob-calendar-post-types.php:129
 msgid "Event Tag"
 msgstr "Étiquette d'événement"
 
-#: includes/class-lrob-calendar-post-types.php:128
+#: includes/class-lrob-calendar-post-types.php:130
 msgid "Search Tags"
 msgstr "Rechercher des étiquettes"
 
-#: includes/class-lrob-calendar-post-types.php:129 blocks/calendar/edit.js:14
+#: includes/class-lrob-calendar-post-types.php:131 blocks/calendar/edit.js:14
 #: blocks/events-list/edit.js:14
 msgid "All Tags"
 msgstr "Toutes les étiquettes"
 
-#: includes/class-lrob-calendar-post-types.php:130
+#: includes/class-lrob-calendar-post-types.php:132
 msgid "Edit Tag"
 msgstr "Modifier l'étiquette"
 
-#: includes/class-lrob-calendar-post-types.php:131
+#: includes/class-lrob-calendar-post-types.php:133
 msgid "Update Tag"
 msgstr "Mettre à jour l'étiquette"
 
-#: includes/class-lrob-calendar-post-types.php:132
+#: includes/class-lrob-calendar-post-types.php:134
 msgid "Add New Tag"
 msgstr "Ajouter une étiquette"
 
-#: includes/class-lrob-calendar-post-types.php:133
+#: includes/class-lrob-calendar-post-types.php:135
 msgid "New Tag Name"
 msgstr "Nom de la nouvelle étiquette"
 
-#: includes/class-lrob-calendar-post-types.php:134 admin/js/event-modal.js:440
+#: includes/class-lrob-calendar-post-types.php:136 admin/js/event-modal.js:440
 #: admin/js/terms-manager.js:34
 msgid "Tags"
 msgstr "Étiquettes"
@@ -1908,6 +1912,16 @@ msgstr "Compact"
 #: blocks/single-event/edit.js:185
 msgid "Select an event in the sidebar."
 msgstr "Sélectionnez un événement dans la barre latérale."
+
+#~ msgid ""
+#~ "Import events from a JSON file (LRob Calendar or All-in-One Event "
+#~ "Calendar format)."
+#~ msgstr ""
+#~ "Importer des événements depuis un fichier JSON (format LRob Calendar ou "
+#~ "All-in-One Event Calendar)."
+
+#~ msgid "Manage Events"
+#~ msgstr "Gérer les événements"
 
 #~ msgid "All Events (classic)"
 #~ msgstr "Tous les événements (classique)"

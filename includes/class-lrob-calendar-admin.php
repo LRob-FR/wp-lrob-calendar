@@ -36,17 +36,19 @@ class LRob_Calendar_Admin {
     }
     
     public function add_menu_pages(): void {
+        // Submenus of the plugin's top-level "Calendar" menu (registered at
+        // admin_menu priority 9 by LRob_Calendar_Manage_Screen).
         add_submenu_page(
-            'edit.php?post_type=' . LRob_Calendar_Post_Types::POST_TYPE,
+            LRob_Calendar_Manage_Screen::SLUG,
             __('Import / Export', 'lrob-calendar'),
             __('Import / Export', 'lrob-calendar'),
             'manage_options',
             'lrob-calendar-import-export',
             [$this, 'render_import_export_page']
         );
-        
+
         add_submenu_page(
-            'edit.php?post_type=' . LRob_Calendar_Post_Types::POST_TYPE,
+            LRob_Calendar_Manage_Screen::SLUG,
             __('Settings', 'lrob-calendar'),
             __('Settings', 'lrob-calendar'),
             'manage_options',
@@ -61,7 +63,9 @@ class LRob_Calendar_Admin {
         // The Appearance section on the Settings page also needs the WP
         // color picker. Hook name pattern for a submenu under the lrob_event
         // CPT: "{cpt}_page_{slug}".
-        $is_settings_page = ($hook === LRob_Calendar_Post_Types::POST_TYPE . '_page_lrob-calendar-settings');
+        // Robust against the menu-parent change: match on the page slug rather
+        // than the generated hook suffix.
+        $is_settings_page = ((($_GET['page'] ?? '') === 'lrob-calendar-settings'));
 
         // Load on event edit pages and category pages
         $is_event_page = ($post_type === LRob_Calendar_Post_Types::POST_TYPE);
@@ -177,7 +181,7 @@ class LRob_Calendar_Admin {
 
                 <div class="lrob-box">
                     <h2><?php esc_html_e('Import', 'lrob-calendar'); ?></h2>
-                    <p><?php esc_html_e('Import events from a JSON file (LRob Calendar or All-in-One Event Calendar format).', 'lrob-calendar'); ?></p>
+                    <p><?php esc_html_e('Import events from a JSON file — a LRob Calendar export, or an All-in-One Event Calendar export. To bring events over from The Events Calendar or All-in-One Event Calendar, use the migration box below first.', 'lrob-calendar'); ?></p>
                     <form method="post" action="" enctype="multipart/form-data">
                         <?php wp_nonce_field('lrob_calendar_import', 'lrob_import_nonce'); ?>
                         <p>
@@ -210,6 +214,7 @@ class LRob_Calendar_Admin {
             .lrob-migrate-source:first-of-type { border-top: 0; }
             .lrob-migrate-source .lrob-migrate-label { flex: 1; }
             .lrob-migrate-source .lrob-migrate-count { color: #646970; }
+            .lrob-migrate-source.is-absent { opacity: 0.55; }
         </style>
         <?php
         $this->render_credit_footer();
@@ -223,30 +228,33 @@ class LRob_Calendar_Admin {
      */
     private function render_migrate_section(): void {
         $migrate = new LRob_Calendar_Migrate();
-        $sources = $migrate->get_available_sources();
-
-        if (empty($sources)) {
-            return;
-        }
+        $sources = $migrate->get_all_sources();
         ?>
         <div class="lrob-box lrob-migrate-box">
             <h2><?php esc_html_e('Migrate from another plugin', 'lrob-calendar'); ?></h2>
-            <p><?php esc_html_e('Detected event data from another calendar plugin. Export it to a JSON file, then import that file with the Import box above. The source plugin must stay active during the export.', 'lrob-calendar'); ?></p>
-            <?php foreach ($sources as $source) : ?>
-                <div class="lrob-migrate-source">
+            <p><?php esc_html_e('Moving from another calendar plugin? Export its events to a JSON file, then import that file with the Import box above. The source plugin must be active on this site to export from it.', 'lrob-calendar'); ?></p>
+            <?php foreach ($sources as $source) :
+                $count    = $source['count'];           // null = source plugin not present
+                $detected = ($count !== null);
+                ?>
+                <div class="lrob-migrate-source<?php echo $detected ? '' : ' is-absent'; ?>">
                     <span class="lrob-migrate-label">
                         <strong><?php echo esc_html($source['label']); ?></strong>
                         <span class="lrob-migrate-count">
                             <?php
-                            /* translators: %d: number of events found */
-                            echo esc_html(sprintf(_n('%d event', '%d events', $source['count'], 'lrob-calendar'), $source['count']));
+                            if (!$detected) {
+                                esc_html_e('Not detected on this site', 'lrob-calendar');
+                            } else {
+                                /* translators: %d: number of events found */
+                                echo esc_html(sprintf(_n('%d event', '%d events', $count, 'lrob-calendar'), $count));
+                            }
                             ?>
                         </span>
                     </span>
                     <form method="post" action="">
                         <?php wp_nonce_field('lrob_calendar_migrate', 'lrob_migrate_nonce'); ?>
                         <input type="hidden" name="migrate_source" value="<?php echo esc_attr($source['key']); ?>">
-                        <button type="submit" name="lrob_migrate_export" class="button" <?php disabled($source['count'], 0); ?>>
+                        <button type="submit" name="lrob_migrate_export" class="button" <?php disabled(!$detected || $count < 1); ?>>
                             <?php esc_html_e('Export to JSON', 'lrob-calendar'); ?>
                         </button>
                     </form>
@@ -718,7 +726,7 @@ class LRob_Calendar_Admin {
         try {
             $data = $migrate->export($source);
         } catch (Exception $e) {
-            wp_redirect(add_query_arg('migrate_error', 1, admin_url('edit.php?post_type=' . LRob_Calendar_Post_Types::POST_TYPE . '&page=lrob-calendar-import-export')));
+            wp_redirect(add_query_arg('migrate_error', 1, admin_url('admin.php?page=lrob-calendar-import-export')));
             exit;
         }
 
@@ -743,7 +751,7 @@ class LRob_Calendar_Admin {
         }
         
         if (!isset($_FILES['import_file']) || $_FILES['import_file']['error'] !== UPLOAD_ERR_OK) {
-            wp_redirect(add_query_arg('import_error', 1, admin_url('edit.php?post_type=' . LRob_Calendar_Post_Types::POST_TYPE . '&page=lrob-calendar-import-export')));
+            wp_redirect(add_query_arg('import_error', 1, admin_url('admin.php?page=lrob-calendar-import-export')));
             exit;
         }
 
@@ -764,7 +772,7 @@ class LRob_Calendar_Admin {
         $data    = json_decode($content, true);
 
         if (!$data) {
-            wp_redirect(add_query_arg('import_error', 1, admin_url('edit.php?post_type=' . LRob_Calendar_Post_Types::POST_TYPE . '&page=lrob-calendar-import-export')));
+            wp_redirect(add_query_arg('import_error', 1, admin_url('admin.php?page=lrob-calendar-import-export')));
             exit;
         }
 
@@ -779,7 +787,7 @@ class LRob_Calendar_Admin {
             set_transient('lrob_calendar_import_warnings', $warnings, 60);
         }
 
-        wp_redirect(add_query_arg('imported', $count, admin_url('edit.php?post_type=' . LRob_Calendar_Post_Types::POST_TYPE . '&page=lrob-calendar-import-export')));
+        wp_redirect(add_query_arg('imported', $count, admin_url('admin.php?page=lrob-calendar-import-export')));
         exit;
     }
     
