@@ -57,7 +57,7 @@ class LRob_Calendar_Blocks {
      */
     public function register_assets(): void {
         $url = LROB_CALENDAR_URL;
-        $ver = LROB_CALENDAR_VERSION;
+        $ver = LRob_Calendar::asset_ver();
 
         // CSS — tokens are the root, every other stylesheet declares it as a dep.
         wp_register_style('lrob-calendar-tokens',           $url . 'assets/css/tokens.css',            [],                              $ver);

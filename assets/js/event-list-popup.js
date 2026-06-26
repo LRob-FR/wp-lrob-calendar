@@ -49,7 +49,7 @@
         }
         var idx = -1;
         for (var j = 0; j < sorted.length; j++) {
-            if (sorted[j].id === eventId) { idx = j; break; }
+            if (String(sorted[j].id) === String(eventId)) { idx = j; break; }
         }
         if (idx === -1) return { prev: null, next: null };
         return {
@@ -74,7 +74,7 @@
                 var triggers = wrapper.querySelectorAll('.lrob-event-details-btn[data-event]');
                 for (var i = 0; i < triggers.length; i++) {
                     var ev = parseEvent(triggers[i]);
-                    if (ev && ev.id === targetId) {
+                    if (ev && String(ev.id) === String(targetId)) {
                         var newSiblings = siblingsAroundId(triggers[i], targetId);
                         window.LRobEventPopup.navigateTo(container, ev, newSiblings, direction);
                         return;

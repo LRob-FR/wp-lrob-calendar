@@ -146,13 +146,13 @@ class LRob_Calendar_Manage_Screen {
             'lrob-calendar-manage',
             LROB_CALENDAR_URL . 'admin/css/manage-events.css',
             [],
-            LROB_CALENDAR_VERSION
+            LRob_Calendar::asset_ver()
         );
         wp_enqueue_style(
             'lrob-calendar-event-modal',
             LROB_CALENDAR_URL . 'admin/css/event-modal.css',
             ['lrob-calendar-manage'],
-            LROB_CALENDAR_VERSION
+            LRob_Calendar::asset_ver()
         );
 
         // The modal script loads first and carries the shared config global; the
@@ -161,7 +161,7 @@ class LRob_Calendar_Manage_Screen {
             'lrob-calendar-event-modal',
             LROB_CALENDAR_URL . 'admin/js/event-modal.js',
             ['wp-i18n'],
-            LROB_CALENDAR_VERSION,
+            LRob_Calendar::asset_ver(),
             true
         );
         wp_set_script_translations('lrob-calendar-event-modal', 'lrob-calendar', LROB_CALENDAR_PATH . 'languages');
@@ -170,7 +170,7 @@ class LRob_Calendar_Manage_Screen {
             'lrob-calendar-terms',
             LROB_CALENDAR_URL . 'admin/js/terms-manager.js',
             ['wp-i18n'],
-            LROB_CALENDAR_VERSION,
+            LRob_Calendar::asset_ver(),
             true
         );
         wp_set_script_translations('lrob-calendar-terms', 'lrob-calendar', LROB_CALENDAR_PATH . 'languages');
@@ -179,7 +179,7 @@ class LRob_Calendar_Manage_Screen {
             'lrob-calendar-manage',
             LROB_CALENDAR_URL . 'admin/js/manage-events.js',
             ['wp-i18n', 'lrob-calendar-event-modal', 'lrob-calendar-terms'],
-            LROB_CALENDAR_VERSION,
+            LRob_Calendar::asset_ver(),
             true
         );
         wp_set_script_translations('lrob-calendar-manage', 'lrob-calendar', LROB_CALENDAR_PATH . 'languages');

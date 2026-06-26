@@ -95,14 +95,14 @@ class LRob_Calendar_Admin {
             'lrob-calendar-admin',
             LROB_CALENDAR_URL . 'admin/css/lrob-calendar-admin.css',
             ['wp-color-picker'],
-            LROB_CALENDAR_VERSION
+            LRob_Calendar::asset_ver()
         );
-        
+
         wp_enqueue_script(
             'lrob-calendar-admin',
             LROB_CALENDAR_URL . 'admin/js/lrob-calendar-admin.js',
             ['jquery', 'jquery-ui-datepicker', 'wp-color-picker', 'wp-date', 'wp-i18n'],
-            LROB_CALENDAR_VERSION,
+            LRob_Calendar::asset_ver(),
             true
         );
 

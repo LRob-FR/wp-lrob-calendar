@@ -119,6 +119,41 @@ class LRob_Calendar {
     }
 
     /**
+     * Cache-busting version string for enqueued assets: the plugin version plus
+     * the most recent mtime across the plugin's CSS/JS. A changed file always
+     * gets a fresh URL — even between releases, so no manual version bump is
+     * needed to dodge browser/page caches. Computed once per request.
+     */
+    public static function asset_ver(): string {
+        static $ver = null;
+        if ($ver !== null) {
+            return $ver;
+        }
+        $latest = 0;
+        foreach (['assets', 'blocks', 'admin'] as $dir) {
+            $base = LROB_CALENDAR_PATH . $dir;
+            if (!is_dir($base)) {
+                continue;
+            }
+            try {
+                $it = new RecursiveIteratorIterator(
+                    new RecursiveDirectoryIterator($base, FilesystemIterator::SKIP_DOTS)
+                );
+                foreach ($it as $file) {
+                    $ext = strtolower($file->getExtension());
+                    if (($ext === 'css' || $ext === 'js') && $file->getMTime() > $latest) {
+                        $latest = $file->getMTime();
+                    }
+                }
+            } catch (Exception $e) {
+                // Filesystem hiccup — fall back to the plain version below.
+            }
+        }
+        $ver = $latest ? LROB_CALENDAR_VERSION . '.' . $latest : LROB_CALENDAR_VERSION;
+        return $ver;
+    }
+
+    /**
      * Effective first day of week (0 = Sunday … 6 = Saturday).
      *
      * Reads the `lrob_calendar_start_of_week` option. When set to 'auto' (default),
