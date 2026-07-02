@@ -119,6 +119,24 @@ class LRob_Calendar {
     }
 
     /**
+     * Resolve the effective colour mode for a block. A block's own attribute
+     * wins; 'inherit' (or empty) falls back to the site-wide setting. Returns one
+     * of 'auto' | 'light' | 'dark'.
+     */
+    public static function color_mode(?string $block_attr = null): string {
+        $mode = $block_attr ?: 'inherit';
+        if ($mode === 'inherit') {
+            $mode = (string) get_option('lrob_calendar_color_mode', 'auto');
+        }
+        return in_array($mode, ['auto', 'light', 'dark'], true) ? $mode : 'auto';
+    }
+
+    /** CSS class for a block wrapper, e.g. "lrob-theme-dark". */
+    public static function theme_class(?string $block_attr = null): string {
+        return 'lrob-theme-' . self::color_mode($block_attr);
+    }
+
+    /**
      * Cache-busting version string for enqueued assets: the plugin version plus
      * the most recent mtime across the plugin's CSS/JS. A changed file always
      * gets a fresh URL — even between releases, so no manual version bump is

@@ -19,7 +19,7 @@ if (!defined('ABSPATH')) {
 $calendar_id = 'lrob-calendar-' . uniqid();
 $link_text   = $attributes['linkText'] ?: __('View event', 'lrob-calendar');
 
-$wrapper_classes = ['wp-block-lrob-calendar-calendar'];
+$wrapper_classes = ['wp-block-lrob-calendar-calendar', LRob_Calendar::theme_class($attributes['colorMode'] ?? null)];
 if (!empty($attributes['align'])) {
     $wrapper_classes[] = 'align' . $attributes['align'];
 }

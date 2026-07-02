@@ -14,7 +14,8 @@
         "imageHeight":     { "type": "string", "default": "medium" },
         "imagePosition":   { "type": "string", "default": "right" },
         "locationDisplay": { "type": "string", "default": "full" },
-        "contactDisplay":  { "type": "string", "default": "full" }
+        "contactDisplay":  { "type": "string", "default": "full" },
+        "colorMode":       { "type": "string", "default": "inherit" }
     },
     "editorScript": "lrob-calendar-block-single-event-edit",
     "editorStyle":  "lrob-calendar-blocks-editor",

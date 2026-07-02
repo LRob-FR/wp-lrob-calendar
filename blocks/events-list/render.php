@@ -117,7 +117,7 @@ if ($needs_popup) {
 // for the minimal template, ignored otherwise).
 $attributes['enablePopup'] = $needs_popup;
 ?>
-<div class="lrob-cal-events-list-wrapper">
+<div class="lrob-cal-events-list-wrapper <?php echo esc_attr(LRob_Calendar::theme_class($attributes['colorMode'] ?? null)); ?>">
 <?php if (empty($list_items)): ?>
     <p class="lrob-no-events"><?php esc_html_e('No events found.', 'lrob-calendar'); ?></p>
 <?php else: ?>

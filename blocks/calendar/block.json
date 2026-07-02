@@ -14,9 +14,10 @@
         "view":     { "type": "string", "default": "month" },
         "category": { "type": "number", "default": 0 },
         "tag":      { "type": "number", "default": 0 },
-        "limit":    { "type": "number", "default": 0 },
-        "linkText": { "type": "string", "default": "" },
-        "align":    { "type": "string", "default": "" }
+        "limit":     { "type": "number", "default": 0 },
+        "linkText":  { "type": "string", "default": "" },
+        "colorMode": { "type": "string", "default": "inherit" },
+        "align":     { "type": "string", "default": "" }
     },
     "editorScript": "lrob-calendar-block-calendar-edit",
     "editorStyle":  "lrob-calendar-blocks-editor",

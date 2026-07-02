@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: LRob Calendar 1.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/lrob-calendar\n"
-"POT-Creation-Date: 2026-06-26T21:39:53+00:00\n"
+"POT-Creation-Date: 2026-07-02T13:29:30+00:00\n"
 "PO-Revision-Date: 2026-05-12 18:00+0200\n"
 "Last-Translator: Robin Labadie <claude@lrob.fr>\n"
 "Language-Team: French <claude@lrob.fr>\n"
@@ -99,8 +99,8 @@ msgid "Settings"
 msgstr "Réglages"
 
 #: includes/class-lrob-calendar-admin.php:116
-#: includes/class-lrob-calendar-admin.php:807
-#: includes/class-lrob-calendar-admin.php:846
+#: includes/class-lrob-calendar-admin.php:828
+#: includes/class-lrob-calendar-admin.php:867
 msgid "Select Image"
 msgstr "Sélectionner une image"
 
@@ -240,56 +240,56 @@ msgid_plural "%d demo events inserted."
 msgstr[0] "%d événement de démo inséré."
 msgstr[1] "%d événements de démo insérés."
 
-#: includes/class-lrob-calendar-admin.php:402
+#: includes/class-lrob-calendar-admin.php:409
 msgid "Settings saved."
 msgstr "Réglages enregistrés."
 
-#: includes/class-lrob-calendar-admin.php:420
+#: includes/class-lrob-calendar-admin.php:428
 msgid "Sunday"
 msgstr "Dimanche"
 
-#: includes/class-lrob-calendar-admin.php:421
+#: includes/class-lrob-calendar-admin.php:429
 msgid "Monday"
 msgstr "Lundi"
 
-#: includes/class-lrob-calendar-admin.php:422
+#: includes/class-lrob-calendar-admin.php:430
 msgid "Saturday"
 msgstr "Samedi"
 
-#: includes/class-lrob-calendar-admin.php:427 blocks/calendar/edit.js:23
+#: includes/class-lrob-calendar-admin.php:435 blocks/calendar/edit.js:23
 msgid "Calendar Settings"
 msgstr "Réglages du calendrier"
 
-#: includes/class-lrob-calendar-admin.php:434
+#: includes/class-lrob-calendar-admin.php:442
 msgid "Default Timezone"
 msgstr "Fuseau horaire par défaut"
 
-#: includes/class-lrob-calendar-admin.php:439
+#: includes/class-lrob-calendar-admin.php:447
 msgid "Default timezone for new events."
 msgstr "Fuseau horaire par défaut pour les nouveaux événements."
 
-#: includes/class-lrob-calendar-admin.php:443
+#: includes/class-lrob-calendar-admin.php:451
 msgid "First day of the week"
 msgstr "Premier jour de la semaine"
 
 #. translators: %s: the auto-detected first day of the week (e.g. Sunday or Monday)
-#: includes/class-lrob-calendar-admin.php:450
+#: includes/class-lrob-calendar-admin.php:458
 msgid "Auto — follow site language (currently %s)"
 msgstr "Auto — selon la langue du site (actuellement %s)"
 
-#: includes/class-lrob-calendar-admin.php:459
+#: includes/class-lrob-calendar-admin.php:467
 msgid "Day shown in the first column of the calendar grid."
 msgstr "Jour affiché dans la première colonne de la grille du calendrier."
 
-#: includes/class-lrob-calendar-admin.php:463
+#: includes/class-lrob-calendar-admin.php:471
 msgid "Public event pages"
 msgstr "Pages publiques des événements"
 
-#: includes/class-lrob-calendar-admin.php:467
+#: includes/class-lrob-calendar-admin.php:475
 msgid "Disable dedicated pages for events and categories"
 msgstr "Désactiver les pages dédiées pour les événements et les catégories"
 
-#: includes/class-lrob-calendar-admin.php:470
+#: includes/class-lrob-calendar-admin.php:478
 msgid ""
 "When disabled, events and their taxonomies are only accessible through the "
 "calendar. Direct URLs return 404, and frontend links are stripped from "
@@ -299,15 +299,15 @@ msgstr ""
 "le calendrier. L'accès direct aux URL renvoie une erreur 404, et les liens "
 "sont retirés des blocs et de l'infobulle du calendrier."
 
-#: includes/class-lrob-calendar-admin.php:476
+#: includes/class-lrob-calendar-admin.php:484
 msgid "Maximum event age"
 msgstr "Ancienneté maximale des événements"
 
-#: includes/class-lrob-calendar-admin.php:481
+#: includes/class-lrob-calendar-admin.php:489
 msgid "months"
 msgstr "mois"
 
-#: includes/class-lrob-calendar-admin.php:483
+#: includes/class-lrob-calendar-admin.php:491
 msgid ""
 "Queries that don't set their own date range will ignore events older than "
 "this. Use 0 for no limit. Helps performance on sites with thousands of "
@@ -317,19 +317,19 @@ msgstr ""
 "événements plus anciens. Utilisez 0 pour ne pas limiter. Améliore les "
 "performances sur les sites comportant des milliers d'événements historiques."
 
-#: includes/class-lrob-calendar-admin.php:489
+#: includes/class-lrob-calendar-admin.php:497
 msgid "Recurrence limits"
 msgstr "Limites de récurrence"
 
-#: includes/class-lrob-calendar-admin.php:495
+#: includes/class-lrob-calendar-admin.php:503
 msgid "max instances per event"
 msgstr "occurrences max par événement"
 
-#: includes/class-lrob-calendar-admin.php:501
+#: includes/class-lrob-calendar-admin.php:509
 msgid "max years ahead"
 msgstr "années max à l'avance"
 
-#: includes/class-lrob-calendar-admin.php:504
+#: includes/class-lrob-calendar-admin.php:512
 msgid ""
 "Safety caps for recurring-event instance generation. Raise these for events "
 "that repeat daily over many years (default 500 / 5 = ~1.4 years of a daily "
@@ -339,11 +339,12 @@ msgstr ""
 "récurrents. À augmenter pour des événements quotidiens sur plusieurs années "
 "(500 / 5 par défaut = environ 1,4 an pour un événement quotidien)."
 
-#: includes/class-lrob-calendar-admin.php:510
+#: includes/class-lrob-calendar-admin.php:518 blocks/calendar/edit.js:66
+#: blocks/events-list/edit.js:95 blocks/single-event/edit.js:170
 msgid "Appearance"
 msgstr "Apparence"
 
-#: includes/class-lrob-calendar-admin.php:512
+#: includes/class-lrob-calendar-admin.php:520
 msgid ""
 "Brand colors used by the calendar, popup, event cards, and CTA buttons. "
 "Leave empty to use the defaults. Per-category colors are configured on each "
@@ -354,12 +355,40 @@ msgstr ""
 "par défaut. Les couleurs par catégorie se configurent sur chaque catégorie "
 "et ne sont pas affectées."
 
-#: includes/class-lrob-calendar-admin.php:516
-#: includes/class-lrob-calendar-admin.php:546
+#: includes/class-lrob-calendar-admin.php:524
+msgid "Color mode"
+msgstr "Mode de couleur"
+
+#: includes/class-lrob-calendar-admin.php:527
+msgid "Auto — follow the theme (light or dark)"
+msgstr "Auto — suit le thème (clair ou sombre)"
+
+#: includes/class-lrob-calendar-admin.php:528 blocks/calendar/edit.js:71
+#: blocks/events-list/edit.js:100 blocks/single-event/edit.js:175
+msgid "Light"
+msgstr "Clair"
+
+#: includes/class-lrob-calendar-admin.php:529 blocks/calendar/edit.js:72
+#: blocks/events-list/edit.js:101 blocks/single-event/edit.js:176
+msgid "Dark"
+msgstr "Sombre"
+
+#: includes/class-lrob-calendar-admin.php:532
+msgid ""
+"Site-wide default. \"Auto\" blends into your theme (inherits its text "
+"colour, transparent surfaces). Each block can override this in its "
+"Appearance setting."
+msgstr ""
+"Défaut du site. « Auto » s'adapte à votre thème (hérite de sa couleur de "
+"texte, surfaces transparentes). Chaque bloc peut surcharger ce choix dans son "
+"réglage Apparence."
+
+#: includes/class-lrob-calendar-admin.php:537
+#: includes/class-lrob-calendar-admin.php:567
 msgid "Primary color"
 msgstr "Couleur principale"
 
-#: includes/class-lrob-calendar-admin.php:523
+#: includes/class-lrob-calendar-admin.php:544
 msgid ""
 "Used for CTA buttons, today indicator, active states, and accent links. "
 "Default: clean blue."
@@ -367,29 +396,29 @@ msgstr ""
 "Utilisée pour les boutons d'action, l'indicateur du jour, les états actifs "
 "et les liens d'accentuation. Par défaut : bleu sobre."
 
-#: includes/class-lrob-calendar-admin.php:528
+#: includes/class-lrob-calendar-admin.php:549
 msgid "Secondary color"
 msgstr "Couleur secondaire"
 
-#: includes/class-lrob-calendar-admin.php:535
+#: includes/class-lrob-calendar-admin.php:556
 msgid "Optional. Used sparingly for secondary accents. Default: neutral slate."
 msgstr ""
 "Optionnel. Utilisée avec parcimonie pour les accents secondaires. Par "
 "défaut : gris ardoise neutre."
 
-#: includes/class-lrob-calendar-admin.php:541
+#: includes/class-lrob-calendar-admin.php:562
 msgid "Date pill color (uncategorized events)"
 msgstr "Couleur de la date (événements sans catégorie)"
 
-#: includes/class-lrob-calendar-admin.php:545
+#: includes/class-lrob-calendar-admin.php:566
 msgid "Random per-event color"
 msgstr "Couleur aléatoire par événement"
 
-#: includes/class-lrob-calendar-admin.php:547
+#: includes/class-lrob-calendar-admin.php:568
 msgid "Use a specific color (below)"
 msgstr "Utiliser une couleur précise (ci-dessous)"
 
-#: includes/class-lrob-calendar-admin.php:550
+#: includes/class-lrob-calendar-admin.php:571
 msgid ""
 "Background tint and text color for the date block on events that have no "
 "category set. Events WITH a category always use that category color."
@@ -398,25 +427,25 @@ msgstr ""
 "catégorie. Les événements AVEC catégorie utilisent toujours la couleur de "
 "cette catégorie."
 
-#: includes/class-lrob-calendar-admin.php:555
+#: includes/class-lrob-calendar-admin.php:576
 msgid "Custom uncategorized color"
 msgstr "Couleur personnalisée"
 
-#: includes/class-lrob-calendar-admin.php:562
+#: includes/class-lrob-calendar-admin.php:583
 msgid "Only used when the mode above is set to “Use a specific color”."
 msgstr ""
 "Utilisée uniquement si le mode ci-dessus est « Utiliser une couleur "
 "précise »."
 
-#: includes/class-lrob-calendar-admin.php:567
+#: includes/class-lrob-calendar-admin.php:588
 msgid "Popup featured image"
 msgstr "Image à la une dans la fenêtre"
 
-#: includes/class-lrob-calendar-admin.php:571
+#: includes/class-lrob-calendar-admin.php:592
 msgid "Show the event's featured image in the popup card"
 msgstr "Afficher l'image à la une de l'événement dans la fenêtre"
 
-#: includes/class-lrob-calendar-admin.php:574
+#: includes/class-lrob-calendar-admin.php:595
 msgid ""
 "Applies to both the calendar popup and the events-list \"View details\" "
 "popup. Off = no image in the popup."
@@ -424,20 +453,20 @@ msgstr ""
 "S'applique à la fenêtre du calendrier et à la fenêtre « Voir les détails » "
 "de la liste d'événements. Désactivé = pas d'image dans la fenêtre."
 
-#: includes/class-lrob-calendar-admin.php:579
+#: includes/class-lrob-calendar-admin.php:600
 msgid "Popup image fit"
 msgstr "Ajustement de l'image dans la fenêtre"
 
-#: includes/class-lrob-calendar-admin.php:582
+#: includes/class-lrob-calendar-admin.php:603
 msgid "Show whole image (natural aspect)"
 msgstr "Afficher l'image entière (proportions d'origine)"
 
-#: includes/class-lrob-calendar-admin.php:583 blocks/events-list/edit.js:117
+#: includes/class-lrob-calendar-admin.php:604 blocks/events-list/edit.js:128
 #: blocks/single-event/edit.js:133
 msgid "Crop to fill"
 msgstr "Recadrer pour remplir"
 
-#: includes/class-lrob-calendar-admin.php:586
+#: includes/class-lrob-calendar-admin.php:607
 msgid ""
 "How images render inside the popup. \"Show whole image\" preserves the "
 "original aspect ratio."
@@ -445,15 +474,15 @@ msgstr ""
 "Comment les images s'affichent dans la fenêtre. « Afficher l'image entière » "
 "préserve les proportions d'origine."
 
-#: includes/class-lrob-calendar-admin.php:591
+#: includes/class-lrob-calendar-admin.php:612
 msgid "Branding"
 msgstr "Marquage"
 
-#: includes/class-lrob-calendar-admin.php:595
+#: includes/class-lrob-calendar-admin.php:616
 msgid "Show a small \"Calendar by LRob\" credit at the bottom of each block"
 msgstr "Afficher un petit crédit « Calendrier par LRob » en bas de chaque bloc"
 
-#: includes/class-lrob-calendar-admin.php:598
+#: includes/class-lrob-calendar-admin.php:619
 msgid ""
 "Helps spread the word about the plugin. Tiny, low-contrast, links to the "
 "LRob website. Disable freely if you prefer no attribution."
@@ -461,28 +490,28 @@ msgstr ""
 "Aide à faire connaître l'extension. Discret, peu contrasté, renvoie vers le "
 "site LRob. Décochez librement si vous préférez sans attribution."
 
-#: includes/class-lrob-calendar-admin.php:604
+#: includes/class-lrob-calendar-admin.php:625
 msgid "Other"
 msgstr "Autres"
 
-#: includes/class-lrob-calendar-admin.php:607
+#: includes/class-lrob-calendar-admin.php:628
 msgid "Date & Time Format"
 msgstr "Format de date et d'heure"
 
 #. translators: %1$s: opening anchor tag, %2$s: closing anchor tag
-#: includes/class-lrob-calendar-admin.php:613
+#: includes/class-lrob-calendar-admin.php:634
 msgid "Date and time formats follow your %1$sWordPress settings%2$s."
 msgstr "Les formats de date et d'heure suivent vos %1$sréglages WordPress%2$s."
 
-#: includes/class-lrob-calendar-admin.php:625
+#: includes/class-lrob-calendar-admin.php:646
 msgid "Save Settings"
 msgstr "Enregistrer les réglages"
 
-#: includes/class-lrob-calendar-admin.php:636
+#: includes/class-lrob-calendar-admin.php:657
 msgid "Demo events"
 msgstr "Événements de démo"
 
-#: includes/class-lrob-calendar-admin.php:638
+#: includes/class-lrob-calendar-admin.php:659
 msgid ""
 "Inserts a handful of sample events spread across the current and upcoming "
 "month. Useful for previewing the plugin's look on a fresh install, or for "
@@ -495,7 +524,7 @@ msgstr ""
 "« [DÉMO] » dans son titre et renvoie vers lrob.fr."
 
 #. translators: %d: existing event count
-#: includes/class-lrob-calendar-admin.php:649
+#: includes/class-lrob-calendar-admin.php:670
 msgid ""
 "I understand my calendar already contains %d event(s); add the demo events "
 "anyway."
@@ -503,16 +532,16 @@ msgstr ""
 "Je comprends que mon calendrier contient déjà %d événement(s) ; ajouter "
 "quand même les événements de démo."
 
-#: includes/class-lrob-calendar-admin.php:658
+#: includes/class-lrob-calendar-admin.php:679
 msgid "Insert demo events"
 msgstr "Insérer les événements de démo"
 
-#: includes/class-lrob-calendar-admin.php:678
+#: includes/class-lrob-calendar-admin.php:699
 msgid "GitHub"
 msgstr "GitHub"
 
 #. translators: %s: human-readable file size (e.g. "12 MB")
-#: includes/class-lrob-calendar-admin.php:766
+#: includes/class-lrob-calendar-admin.php:787
 msgid ""
 "Large import file (%s). If the page times out, increase your PHP "
 "memory_limit / max_execution_time."
@@ -520,32 +549,32 @@ msgstr ""
 "Fichier d'import volumineux (%s). Si la page expire, augmentez le "
 "memory_limit / max_execution_time de PHP."
 
-#: includes/class-lrob-calendar-admin.php:799
-#: includes/class-lrob-calendar-admin.php:831
+#: includes/class-lrob-calendar-admin.php:820
+#: includes/class-lrob-calendar-admin.php:852
 msgid "Color"
 msgstr "Couleur"
 
-#: includes/class-lrob-calendar-admin.php:803
-#: includes/class-lrob-calendar-admin.php:837
+#: includes/class-lrob-calendar-admin.php:824
+#: includes/class-lrob-calendar-admin.php:858
 msgid "Image"
 msgstr "Image"
 
-#: includes/class-lrob-calendar-admin.php:810
-#: includes/class-lrob-calendar-admin.php:849
+#: includes/class-lrob-calendar-admin.php:831
+#: includes/class-lrob-calendar-admin.php:870
 msgid "Remove Image"
 msgstr "Retirer l'image"
 
-#: includes/class-lrob-calendar-admin.php:906
+#: includes/class-lrob-calendar-admin.php:927
 msgid "Date"
 msgstr "Date"
 
-#: includes/class-lrob-calendar-admin.php:907
+#: includes/class-lrob-calendar-admin.php:928
 #: includes/class-lrob-calendar-meta-boxes.php:38 admin/js/event-modal.js:390
-#: blocks/events-list/edit.js:145 blocks/single-event/edit.js:150
+#: blocks/events-list/edit.js:156 blocks/single-event/edit.js:150
 msgid "Location"
 msgstr "Lieu"
 
-#: includes/class-lrob-calendar-admin.php:930
+#: includes/class-lrob-calendar-admin.php:951
 #: includes/class-lrob-calendar-block-helpers.php:552
 #: includes/class-lrob-calendar-blocks.php:214
 #: includes/class-lrob-calendar-blocks.php:270 admin/js/manage-events.js:193
@@ -1543,7 +1572,7 @@ msgstr "Déplacer vers la corbeille"
 msgid "Page"
 msgstr "Page"
 
-#: admin/js/manage-events.js:216 blocks/events-list/edit.js:190
+#: admin/js/manage-events.js:216 blocks/events-list/edit.js:201
 msgid "events"
 msgstr "événements"
 
@@ -1615,11 +1644,11 @@ msgstr "Suppression impossible."
 msgid "Layout"
 msgstr "Mise en page"
 
-#: blocks/calendar/edit.js:28 blocks/calendar/edit.js:76
+#: blocks/calendar/edit.js:28 blocks/calendar/edit.js:88
 msgid "Month grid"
 msgstr "Grille mensuelle"
 
-#: blocks/calendar/edit.js:29 blocks/calendar/edit.js:75
+#: blocks/calendar/edit.js:29 blocks/calendar/edit.js:87
 msgid "Agenda list"
 msgstr "Liste agenda"
 
@@ -1647,11 +1676,21 @@ msgstr "Texte du lien"
 msgid "Text for the event link in popup"
 msgstr "Texte du lien vers l'événement dans la pop-up"
 
-#: blocks/calendar/edit.js:71
+#: blocks/calendar/edit.js:69 blocks/events-list/edit.js:98
+#: blocks/single-event/edit.js:173
+msgid "Site default"
+msgstr "Défaut du site"
+
+#: blocks/calendar/edit.js:70 blocks/events-list/edit.js:99
+#: blocks/single-event/edit.js:174
+msgid "Auto (follow theme)"
+msgstr "Auto (suit le thème)"
+
+#: blocks/calendar/edit.js:83
 msgid "Event Calendar"
 msgstr "Calendrier des événements"
 
-#: blocks/calendar/edit.js:73
+#: blocks/calendar/edit.js:85
 msgid "Layout:"
 msgstr "Mise en page :"
 
@@ -1738,31 +1777,31 @@ msgid ""
 msgstr ""
 "Affichés en plus des événements à venir, sans jamais évincer ces derniers."
 
-#: blocks/events-list/edit.js:95
+#: blocks/events-list/edit.js:106
 msgid "Display Options"
 msgstr "Options d'affichage"
 
-#: blocks/events-list/edit.js:97
+#: blocks/events-list/edit.js:108
 msgid "Show Images"
 msgstr "Afficher les images"
 
-#: blocks/events-list/edit.js:102 blocks/single-event/edit.js:118
+#: blocks/events-list/edit.js:113 blocks/single-event/edit.js:118
 msgid "Image position"
 msgstr "Position de l'image"
 
-#: blocks/events-list/edit.js:105 blocks/single-event/edit.js:121
+#: blocks/events-list/edit.js:116 blocks/single-event/edit.js:121
 msgid "Right column"
 msgstr "Colonne de droite"
 
-#: blocks/events-list/edit.js:106 blocks/single-event/edit.js:122
+#: blocks/events-list/edit.js:117 blocks/single-event/edit.js:122
 msgid "Left column"
 msgstr "Colonne de gauche"
 
-#: blocks/events-list/edit.js:107 blocks/single-event/edit.js:123
+#: blocks/events-list/edit.js:118 blocks/single-event/edit.js:123
 msgid "Below content (full width)"
 msgstr "Sous le contenu (pleine largeur)"
 
-#: blocks/events-list/edit.js:109 blocks/single-event/edit.js:125
+#: blocks/events-list/edit.js:120 blocks/single-event/edit.js:125
 msgid ""
 "Vertical/portrait images look best in a side column. Wide/landscape images "
 "look best below the content."
@@ -1771,59 +1810,59 @@ msgstr ""
 "latérale. Les images horizontales / paysage sont mieux rendues sous le "
 "contenu."
 
-#: blocks/events-list/edit.js:113 blocks/single-event/edit.js:129
+#: blocks/events-list/edit.js:124 blocks/single-event/edit.js:129
 msgid "Image display"
 msgstr "Affichage de l'image"
 
-#: blocks/events-list/edit.js:116 blocks/single-event/edit.js:132
+#: blocks/events-list/edit.js:127 blocks/single-event/edit.js:132
 msgid "Show whole image"
 msgstr "Afficher l'image entière"
 
-#: blocks/events-list/edit.js:122 blocks/single-event/edit.js:138
+#: blocks/events-list/edit.js:133 blocks/single-event/edit.js:138
 msgid "Image height"
 msgstr "Hauteur de l'image"
 
-#: blocks/events-list/edit.js:125 blocks/single-event/edit.js:141
+#: blocks/events-list/edit.js:136 blocks/single-event/edit.js:141
 msgid "Small"
 msgstr "Petite"
 
-#: blocks/events-list/edit.js:126 blocks/single-event/edit.js:142
+#: blocks/events-list/edit.js:137 blocks/single-event/edit.js:142
 msgid "Medium"
 msgstr "Moyenne"
 
-#: blocks/events-list/edit.js:127 blocks/single-event/edit.js:143
+#: blocks/events-list/edit.js:138 blocks/single-event/edit.js:143
 msgid "Large"
 msgstr "Grande"
 
-#: blocks/events-list/edit.js:128 blocks/single-event/edit.js:144
+#: blocks/events-list/edit.js:139 blocks/single-event/edit.js:144
 msgid "Natural"
 msgstr "Naturelle"
 
-#: blocks/events-list/edit.js:130 blocks/single-event/edit.js:146
+#: blocks/events-list/edit.js:141 blocks/single-event/edit.js:146
 msgid "Natural fills the card width at the image's own aspect ratio."
 msgstr ""
 "« Naturelle » remplit la largeur de la carte selon le ratio d'origine de "
 "l'image."
 
-#: blocks/events-list/edit.js:134
+#: blocks/events-list/edit.js:145
 msgid "Event description"
 msgstr "Description de l'événement"
 
-#: blocks/events-list/edit.js:137
+#: blocks/events-list/edit.js:148
 msgid "Show inline in each row"
 msgstr "Afficher dans chaque ligne"
 
-#: blocks/events-list/edit.js:138
+#: blocks/events-list/edit.js:149
 msgid "Hidden — show \"Details\" button (opens popup)"
 msgstr "Masquée — afficher un bouton « Détails » (ouvre une fenêtre)"
 
-#: blocks/events-list/edit.js:139 blocks/events-list/edit.js:150
-#: blocks/events-list/edit.js:161 blocks/single-event/edit.js:155
+#: blocks/events-list/edit.js:150 blocks/events-list/edit.js:161
+#: blocks/events-list/edit.js:172 blocks/single-event/edit.js:155
 #: blocks/single-event/edit.js:165
 msgid "Don’t show"
 msgstr "Ne pas afficher"
 
-#: blocks/events-list/edit.js:141
+#: blocks/events-list/edit.js:152
 msgid ""
 "Inline puts the description in the row. The button mode opens the full event "
 "in a popup card on click."
@@ -1831,58 +1870,58 @@ msgstr ""
 "« Afficher » place la description directement dans la ligne. Le mode "
 "« Bouton » ouvre une fenêtre avec l'événement complet au clic."
 
-#: blocks/events-list/edit.js:148 blocks/single-event/edit.js:153
+#: blocks/events-list/edit.js:159 blocks/single-event/edit.js:153
 msgid "Full address (multi-line)"
 msgstr "Adresse complète (multi-lignes)"
 
-#: blocks/events-list/edit.js:149 blocks/single-event/edit.js:154
+#: blocks/events-list/edit.js:160 blocks/single-event/edit.js:154
 msgid "Compact (venue, city)"
 msgstr "Compact (lieu, ville)"
 
-#: blocks/events-list/edit.js:152
+#: blocks/events-list/edit.js:163
 msgid "The popup always shows the full address; this only affects the row."
 msgstr ""
 "La fenêtre affiche toujours l'adresse complète ; ceci n'affecte que la ligne."
 
-#: blocks/events-list/edit.js:156 blocks/single-event/edit.js:160
+#: blocks/events-list/edit.js:167 blocks/single-event/edit.js:160
 msgid "Contact info"
 msgstr "Informations de contact"
 
-#: blocks/events-list/edit.js:159 blocks/single-event/edit.js:163
+#: blocks/events-list/edit.js:170 blocks/single-event/edit.js:163
 msgid "Name, email, phone, website"
 msgstr "Nom, e-mail, téléphone, site web"
 
-#: blocks/events-list/edit.js:160 blocks/single-event/edit.js:164
+#: blocks/events-list/edit.js:171 blocks/single-event/edit.js:164
 msgid "Name only"
 msgstr "Nom uniquement"
 
-#: blocks/events-list/edit.js:163
+#: blocks/events-list/edit.js:174
 msgid "The popup always shows full contact info; this only affects the row."
 msgstr ""
 "La fenêtre affiche toujours les coordonnées complètes ; ceci n'affecte que "
 "la ligne."
 
-#: blocks/events-list/edit.js:167
+#: blocks/events-list/edit.js:178
 msgid "Show Categories"
 msgstr "Afficher les catégories"
 
-#: blocks/events-list/edit.js:172
+#: blocks/events-list/edit.js:183
 msgid "Filters"
 msgstr "Filtres"
 
-#: blocks/events-list/edit.js:174
+#: blocks/events-list/edit.js:185
 msgid "Category"
 msgstr "Catégorie"
 
-#: blocks/events-list/edit.js:180
+#: blocks/events-list/edit.js:191
 msgid "Tag"
 msgstr "Étiquette"
 
-#: blocks/events-list/edit.js:190
+#: blocks/events-list/edit.js:201
 msgid "Events List"
 msgstr "Liste d'événements"
 
-#: blocks/events-list/edit.js:201
+#: blocks/events-list/edit.js:212
 msgid "more events"
 msgstr "événements supplémentaires"
 
@@ -1910,7 +1949,7 @@ msgstr "Complet"
 msgid "Compact"
 msgstr "Compact"
 
-#: blocks/single-event/edit.js:185
+#: blocks/single-event/edit.js:196
 msgid "Select an event in the sidebar."
 msgstr "Sélectionnez un événement dans la barre latérale."
 

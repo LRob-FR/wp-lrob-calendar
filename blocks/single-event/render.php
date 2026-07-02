@@ -24,6 +24,7 @@ if (!$event->get_post()) {
     return;
 }
 
+echo '<div class="lrob-cal-single-event-block ' . esc_attr(LRob_Calendar::theme_class($attributes['colorMode'] ?? null)) . '">';
 echo LRob_Calendar_Block_Helpers::render_event_card($event, [
     'template'        => $attributes['template'],
     'showImages'      => true,
@@ -35,3 +36,4 @@ echo LRob_Calendar_Block_Helpers::render_event_card($event, [
     'contactDisplay'  => $attributes['contactDisplay']  ?? 'full',
 ]);
 echo LRob_Calendar_Block_Helpers::render_credit();
+echo '</div>';

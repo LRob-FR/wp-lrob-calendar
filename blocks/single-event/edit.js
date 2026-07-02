@@ -165,6 +165,17 @@
                                 { value: 'none',    label: __('Don’t show',                    'lrob-calendar') }
                             ],
                             onChange: (value) => setAttributes({ contactDisplay: value })
+                        }),
+                        el(SelectControl, {
+                            label: __('Appearance', 'lrob-calendar'),
+                            value: attributes.colorMode,
+                            options: [
+                                { value: 'inherit', label: __('Site default', 'lrob-calendar') },
+                                { value: 'auto',    label: __('Auto (follow theme)', 'lrob-calendar') },
+                                { value: 'light',   label: __('Light', 'lrob-calendar') },
+                                { value: 'dark',    label: __('Dark', 'lrob-calendar') }
+                            ],
+                            onChange: (value) => setAttributes({ colorMode: value })
                         })
                     )
                 ),

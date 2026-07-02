@@ -376,6 +376,13 @@ class LRob_Calendar_Admin {
             update_option('lrob_calendar_primary_color',   $primary_color   ?: '');
             update_option('lrob_calendar_secondary_color', $secondary_color ?: '');
 
+            // Site-wide colour mode (blocks set to "Site default" follow this).
+            $color_mode = sanitize_key($_POST['color_mode'] ?? 'auto');
+            if (!in_array($color_mode, ['auto', 'light', 'dark'], true)) {
+                $color_mode = 'auto';
+            }
+            update_option('lrob_calendar_color_mode', $color_mode);
+
             // Date pill color mode for events that have no category color.
             $uncat_mode = sanitize_text_field($_POST['uncategorized_pill_mode'] ?? 'random');
             if (!in_array($uncat_mode, ['random', 'primary', 'custom'], true)) {
@@ -410,6 +417,7 @@ class LRob_Calendar_Admin {
         $max_years        = (int) get_option('lrob_calendar_max_recurrence_years', 5);
         $primary_color    = (string) get_option('lrob_calendar_primary_color', '');
         $secondary_color  = (string) get_option('lrob_calendar_secondary_color', '');
+        $color_mode       = (string) get_option('lrob_calendar_color_mode', 'auto');
         $uncat_mode       = (string) get_option('lrob_calendar_uncategorized_pill_mode', 'random');
         $uncat_color      = (string) get_option('lrob_calendar_uncategorized_pill_color', '');
         $popup_show_image = (bool)   get_option('lrob_calendar_popup_show_image', true);
@@ -512,6 +520,19 @@ class LRob_Calendar_Admin {
                     <?php esc_html_e('Brand colors used by the calendar, popup, event cards, and CTA buttons. Leave empty to use the defaults. Per-category colors are configured on each category and are not affected.', 'lrob-calendar'); ?>
                 </p>
                 <table class="form-table">
+                    <tr>
+                        <th scope="row"><label for="color_mode"><?php esc_html_e('Color mode', 'lrob-calendar'); ?></label></th>
+                        <td>
+                            <select id="color_mode" name="color_mode">
+                                <option value="auto"  <?php selected($color_mode, 'auto'); ?>><?php esc_html_e('Auto — follow the theme (light or dark)', 'lrob-calendar'); ?></option>
+                                <option value="light" <?php selected($color_mode, 'light'); ?>><?php esc_html_e('Light', 'lrob-calendar'); ?></option>
+                                <option value="dark"  <?php selected($color_mode, 'dark'); ?>><?php esc_html_e('Dark', 'lrob-calendar'); ?></option>
+                            </select>
+                            <p class="description">
+                                <?php esc_html_e('Site-wide default. "Auto" blends into your theme (inherits its text colour, transparent surfaces). Each block can override this in its Appearance setting.', 'lrob-calendar'); ?>
+                            </p>
+                        </td>
+                    </tr>
                     <tr>
                         <th scope="row"><label for="primary_color"><?php esc_html_e('Primary color', 'lrob-calendar'); ?></label></th>
                         <td>

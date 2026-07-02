@@ -79,6 +79,65 @@
     --lrob-white:         var(--lrob-cal-surface);
 }
 
+/* ─── Color modes ────────────────────────────────────────────────────────
+   The block wrapper carries one of these classes (lrob-theme-{auto,light,dark}).
+   :root above holds the default LIGHT palette; the classes below override the
+   mode-dependent tokens. "auto" follows the surrounding theme by inheriting its
+   text colour (currentColor) and keeping surfaces transparent/tinted, so the
+   plugin blends into any light OR dark FSE theme without knowing its palette.
+   Spacing / radius / typography / brand colours are mode-independent and stay
+   on :root. */
+
+.lrob-theme-light {
+    --lrob-cal-surface:        #ffffff;
+    --lrob-cal-surface-muted:  #f8fafc;
+    --lrob-cal-surface-hover:  #f1f5f9;
+    --lrob-cal-text:           #0f172a;
+    --lrob-cal-text-muted:     #64748b;
+    --lrob-cal-text-subtle:    #94a3b8;
+    --lrob-cal-border:         #e2e8f0;
+    --lrob-cal-border-strong:  #cbd5e1;
+}
+
+.lrob-theme-dark {
+    --lrob-cal-surface:        #1e2530;
+    --lrob-cal-surface-muted:  #252d3a;
+    --lrob-cal-surface-hover:  #2d3644;
+    --lrob-cal-text:           #e5e7eb;
+    --lrob-cal-text-muted:     #9ca3af;
+    --lrob-cal-text-subtle:    #6b7280;
+    --lrob-cal-border:         #374151;
+    --lrob-cal-border-strong:  #4b5563;
+    --lrob-cal-shadow-elevated: 0 4px 6px -1px rgba(0, 0, 0, 0.3),
+                                 0 10px 30px -8px rgba(0, 0, 0, 0.55);
+    --lrob-cal-shadow-card:     0 1px 2px rgba(0, 0, 0, 0.3),
+                                 0 1px 3px rgba(0, 0, 0, 0.45);
+}
+
+.lrob-theme-auto {
+    /* Text follows the theme; muted/subtle are translucent shades of it. */
+    --lrob-cal-text:           inherit;
+    --lrob-cal-text-muted:     color-mix(in srgb, currentColor 65%, transparent);
+    --lrob-cal-text-subtle:    color-mix(in srgb, currentColor 45%, transparent);
+    /* Surfaces stay out of the way so the theme's background shows through. */
+    --lrob-cal-surface:        transparent;
+    --lrob-cal-surface-muted:  color-mix(in srgb, currentColor 5%, transparent);
+    --lrob-cal-surface-hover:  color-mix(in srgb, currentColor 8%, transparent);
+    --lrob-cal-border:         color-mix(in srgb, currentColor 15%, transparent);
+    --lrob-cal-border-strong:  color-mix(in srgb, currentColor 28%, transparent);
+}
+
+/* A floating popup can't be transparent (it overlays the page). In auto mode
+   give it an opaque system surface that follows the light/dark preference, so
+   it's always readable whatever the theme. Inside it, surfaces become opaque
+   and text resolves to CanvasText. */
+.lrob-theme-auto .lrob-cal-popup-content {
+    color-scheme: light dark;
+    color: CanvasText;
+    background: Canvas;
+    --lrob-cal-surface: Canvas;
+}
+
 /* Shared icon utility — sizing handled by parent context, colour follows
    currentColor (every icon is a stroke SVG with stroke=currentColor). */
 .lrob-icon {
