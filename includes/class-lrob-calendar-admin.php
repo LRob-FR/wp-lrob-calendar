@@ -293,9 +293,9 @@ class LRob_Calendar_Admin {
             );
             ?>
             &nbsp;·&nbsp;
-            <a href="<?php echo esc_url(LROB_CALENDAR_GITHUB_URL); ?>" target="_blank" rel="noopener"><?php esc_html_e('Source on GitHub', 'lrob-calendar'); ?></a>
+            <a href="<?php echo esc_url(LROB_CALENDAR_REPO_URL); ?>" target="_blank" rel="noopener"><?php esc_html_e('Source code', 'lrob-calendar'); ?></a>
             &nbsp;·&nbsp;
-            <a href="<?php echo esc_url(LROB_CALENDAR_GITHUB_ISSUES_URL); ?>" target="_blank" rel="noopener"><?php esc_html_e('Report an issue', 'lrob-calendar'); ?></a>
+            <a href="<?php echo esc_url(LROB_CALENDAR_ISSUES_URL); ?>" target="_blank" rel="noopener"><?php esc_html_e('Report an issue', 'lrob-calendar'); ?></a>
         </p>
         <?php
     }
@@ -695,8 +695,8 @@ class LRob_Calendar_Admin {
         if ($file !== LROB_CALENDAR_BASENAME) {
             return $links;
         }
-        $links[] = '<a href="' . esc_url(LROB_CALENDAR_GITHUB_URL) . '" target="_blank" rel="noopener">' .
-            esc_html__('GitHub', 'lrob-calendar') . '</a>';
+        $links[] = '<a href="' . esc_url(LROB_CALENDAR_REPO_URL) . '" target="_blank" rel="noopener">' .
+            esc_html__('Source code', 'lrob-calendar') . '</a>';
         return $links;
     }
 

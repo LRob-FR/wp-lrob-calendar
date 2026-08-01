@@ -1,20 +1,17 @@
 <?php
 /**
- * Self-hosted plugin updater — surfaces GitHub releases as WordPress updates.
+ * Self-hosted plugin updater — surfaces Forgejo releases as WordPress updates.
  *
  * Two filters do the work:
  *   1. pre_set_site_transient_update_plugins — when WP decides which plugins
- *      need updating, we hit the GitHub API, compare versions, and inject our
+ *      need updating, we hit the releases API, compare versions, and inject our
  *      entry if a newer release is published.
  *   2. plugins_api — the "View version details" / "View details" modal pulls
- *      release info from GitHub (changelog from the release body, formatted
- *      via a minimal Markdown→HTML conversion).
+ *      release info from the same payload (changelog from the release body,
+ *      formatted via a minimal Markdown→HTML conversion).
  *
- * The GitHub API response is cached in a transient for 1h. GitHub's
- * unauthenticated rate limit is 60 req/h per IP — well clear of that at this
- * cache rate, even on shared hosting where multiple sites share an outbound IP.
- * Admin intent signals (the "Check again" button on the Updates page, or
- * simply landing on update-core.php) bypass the cache for that one request.
+ * The API base is derived from LROB_CALENDAR_REPO_URL, so moving the repo to
+ * another host/owner only means editing that one constant.
  *
  * No external library. ~200 lines.
  */
@@ -25,10 +22,14 @@ if (!defined('ABSPATH')) {
 
 class LRob_Calendar_Updater {
 
-    const TRANSIENT_KEY      = 'lrob_calendar_gh_release';
-    const TRANSIENT_TTL      = HOUR_IN_SECONDS;
-    const TRANSIENT_TTL_FAIL = HOUR_IN_SECONDS;   // shorter on network/API failure
+    // Back-off when the server is unreachable, so admin pages don't each pay a
+    // connection timeout.
+    const TRANSIENT_KEY      = 'lrob_calendar_release_fail';
+    const TRANSIENT_TTL_FAIL = 5 * MINUTE_IN_SECONDS;
     const PLUGIN_SLUG        = 'lrob-calendar';
+
+    /** Per-request memo — the filters below can both fire in a single request. */
+    private static $release_memo = false;
 
     public function __construct() {
         add_filter('pre_set_site_transient_update_plugins', [$this, 'check_for_update']);
@@ -72,7 +73,7 @@ class LRob_Calendar_Updater {
             'slug'         => self::PLUGIN_SLUG,
             'plugin'       => LROB_CALENDAR_BASENAME,
             'new_version'  => $remote_version,
-            'url'          => LROB_CALENDAR_GITHUB_URL,
+            'url'          => LROB_CALENDAR_REPO_URL,
             'package'      => $zip_url,
             'tested'       => $this->tested_wp_version(),
             'requires_php' => '8.0',
@@ -113,7 +114,7 @@ class LRob_Calendar_Updater {
             'slug'          => self::PLUGIN_SLUG,
             'version'       => $remote_version,
             'author'        => '<a href="https://www.lrob.fr">LRob</a>',
-            'homepage'      => defined('LROB_CALENDAR_PLUGIN_URL') ? LROB_CALENDAR_PLUGIN_URL : LROB_CALENDAR_GITHUB_URL,
+            'homepage'      => defined('LROB_CALENDAR_PLUGIN_URL') ? LROB_CALENDAR_PLUGIN_URL : LROB_CALENDAR_REPO_URL,
             'requires'      => '6.0',
             'requires_php'  => '8.0',
             'tested'        => $this->tested_wp_version(),
@@ -126,91 +127,59 @@ class LRob_Calendar_Updater {
         ];
     }
 
-    /**
-     * Force-clear the cached release info — useful on plugin activation /
-     * after a manual update, or from a future "check now" admin button.
-     */
+    /** Clear the "server unreachable" back-off so the next check retries immediately. */
     public static function flush_cache(): void {
         delete_transient(self::TRANSIENT_KEY);
+        self::$release_memo = false;
     }
 
     /* ─── Internals ──────────────────────────────────────────────────── */
 
     /**
-     * Hit the GitHub API for the latest release. Cached 1h on success,
-     * 1h on failure (to avoid hammering the API when it's flaky).
-     * Returns null when there's no usable response.
-     *
-     * Cache lookup is skipped when is_force_refresh() — the admin is
-     * actively looking for updates and shouldn't have to wait an hour for
-     * the transient to roll over. The fresh response is still written back
-     * so subsequent loads on the same page don't re-hit the API.
+     * Fetch the latest release. Returns null when there's no usable response.
      */
     private function get_release(): ?array {
-        if (!$this->is_force_refresh()) {
-            $cached = get_transient(self::TRANSIENT_KEY);
-            if ($cached === 'none') {
-                return null;
-            }
-            if (is_array($cached) && !empty($cached)) {
-                return $cached;
-            }
+        if (self::$release_memo !== false) {
+            return self::$release_memo;
+        }
+        if (get_transient(self::TRANSIENT_KEY) === 'down') {
+            return null;
         }
 
-        $api_url = 'https://api.github.com/repos/' . $this->github_repo() . '/releases/latest';
+        $api_url = $this->api_url();
+        if ($api_url === '') {
+            return null;
+        }
+
         $response = wp_remote_get($api_url, [
-            'timeout' => 8,
+            'timeout' => 5,
             'headers' => [
-                'Accept'     => 'application/vnd.github+json',
+                'Accept'     => 'application/json',
                 'User-Agent' => 'WordPress/' . get_bloginfo('version') . '; ' . home_url(),
             ],
         ]);
 
         if (is_wp_error($response) || wp_remote_retrieve_response_code($response) !== 200) {
-            set_transient(self::TRANSIENT_KEY, 'none', self::TRANSIENT_TTL_FAIL);
-            return null;
+            set_transient(self::TRANSIENT_KEY, 'down', self::TRANSIENT_TTL_FAIL);
+            return self::$release_memo = null;
         }
 
         $body = json_decode(wp_remote_retrieve_body($response), true);
         if (!is_array($body) || empty($body['tag_name'])) {
-            set_transient(self::TRANSIENT_KEY, 'none', self::TRANSIENT_TTL_FAIL);
-            return null;
+            set_transient(self::TRANSIENT_KEY, 'down', self::TRANSIENT_TTL_FAIL);
+            return self::$release_memo = null;
         }
 
-        set_transient(self::TRANSIENT_KEY, $body, self::TRANSIENT_TTL);
-        return $body;
+        return self::$release_memo = $body;
     }
 
-    /**
-     * True when the admin is signalling "check now" intent:
-     *   - ?force-check=1 on the URL — core sets this when "Check again" is
-     *     clicked on the Updates page, and wp_update_plugins() reads the
-     *     same flag to bypass its own cache.
-     *   - pagenow === 'update-core.php' — they're on the Updates screen
-     *     right now, so any cache hit there is just stale data they're
-     *     trying to refresh.
-     * Gated on is_admin() so frontend cron triggers never force-refresh.
-     */
-    private function is_force_refresh(): bool {
-        if (!is_admin()) {
-            return false;
+    /** https://git.lrob.net/WP/calendar → https://git.lrob.net/api/v1/repos/WP/calendar/releases/latest */
+    private function api_url(): string {
+        $url = defined('LROB_CALENDAR_REPO_URL') ? LROB_CALENDAR_REPO_URL : '';
+        if (!preg_match('#^(https?://[^/]+)/([^/]+/[^/]+?)/?$#', $url, $m)) {
+            return '';
         }
-        if (isset($_GET['force-check']) && (string) $_GET['force-check'] === '1') {
-            return true;
-        }
-        if (($GLOBALS['pagenow'] ?? '') === 'update-core.php') {
-            return true;
-        }
-        return false;
-    }
-
-    private function github_repo(): string {
-        // Derive from LROB_CALENDAR_GITHUB_URL so the URL lives in ONE place.
-        $url = defined('LROB_CALENDAR_GITHUB_URL') ? LROB_CALENDAR_GITHUB_URL : '';
-        if (preg_match('#github\.com/([^/]+/[^/]+?)/?$#', $url, $m)) {
-            return $m[1];
-        }
-        return 'LRob-FR/wp-lrob-calendar';
+        return $m[1] . '/api/v1/repos/' . $m[2] . '/releases/latest';
     }
 
     private function normalize_version(?string $tag): string {

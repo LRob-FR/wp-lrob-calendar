@@ -30,7 +30,7 @@
   where a block is used.
 - 🌍 **Translation-ready** — English + French included.
 - 🔄 **Self-updating** — new versions arrive in your Updates screen, straight
-  from GitHub.
+  from [git.lrob.net](https://git.lrob.net/WP/calendar).
 
 ---
 
@@ -144,7 +144,7 @@ See [**CHANGELOG.md**](CHANGELOG.md).
 ## 💬 Feedback & contributions
 
 Bug reports, feature ideas and pull requests welcome on the
-[GitHub issue tracker](https://github.com/LRob-FR/wp-lrob-calendar/issues).
+[issue tracker](https://git.lrob.net/WP/calendar/issues).
 
 ---
 
@@ -158,7 +158,7 @@ Plugin code: **GPL-2.0-or-later**. See [`LICENSE`](./LICENSE).
 Orléans, France.
 
 - 📦 Plugin home: <https://www.lrob.fr/wordpress/plugins/lrob-calendar/>
-- 🐛 Issues: <https://github.com/LRob-FR/wp-lrob-calendar/issues>
+- 🐛 Issues: <https://git.lrob.net/WP/calendar/issues>
 - 💼 Hosting service: <https://www.lrob.fr>
 
 ---

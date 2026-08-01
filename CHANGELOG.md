@@ -28,6 +28,12 @@ WordPress post list and the block editor.
   lists (previously only the next one showed), with per-view caps so a daily or
   never-ending series can't flood the agenda or a list.
 
+**🏠 New home**
+- Development moved to [git.lrob.net/WP/calendar](https://git.lrob.net/WP/calendar):
+  source, releases and issue tracker. Automatic updates now come from there, and
+  a new version is picked up as soon as WordPress checks instead of up to an
+  hour later.
+
 **📥 Migrate from other plugins**
 - One-step migration from **The Events Calendar** and **All-in-One Event
   Calendar**: export their data to JSON from the Import/Export screen, then

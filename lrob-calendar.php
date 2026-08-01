@@ -8,6 +8,7 @@
  * Author URI: https://www.lrob.fr
  * License: GPL-2.0+
  * License URI: http://www.gnu.org/licenses/gpl-2.0.txt
+ * Update URI: https://git.lrob.net/WP/calendar
  * Text Domain: lrob-calendar
  * Domain Path: /languages
  * Requires PHP: 8.0
@@ -24,8 +25,8 @@ define('LROB_CALENDAR_PATH', plugin_dir_path(__FILE__));
 define('LROB_CALENDAR_URL', plugin_dir_url(__FILE__));
 define('LROB_CALENDAR_BASENAME', plugin_basename(__FILE__));
 define('LROB_CALENDAR_PLUGIN_URL', 'https://www.lrob.fr/wordpress/plugins/lrob-calendar/');
-define('LROB_CALENDAR_GITHUB_URL', 'https://github.com/LRob-FR/wp-lrob-calendar');
-define('LROB_CALENDAR_GITHUB_ISSUES_URL', LROB_CALENDAR_GITHUB_URL . '/issues');
+define('LROB_CALENDAR_REPO_URL', 'https://git.lrob.net/WP/calendar');
+define('LROB_CALENDAR_ISSUES_URL', LROB_CALENDAR_REPO_URL . '/issues');
 
 // Autoload
 spl_autoload_register(function ($class) {

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: LRob Calendar 1.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/lrob-calendar\n"
-"POT-Creation-Date: 2026-07-02T13:29:30+00:00\n"
+"POT-Creation-Date: 2026-08-01T02:09:37+00:00\n"
 "PO-Revision-Date: 2026-05-12 18:00+0200\n"
 "Last-Translator: Robin Labadie <claude@lrob.fr>\n"
 "Language-Team: French <claude@lrob.fr>\n"
@@ -17,14 +17,17 @@ msgstr ""
 "X-Domain: lrob-calendar\n"
 
 #. Plugin Name of the plugin
+#: lrob-calendar.php
 msgid "LRob - Calendar"
 msgstr "LRob - Calendar"
 
 #. Plugin URI of the plugin
+#: lrob-calendar.php
 msgid "https://www.lrob.fr/en/wordpress/plugins/lrob-calendar/"
 msgstr "https://www.lrob.fr/wordpress/plugins/lrob-calendar/"
 
 #. Description of the plugin
+#: lrob-calendar.php
 msgid ""
 "A powerful and clean event calendar for WordPress with recurring events, "
 "categories, locations, import/export and more."
@@ -33,10 +36,12 @@ msgstr ""
 "récurrents, catégories, lieux, import/export et plus encore."
 
 #. Author of the plugin
+#: lrob-calendar.php
 msgid "LRob"
 msgstr "LRob"
 
 #. Author URI of the plugin
+#: lrob-calendar.php
 msgid "https://www.lrob.fr"
 msgstr "https://www.lrob.fr"
 
@@ -60,6 +65,7 @@ msgstr "Page précédente"
 
 #. translators: 1: current page number, 2: total pages
 #: blocks/events-list/render.php:156
+#, php-format
 msgid "Page %1$d / %2$d"
 msgstr "Page %1$d / %2$d"
 
@@ -114,6 +120,7 @@ msgstr "Export terminé avec succès."
 
 #. translators: %d: number of events imported
 #: includes/class-lrob-calendar-admin.php:137
+#, php-format
 msgid "%d events imported successfully."
 msgstr "%d événements importés avec succès."
 
@@ -194,6 +201,7 @@ msgstr "Non détecté sur ce site"
 
 #. translators: %d: number of events found
 #: includes/class-lrob-calendar-admin.php:249
+#, php-format
 msgid "%d event"
 msgid_plural "%d events"
 msgstr[0] "%d événement"
@@ -205,12 +213,14 @@ msgstr "par"
 
 #. translators: 1: plugin name with link to author, 2: version number
 #: includes/class-lrob-calendar-admin.php:290
+#, php-format
 msgid "%1$s — version %2$s"
 msgstr "%1$s — version %2$s"
 
 #: includes/class-lrob-calendar-admin.php:296
-msgid "Source on GitHub"
-msgstr "Code source sur GitHub"
+#: includes/class-lrob-calendar-admin.php:699
+msgid "Source code"
+msgstr "Code source"
 
 #: includes/class-lrob-calendar-admin.php:298
 msgid "Report an issue"
@@ -218,6 +228,7 @@ msgstr "Signaler un problème"
 
 #. translators: %d: number of existing events
 #: includes/class-lrob-calendar-admin.php:318
+#, php-format
 msgid ""
 "There is already %d event in your calendar. Tick the confirmation box below "
 "and click \"Insert demo events\" again to add the demo events anyway."
@@ -235,6 +246,7 @@ msgstr[1] ""
 
 #. translators: %d: number of events created
 #: includes/class-lrob-calendar-admin.php:332
+#, php-format
 msgid "%d demo event inserted."
 msgid_plural "%d demo events inserted."
 msgstr[0] "%d événement de démo inséré."
@@ -274,6 +286,7 @@ msgstr "Premier jour de la semaine"
 
 #. translators: %s: the auto-detected first day of the week (e.g. Sunday or Monday)
 #: includes/class-lrob-calendar-admin.php:458
+#, php-format
 msgid "Auto — follow site language (currently %s)"
 msgstr "Auto — selon la langue du site (actuellement %s)"
 
@@ -380,8 +393,8 @@ msgid ""
 "Appearance setting."
 msgstr ""
 "Défaut du site. « Auto » s'adapte à votre thème (hérite de sa couleur de "
-"texte, surfaces transparentes). Chaque bloc peut surcharger ce choix dans son "
-"réglage Apparence."
+"texte, surfaces transparentes). Chaque bloc peut surcharger ce choix dans "
+"son réglage Apparence."
 
 #: includes/class-lrob-calendar-admin.php:537
 #: includes/class-lrob-calendar-admin.php:567
@@ -500,6 +513,7 @@ msgstr "Format de date et d'heure"
 
 #. translators: %1$s: opening anchor tag, %2$s: closing anchor tag
 #: includes/class-lrob-calendar-admin.php:634
+#, php-format
 msgid "Date and time formats follow your %1$sWordPress settings%2$s."
 msgstr "Les formats de date et d'heure suivent vos %1$sréglages WordPress%2$s."
 
@@ -525,6 +539,7 @@ msgstr ""
 
 #. translators: %d: existing event count
 #: includes/class-lrob-calendar-admin.php:670
+#, php-format
 msgid ""
 "I understand my calendar already contains %d event(s); add the demo events "
 "anyway."
@@ -536,12 +551,9 @@ msgstr ""
 msgid "Insert demo events"
 msgstr "Insérer les événements de démo"
 
-#: includes/class-lrob-calendar-admin.php:699
-msgid "GitHub"
-msgstr "GitHub"
-
 #. translators: %s: human-readable file size (e.g. "12 MB")
 #: includes/class-lrob-calendar-admin.php:787
+#, php-format
 msgid ""
 "Large import file (%s). If the page times out, increase your PHP "
 "memory_limit / max_execution_time."
@@ -664,6 +676,7 @@ msgstr "Toute la journée"
 
 #. translators: %s = formatted date like "Tuesday, May 18"
 #: includes/class-lrob-calendar-blocks.php:274
+#, php-format
 msgid "Events on %s"
 msgstr "Événements du %s"
 
@@ -843,6 +856,7 @@ msgstr ""
 
 #. translators: %s: hostname
 #: includes/class-lrob-calendar-import.php:444
+#, php-format
 msgid ""
 "Imported image(s) reference a private or localhost host (%s). They may not "
 "be reachable from your live site after migration."
@@ -1260,7 +1274,7 @@ msgstr "Carte du lieu de l'événement"
 msgid "View larger map"
 msgstr "Voir la carte en grand"
 
-#: includes/class-lrob-calendar-updater.php:123
+#: includes/class-lrob-calendar-updater.php:124
 msgid ""
 "A clean event calendar for WordPress with recurring events, click-to-preview "
 "month grid, agenda view, AJAX-paginated event lists, and an OpenStreetMap "
@@ -1952,6 +1966,45 @@ msgstr "Compact"
 #: blocks/single-event/edit.js:196
 msgid "Select an event in the sidebar."
 msgstr "Sélectionnez un événement dans la barre latérale."
+
+#: blocks/calendar/block.json
+#, fuzzy
+msgctxt "block title"
+msgid "Event Calendar"
+msgstr "Calendrier des événements"
+
+#: blocks/calendar/block.json
+msgctxt "block description"
+msgid "Month grid of events with a click-to-preview popup."
+msgstr ""
+
+#: blocks/events-list/block.json
+#, fuzzy
+msgctxt "block title"
+msgid "Events List"
+msgstr "Liste d'événements"
+
+#: blocks/events-list/block.json
+msgctxt "block description"
+msgid "List or grid of upcoming events with images, excerpts, and categories."
+msgstr ""
+
+#: blocks/single-event/block.json
+#, fuzzy
+msgctxt "block title"
+msgid "Single Event"
+msgstr "Voir l'événement"
+
+#: blocks/single-event/block.json
+msgctxt "block description"
+msgid "Display a single event chosen from a search list."
+msgstr ""
+
+#~ msgid "Source on GitHub"
+#~ msgstr "Code source sur GitHub"
+
+#~ msgid "GitHub"
+#~ msgstr "GitHub"
 
 #~ msgid ""
 #~ "Import events from a JSON file (LRob Calendar or All-in-One Event "
