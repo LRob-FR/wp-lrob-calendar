@@ -114,9 +114,10 @@ body.lrob-cal-popup-open {
     padding: var(--lrob-cal-space-4) var(--lrob-cal-space-4) var(--lrob-cal-space-3);
 }
 
-/* Date block — big day number stacked over uppercase short month. bg + text
-   colors come from inline `style="..."` set by PHP (per-event pair). Children
-   use color:inherit so the inline color flows through. */
+/* Date block — big day number stacked over uppercase short month. The per-event
+   hue + saturation arrive as inline --pill-hue / --pill-sat; lightness comes
+   from the mode tokens so the pill inverts on dark surfaces. Children use
+   color:inherit so the resolved colour flows through. */
 .lrob-cal-date-block {
     display: flex;
     flex-direction: column;
@@ -124,8 +125,8 @@ body.lrob-cal-popup-open {
     justify-content: center;
     min-width: 56px;
     padding: var(--lrob-cal-space-2) var(--lrob-cal-space-3);
-    background: var(--lrob-cal-primary-soft);
-    color: var(--lrob-cal-primary);
+    background: hsl(var(--pill-hue, 210), var(--pill-sat, 60%), var(--lrob-cal-pill-bg-l));
+    color:      hsl(var(--pill-hue, 210), var(--pill-sat, 60%), var(--lrob-cal-pill-fg-l));
     border-radius: var(--lrob-cal-radius-md);
     line-height: 1;
     font-variant-numeric: tabular-nums;

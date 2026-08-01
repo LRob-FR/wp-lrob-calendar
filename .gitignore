@@ -37,3 +37,6 @@ composer.lock
 # `release.sh`, which bakes in the compiled .mo + JSON.
 languages/*.mo
 languages/lrob-calendar-*.json
+
+# Deploy host config (server paths — repo is public)
+.deploy.conf

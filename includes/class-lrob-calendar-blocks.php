@@ -68,11 +68,18 @@ class LRob_Calendar_Blocks {
         // conditional with the per-block asset loading.
         $primary   = (string) get_option('lrob_calendar_primary_color', '');
         $secondary = (string) get_option('lrob_calendar_secondary_color', '');
+        $css = '';
         if ($primary !== '' || $secondary !== '') {
-            $css = ':root {';
+            $css .= ':root {';
             if ($primary !== '')   { $css .= '--lrob-cal-primary:' . sanitize_hex_color($primary) . ';'; }
             if ($secondary !== '') { $css .= '--lrob-cal-secondary:' . sanitize_hex_color($secondary) . ';'; }
             $css .= '}';
+        }
+        // Keyed on the palette markers, not the mode classes, so a block left on
+        // Auto picks up the same custom colours once it resolves.
+        $css .= self::mode_palette_css('light', ':root, .lrob-is-light');
+        $css .= self::mode_palette_css('dark',  '.lrob-is-dark');
+        if ($css !== '') {
             wp_add_inline_style('lrob-calendar-tokens', $css);
         }
         wp_register_style('lrob-calendar-event-card',        $url . 'assets/css/event-card.css',         ['lrob-calendar-tokens'],          $ver);
@@ -107,6 +114,18 @@ class LRob_Calendar_Blocks {
             wp_register_script($handle, $url . $rel_path, $editor_deps, $ver, true);
             wp_set_script_translations($handle, 'lrob-calendar', LROB_CALENDAR_PATH . 'languages');
         }
+
+        // Measures the real page background behind every "auto" block so the
+        // popup can be opaque in the page's own colours and dark pages flip
+        // shadows + date pills. Listed as a viewScript dep by every block, and
+        // enqueued directly for the single-event page injection.
+        wp_register_script(
+            'lrob-calendar-theme-detect',
+            $url . 'assets/js/theme-detect.js',
+            [],
+            $ver,
+            true
+        );
 
         // Shared event-popup module. Owns the popup card rendering + UX
         // (open/close, prev/next nav with two-card slide, ESC, swipe).
@@ -160,6 +179,48 @@ class LRob_Calendar_Blocks {
             true
         );
 
+    }
+
+    /**
+     * Admin-configured surface/text overrides for one palette, as a CSS rule.
+     *
+     * Only two colours are asked for; everything else in the neutral ramp is
+     * mixed from them, so a custom palette stays internally consistent instead
+     * of needing eight pickers that can contradict each other. Each override is
+     * independent — set only a background and the derived shades still mix
+     * against whatever text colour is in effect.
+     *
+     * Returns '' when the mode has no overrides.
+     */
+    private static function mode_palette_css(string $mode, string $selector): string {
+        $surface = sanitize_hex_color((string) get_option('lrob_calendar_' . $mode . '_surface', ''));
+        $text    = sanitize_hex_color((string) get_option('lrob_calendar_' . $mode . '_text', ''));
+        if (!$surface && !$text) {
+            return '';
+        }
+
+        // Referenced rather than inlined so each derivation picks up the other
+        // override when both are set, and the built-in token when only one is.
+        $s = $surface ?: 'var(--lrob-cal-surface)';
+        $t = $text    ?: 'var(--lrob-cal-text)';
+        $mix = fn(string $a, int $pct, string $b) => 'color-mix(in srgb, ' . $a . ' ' . $pct . '%, ' . $b . ')';
+
+        $css = $selector . '{';
+        if ($surface) {
+            $css .= '--lrob-cal-surface:' . $surface . ';';
+        }
+        if ($text) {
+            $css .= '--lrob-cal-text:' . $text . ';';
+        }
+        $css .= '--lrob-cal-surface-muted:' . $mix($t, 4,  $s) . ';';
+        $css .= '--lrob-cal-surface-hover:' . $mix($t, 8,  $s) . ';';
+        $css .= '--lrob-cal-text-muted:'    . $mix($t, 65, $s) . ';';
+        $css .= '--lrob-cal-text-subtle:'   . $mix($t, 45, $s) . ';';
+        $css .= '--lrob-cal-border:'        . $mix($t, 14, $s) . ';';
+        $css .= '--lrob-cal-border-strong:' . $mix($t, 28, $s) . ';';
+        $css .= '}';
+
+        return $css;
     }
 
     /**

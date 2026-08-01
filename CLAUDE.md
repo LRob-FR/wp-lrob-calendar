@@ -26,6 +26,52 @@ Translation workflow when strings change:
 - Update `languages/lrob-calendar-fr_FR.po` to add French translations for any new `msgid` entries (the project is developed in English and translated to French).
 - Run `./release.sh` again to compile the updated `.po`.
 
+## Deploying to the test site
+
+`./deploy.sh` ships the **built zip** to a remote WordPress install over SSH, so
+the user (and you) can test a real render instead of reasoning about CSS. Run it
+yourself whenever you've changed something the user needs to look at — no need
+to ask. **Never deploy to prod** unless the user explicitly says so; prod
+targets refuse to run without `--confirm-prod`.
+
+```sh
+./deploy.sh --dry-run     # prints every command, touches nothing
+./deploy.sh               # ship the zip release.sh already built → demo
+./deploy.sh -b            # run ./release.sh first, then ship
+```
+
+Host paths live in `.deploy.conf` (gitignored — this repo is public). Full
+rationale and server-side traps: `~/.claude/deploy-wp-plugin-to-demo.md`.
+
+Two things that will waste your time if you forget them:
+
+- **The version number does not change between rebuilds of the same version.**
+  "Already installed: 1.2.1" says nothing about *which* 1.2.1 is on the site.
+  When you need certainty that a fix is live, diff the deployed asset against
+  the local one, e.g.
+  `curl -s https://demo.lrob.fr/wp-content/plugins/lrob-calendar/assets/js/theme-detect.js | diff - assets/js/theme-detect.js`.
+- **Demo runs `WP_DEBUG`**, so `filemtime` cache-busting works there and
+  re-deploying the same version still refreshes CSS/JS. On prod it won't.
+
+### Looking at a render
+
+There is no MCP browser, but `chromium` is installed and a dependency-free CDP
+client lives in the session scratchpad (`cdp.js` — npm registry is unreachable,
+so don't try to `npm install puppeteer`). Drive it with
+`--remote-debugging-port=9222` plus `--user-data-dir` (without a profile dir it
+exits immediately). `--headless --screenshot` alone is often enough.
+
+**demo.lrob.fr sits behind an age-verification gate and a cookie banner**, both
+of which dim/blur the whole page. A naive screenshot shows the entire site
+black-on-black and looks like a catastrophic plugin bug — it isn't. Click
+"Je suis majeur" and "Tout refuser" via `Runtime.evaluate` before capturing.
+(The user has offered to disable the age gate if it keeps getting in the way.)
+
+Note that **public event pages are disabled on demo**
+(`lrob_calendar_disable_public_pages = 1`), so `.lrob-event-single` — the
+`the_content` meta injection — never renders there and cannot be verified on
+that site.
+
 ## Architecture
 
 ### Entry point and autoloader

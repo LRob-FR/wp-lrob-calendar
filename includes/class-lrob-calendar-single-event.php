@@ -37,7 +37,7 @@ class LRob_Calendar_Single_Event {
     private function render_meta(LRob_Calendar_Event $event): string {
         ob_start();
         ?>
-        <div class="lrob-event-single">
+        <div class="lrob-event-single <?php echo esc_attr(LRob_Calendar::theme_class()); ?>">
             <div class="lrob-event-single-grid">
                 <?php $this->render_when($event); ?>
                 <?php $this->render_where($event); ?>

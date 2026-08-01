@@ -21,7 +21,7 @@
     },
     "editorScript": "lrob-calendar-block-calendar-edit",
     "editorStyle":  "lrob-calendar-blocks-editor",
-    "viewScript":   "lrob-calendar-view",
+    "viewScript":   ["lrob-calendar-theme-detect", "lrob-calendar-view"],
     "style":        ["lrob-calendar-block-calendar"],
     "render":       "file:./render.php"
 }

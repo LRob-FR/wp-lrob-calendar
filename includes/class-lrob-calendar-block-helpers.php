@@ -99,6 +99,11 @@ class LRob_Calendar_Block_Helpers {
             'cost'          => $event->get('cost') ?: null,
             'ticketUrl'     => $event->get('ticket_url') ?: null,
             'color'         => $color,
+            // hue/sat drive the pill; bg/text are the pre-computed light-mode
+            // pair, kept so JS from before the dark-mode refactor (or a cached
+            // REST payload) still renders something sensible.
+            'pillHue'       => $pill_colors['hue'],
+            'pillSat'       => $pill_colors['sat'],
             'pillBg'        => $pill_colors['bg'],
             'pillText'      => $pill_colors['text'],
         ];
@@ -159,7 +164,13 @@ class LRob_Calendar_Block_Helpers {
      *    a soft pastel pair — same event always gets the same color, but a
      *    page of mixed events gets visual variety.
      *
-     * Returns ['bg' => 'hsl(...)', 'text' => 'hsl(...)'].
+     * Returns ['hue' => int, 'sat' => int, 'bg' => 'hsl(...)', 'text' => 'hsl(...)'].
+     *
+     * Only hue + saturation are per-event; the LIGHTNESS that turns them into a
+     * background/text pair is mode-dependent and lives in CSS (--lrob-cal-pill-*-l
+     * in tokens.css), so pills can invert on dark surfaces. The 'bg'/'text' keys
+     * are the light-mode rendering, kept because REST responses are cached for a
+     * few minutes — a payload written before an upgrade must still render.
      */
     public static function date_pill_colors(?string $category_color, int $event_id): array {
         // 1. Category color always wins, regardless of admin settings.
@@ -190,25 +201,39 @@ class LRob_Calendar_Block_Helpers {
         // event always gets the same color, but a page of mixed events gets
         // visual variety. 137° steps spread well across the circle.
         $hue = ($event_id * 137) % 360;
+        return self::pill_pair($hue, 60);
+    }
+
+    /**
+     * Given a 6-char hex (no `#`), return the pill hue/sat pair used by every
+     * date pill in the plugin. Single source of truth — both the category-color
+     * path and the admin-configurable uncategorized paths run through this.
+     */
+    private static function pill_pair_from_hex(string $hex): array {
+        [$h, $s, $_l] = self::hex_to_hsl($hex);
+        return self::pill_pair($h, max(45, $s));
+    }
+
+    /** Assemble the pill descriptor from a hue + saturation. */
+    private static function pill_pair(int $hue, int $sat): array {
         return [
-            'bg'   => 'hsl(' . $hue . ', 65%, 92%)',
-            'text' => 'hsl(' . $hue . ', 55%, 28%)',
+            'hue'  => $hue,
+            'sat'  => $sat,
+            'bg'   => 'hsl(' . $hue . ', ' . $sat . '%, 92%)',
+            'text' => 'hsl(' . $hue . ', ' . $sat . '%, 28%)',
         ];
     }
 
     /**
-     * Given a 6-char hex (no `#`), return the soft-tint / deep-text HSL pair
-     * used by every date pill in the plugin. Single source of truth — both
-     * the category-color path and the admin-configurable uncategorized
-     * paths run through this.
+     * Inline style attribute for a date pill: the per-event hue/saturation only.
+     * CSS combines them with the mode-dependent lightness tokens.
      */
-    private static function pill_pair_from_hex(string $hex): array {
-        [$h, $s, $_l] = self::hex_to_hsl($hex);
-        $sat = max(45, $s);
-        return [
-            'bg'   => 'hsl(' . $h . ', ' . $sat . '%, 92%)',
-            'text' => 'hsl(' . $h . ', ' . $sat . '%, 28%)',
-        ];
+    public static function pill_style_attr(array $pill_colors): string {
+        if (!isset($pill_colors['hue'], $pill_colors['sat'])) {
+            return '';
+        }
+        return ' style="--pill-hue: ' . (int) $pill_colors['hue']
+             . '; --pill-sat: ' . (int) $pill_colors['sat'] . '%"';
     }
 
     /**
@@ -338,8 +363,7 @@ class LRob_Calendar_Block_Helpers {
             $cat_color = self::get_category_color((int) $categories[0]->term_id);
         }
         $pill_colors = self::date_pill_colors($cat_color, $post->ID);
-        $pill_style  = ' style="background-color: ' . esc_attr($pill_colors['bg'])
-                     . '; color: ' . esc_attr($pill_colors['text']) . '"';
+        $pill_style  = self::pill_style_attr($pill_colors);
 
         // CTA link target — falls back to the permalink if no ticket URL is set.
         $ticket_url  = $event->get('ticket_url') ?: '';

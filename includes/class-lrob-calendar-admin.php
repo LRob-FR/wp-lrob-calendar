@@ -113,8 +113,6 @@ class LRob_Calendar_Admin {
         wp_localize_script('lrob-calendar-admin', 'lrobCalendarAdmin', [
             'ajaxUrl'          => admin_url('admin-ajax.php'),
             'nonce'            => wp_create_nonce('lrob_calendar_admin'),
-            'selectImageTitle' => __('Select Image', 'lrob-calendar'),
-            'useImageText'     => __('Use this image', 'lrob-calendar'),
             // PHP date() format tokens; wp.date.dateI18n() in admin JS uses these
             // to render the live preview in the site's locale, not the browser's.
             'dateFormat'       => get_option('date_format'),
@@ -383,6 +381,15 @@ class LRob_Calendar_Admin {
             }
             update_option('lrob_calendar_color_mode', $color_mode);
 
+            // Per-mode surface + text overrides. Empty clears the override and
+            // the built-in palette for that mode applies. Only Light and Dark
+            // are customizable — in Auto the plugin deliberately borrows the
+            // theme's own background and text colour.
+            foreach (['light_surface', 'light_text', 'dark_surface', 'dark_text'] as $key) {
+                $value = sanitize_hex_color($_POST[$key] ?? '');
+                update_option('lrob_calendar_' . $key, $value ?: '');
+            }
+
             // Date pill color mode for events that have no category color.
             $uncat_mode = sanitize_text_field($_POST['uncategorized_pill_mode'] ?? 'random');
             if (!in_array($uncat_mode, ['random', 'primary', 'custom'], true)) {
@@ -418,6 +425,10 @@ class LRob_Calendar_Admin {
         $primary_color    = (string) get_option('lrob_calendar_primary_color', '');
         $secondary_color  = (string) get_option('lrob_calendar_secondary_color', '');
         $color_mode       = (string) get_option('lrob_calendar_color_mode', 'auto');
+        $light_surface    = (string) get_option('lrob_calendar_light_surface', '');
+        $light_text       = (string) get_option('lrob_calendar_light_text', '');
+        $dark_surface     = (string) get_option('lrob_calendar_dark_surface', '');
+        $dark_text        = (string) get_option('lrob_calendar_dark_text', '');
         $uncat_mode       = (string) get_option('lrob_calendar_uncategorized_pill_mode', 'random');
         $uncat_color      = (string) get_option('lrob_calendar_uncategorized_pill_color', '');
         $popup_show_image = (bool)   get_option('lrob_calendar_popup_show_image', true);
@@ -529,7 +540,47 @@ class LRob_Calendar_Admin {
                                 <option value="dark"  <?php selected($color_mode, 'dark'); ?>><?php esc_html_e('Dark', 'lrob-calendar'); ?></option>
                             </select>
                             <p class="description">
-                                <?php esc_html_e('Site-wide default. "Auto" blends into your theme (inherits its text colour, transparent surfaces). Each block can override this in its Appearance setting.', 'lrob-calendar'); ?>
+                                <?php esc_html_e('Site-wide default. "Auto" measures the page background and picks the light or dark palette to match — including themes that switch between the two. Each block can override this in its Appearance setting.', 'lrob-calendar'); ?>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><?php esc_html_e('Light mode colors', 'lrob-calendar'); ?></th>
+                        <td>
+                            <p style="margin: 0 0 6px;">
+                                <label for="light_surface" style="display: inline-block; min-width: 90px;"><?php esc_html_e('Background', 'lrob-calendar'); ?></label>
+                                <input type="text" id="light_surface" name="light_surface"
+                                       value="<?php echo esc_attr($light_surface); ?>"
+                                       class="lrob-color-field" data-default-color="#ffffff">
+                            </p>
+                            <p style="margin: 0;">
+                                <label for="light_text" style="display: inline-block; min-width: 90px;"><?php esc_html_e('Text', 'lrob-calendar'); ?></label>
+                                <input type="text" id="light_text" name="light_text"
+                                       value="<?php echo esc_attr($light_text); ?>"
+                                       class="lrob-color-field" data-default-color="#0f172a">
+                            </p>
+                            <p class="description">
+                                <?php esc_html_e('Used whenever the calendar shows its light palette — Light mode, or Auto on a light page. Borders, muted text and hover shades are derived from these two automatically. Leave empty for the defaults.', 'lrob-calendar'); ?>
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><?php esc_html_e('Dark mode colors', 'lrob-calendar'); ?></th>
+                        <td>
+                            <p style="margin: 0 0 6px;">
+                                <label for="dark_surface" style="display: inline-block; min-width: 90px;"><?php esc_html_e('Background', 'lrob-calendar'); ?></label>
+                                <input type="text" id="dark_surface" name="dark_surface"
+                                       value="<?php echo esc_attr($dark_surface); ?>"
+                                       class="lrob-color-field" data-default-color="#1e2530">
+                            </p>
+                            <p style="margin: 0;">
+                                <label for="dark_text" style="display: inline-block; min-width: 90px;"><?php esc_html_e('Text', 'lrob-calendar'); ?></label>
+                                <input type="text" id="dark_text" name="dark_text"
+                                       value="<?php echo esc_attr($dark_text); ?>"
+                                       class="lrob-color-field" data-default-color="#e5e7eb">
+                            </p>
+                            <p class="description">
+                                <?php esc_html_e('Used whenever the calendar shows its dark palette — Dark mode, or Auto on a dark page. Set the background close to your theme’s own if you want the calendar to sit more quietly on the page.', 'lrob-calendar'); ?>
                             </p>
                         </td>
                     </tr>
@@ -820,17 +871,6 @@ class LRob_Calendar_Admin {
             <label for="lrob_cat_color"><?php esc_html_e('Color', 'lrob-calendar'); ?></label>
             <input type="text" name="lrob_cat_color" id="lrob_cat_color" value="#3788d8" class="lrob-color-picker">
         </div>
-        <div class="form-field">
-            <label for="lrob_cat_image_id"><?php esc_html_e('Image', 'lrob-calendar'); ?></label>
-            <input type="hidden" name="lrob_cat_image_id" id="lrob_cat_image_id" value="">
-            <div id="lrob_cat_image_preview" class="lrob-image-preview"></div>
-            <button type="button" class="button lrob-select-image" data-target="lrob_cat_image_id" data-preview="lrob_cat_image_preview">
-                <?php esc_html_e('Select Image', 'lrob-calendar'); ?>
-            </button>
-            <button type="button" class="button lrob-remove-image" data-target="lrob_cat_image_id" data-preview="lrob_cat_image_preview" style="display:none;">
-                <?php esc_html_e('Remove Image', 'lrob-calendar'); ?>
-            </button>
-        </div>
         <?php
     }
     
@@ -844,31 +884,12 @@ class LRob_Calendar_Admin {
         ));
         
         $color = $meta->color ?? '#3788d8';
-        $image_url = $meta->image ?? '';
-        $image_id = $image_url ? attachment_url_to_postid($image_url) : 0;
-        
+
         ?>
         <tr class="form-field">
             <th scope="row"><label for="lrob_cat_color"><?php esc_html_e('Color', 'lrob-calendar'); ?></label></th>
             <td>
                 <input type="text" name="lrob_cat_color" id="lrob_cat_color" value="<?php echo esc_attr($color); ?>" class="lrob-color-picker">
-            </td>
-        </tr>
-        <tr class="form-field">
-            <th scope="row"><label><?php esc_html_e('Image', 'lrob-calendar'); ?></label></th>
-            <td>
-                <input type="hidden" name="lrob_cat_image_id" id="lrob_cat_image_id" value="<?php echo esc_attr($image_id); ?>">
-                <div id="lrob_cat_image_preview" class="lrob-image-preview">
-                    <?php if ($image_url): ?>
-                        <img src="<?php echo esc_url($image_url); ?>" style="max-width:150px;height:auto;">
-                    <?php endif; ?>
-                </div>
-                <button type="button" class="button lrob-select-image" data-target="lrob_cat_image_id" data-preview="lrob_cat_image_preview">
-                    <?php esc_html_e('Select Image', 'lrob-calendar'); ?>
-                </button>
-                <button type="button" class="button lrob-remove-image" data-target="lrob_cat_image_id" data-preview="lrob_cat_image_preview" style="<?php echo $image_url ? '' : 'display:none;'; ?>">
-                    <?php esc_html_e('Remove Image', 'lrob-calendar'); ?>
-                </button>
             </td>
         </tr>
         <?php
@@ -879,19 +900,20 @@ class LRob_Calendar_Admin {
         
         $table = LRob_Calendar_Database::get_category_meta_table();
         $color = sanitize_hex_color($_POST['lrob_cat_color'] ?? '');
-        
-        $image_id = absint($_POST['lrob_cat_image_id'] ?? 0);
-        $image = $image_id ? wp_get_attachment_url($image_id) : '';
-        
+
         $exists = $wpdb->get_var($wpdb->prepare(
             "SELECT term_id FROM {$table} WHERE term_id = %d",
             $term_id
         ));
-        
+
+        // `image` is intentionally left alone. Nothing in the plugin has ever
+        // rendered a category image, so the field was dropped from the UI in
+        // 1.2.1 — but the column and its import/export mapping stay for
+        // round-tripping AI1EC data, and an update here must not blank it.
         if ($exists) {
-            $wpdb->update($table, ['color' => $color, 'image' => $image], ['term_id' => $term_id]);
+            $wpdb->update($table, ['color' => $color], ['term_id' => $term_id]);
         } else {
-            $wpdb->insert($table, ['term_id' => $term_id, 'color' => $color, 'image' => $image]);
+            $wpdb->insert($table, ['term_id' => $term_id, 'color' => $color, 'image' => '']);
         }
 
         LRob_Calendar_Block_Helpers::invalidate_category_color($term_id);

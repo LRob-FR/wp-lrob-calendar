@@ -39,6 +39,15 @@
     --lrob-cal-shadow-card:     0 1px 2px rgba(15, 23, 42, 0.04),
                                  0 1px 3px rgba(15, 23, 42, 0.06);
 
+    /* Date-pill lightness. The hue + saturation of a pill are per-event and
+       arrive as inline --pill-hue / --pill-sat custom properties (category
+       colour, or a deterministic hash). Only the LIGHTNESS is mode-dependent,
+       and it lives here so a dark surface can invert the pill without the
+       inline style getting in the way — inline styles beat stylesheets, which
+       is why the full colour used to be baked in and never adapted. */
+    --lrob-cal-pill-bg-l: 92%;
+    --lrob-cal-pill-fg-l: 28%;
+
     /* ─── Spacing scale (8px grid, with one 4px sub-step) ───────── */
     --lrob-cal-space-1: 4px;
     --lrob-cal-space-2: 8px;
@@ -80,15 +89,31 @@
 }
 
 /* ─── Color modes ────────────────────────────────────────────────────────
-   The block wrapper carries one of these classes (lrob-theme-{auto,light,dark}).
-   :root above holds the default LIGHT palette; the classes below override the
-   mode-dependent tokens. "auto" follows the surrounding theme by inheriting its
-   text colour (currentColor) and keeping surfaces transparent/tinted, so the
-   plugin blends into any light OR dark FSE theme without knowing its palette.
-   Spacing / radius / typography / brand colours are mode-independent and stay
-   on :root. */
+   There are exactly TWO palettes, Light and Dark, selected by `.lrob-is-light`
+   / `.lrob-is-dark` on the block wrapper. Spacing / radius / typography / brand
+   colours are mode-independent and stay on :root.
 
-.lrob-theme-light {
+   How a wrapper gets its marker:
+     - Light / Dark mode → PHP writes `lrob-theme-light lrob-is-light` (resp.
+       dark) at render time.
+     - Auto             → PHP writes `lrob-theme-auto` only, and theme-detect.js
+       measures the page background behind the block and adds the matching
+       `lrob-is-*`. Auto is therefore just a *chooser* between the same two
+       palettes — not a third rendering mode.
+
+   Auto used to be a third mode that inherited the theme's text colour and kept
+   surfaces transparent, to blend in. Two problems killed it: a calendar with
+   the page's own background has no edge and dissolves into the page, and every
+   token derived from `inherit`/`currentColor` collapses to black when a theme
+   doesn't pass a colour down to arbitrary containers — black text on a black
+   page. Resolving to a real palette removes that whole class of failure, and
+   the palettes are admin-configurable if the defaults don't suit a theme.
+
+   Before the script runs (and with JS off) an Auto wrapper has no marker and
+   falls back to the :root Light palette — a readable card, possibly the wrong
+   one, which is the right way to fail. */
+
+.lrob-is-light {
     --lrob-cal-surface:        #ffffff;
     --lrob-cal-surface-muted:  #f8fafc;
     --lrob-cal-surface-hover:  #f1f5f9;
@@ -99,7 +124,7 @@
     --lrob-cal-border-strong:  #cbd5e1;
 }
 
-.lrob-theme-dark {
+.lrob-is-dark {
     --lrob-cal-surface:        #1e2530;
     --lrob-cal-surface-muted:  #252d3a;
     --lrob-cal-surface-hover:  #2d3644;
@@ -112,30 +137,9 @@
                                  0 10px 30px -8px rgba(0, 0, 0, 0.55);
     --lrob-cal-shadow-card:     0 1px 2px rgba(0, 0, 0, 0.3),
                                  0 1px 3px rgba(0, 0, 0, 0.45);
-}
-
-.lrob-theme-auto {
-    /* Text follows the theme; muted/subtle are translucent shades of it. */
-    --lrob-cal-text:           inherit;
-    --lrob-cal-text-muted:     color-mix(in srgb, currentColor 65%, transparent);
-    --lrob-cal-text-subtle:    color-mix(in srgb, currentColor 45%, transparent);
-    /* Surfaces stay out of the way so the theme's background shows through. */
-    --lrob-cal-surface:        transparent;
-    --lrob-cal-surface-muted:  color-mix(in srgb, currentColor 5%, transparent);
-    --lrob-cal-surface-hover:  color-mix(in srgb, currentColor 8%, transparent);
-    --lrob-cal-border:         color-mix(in srgb, currentColor 15%, transparent);
-    --lrob-cal-border-strong:  color-mix(in srgb, currentColor 28%, transparent);
-}
-
-/* A floating popup can't be transparent (it overlays the page). In auto mode
-   give it an opaque system surface that follows the light/dark preference, so
-   it's always readable whatever the theme. Inside it, surfaces become opaque
-   and text resolves to CanvasText. */
-.lrob-theme-auto .lrob-cal-popup-content {
-    color-scheme: light dark;
-    color: CanvasText;
-    background: Canvas;
-    --lrob-cal-surface: Canvas;
+    /* Pills invert: deep saturated background, bright text of the same hue. */
+    --lrob-cal-pill-bg-l: 26%;
+    --lrob-cal-pill-fg-l: 84%;
 }
 
 /* Shared icon utility — sizing handled by parent context, colour follows

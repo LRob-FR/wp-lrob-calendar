@@ -106,6 +106,9 @@ class LRob_Calendar {
             return;
         }
         wp_enqueue_style('lrob-calendar-single-event-page');
+        // The injected meta block honours the site colour mode, so "auto" needs
+        // the same page-background measurement the blocks get.
+        wp_enqueue_script('lrob-calendar-theme-detect');
     }
 
     /**
@@ -131,9 +134,21 @@ class LRob_Calendar {
         return in_array($mode, ['auto', 'light', 'dark'], true) ? $mode : 'auto';
     }
 
-    /** CSS class for a block wrapper, e.g. "lrob-theme-dark". */
+    /**
+     * CSS classes for a block wrapper, e.g. "lrob-theme-dark lrob-is-dark".
+     *
+     * The palette is selected by the `lrob-is-light` / `lrob-is-dark` marker,
+     * which Light and Dark carry from the server. Auto gets only its mode class
+     * here — theme-detect.js adds the marker once it has measured the page
+     * background, so Auto simply resolves to one of the same two palettes.
+     */
     public static function theme_class(?string $block_attr = null): string {
-        return 'lrob-theme-' . self::color_mode($block_attr);
+        $mode = self::color_mode($block_attr);
+        $classes = 'lrob-theme-' . $mode;
+        if ($mode !== 'auto') {
+            $classes .= ' lrob-is-' . $mode;
+        }
+        return $classes;
     }
 
     /**

@@ -191,10 +191,17 @@
         var dayNum    = startDate.getDate();
         var monthStr  = shortMonthName(startDate.getMonth());
 
-        // Date-block color pair — same per-event hashed/category pastel pair
-        // the events-list cards use (PHP-computed, in event.pillBg/pillText).
+        // Date-block colour — same per-event hashed/category hue the events-list
+        // cards use. We pass only hue + saturation; CSS supplies the lightness
+        // from the active colour mode so the pill inverts on a dark surface.
+        // pillBg/pillText is the pre-refactor pair, still present in REST
+        // payloads cached before an upgrade — fall back to it so a stale
+        // response renders a coloured pill rather than an unstyled one.
         var pillStyle = '';
-        if (event.pillBg || event.pillText) {
+        if (event.pillHue !== undefined && event.pillHue !== null) {
+            pillStyle = ' style="--pill-hue: ' + parseInt(event.pillHue, 10)
+                      + '; --pill-sat: ' + parseInt(event.pillSat, 10) + '%"';
+        } else if (event.pillBg || event.pillText) {
             pillStyle = ' style="background-color: ' + escapeAttr(event.pillBg || '')
                       + '; color: ' + escapeAttr(event.pillText || '') + '"';
         }

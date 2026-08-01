@@ -30,7 +30,7 @@
     },
     "editorScript": "lrob-calendar-block-events-list-edit",
     "editorStyle":  "lrob-calendar-blocks-editor",
-    "viewScript":   ["lrob-calendar-event-card-expand", "lrob-calendar-events-list-pagination"],
+    "viewScript":   ["lrob-calendar-theme-detect", "lrob-calendar-event-card-expand", "lrob-calendar-events-list-pagination"],
     "style":        ["lrob-calendar-block-events-list"],
     "render":       "file:./render.php"
 }

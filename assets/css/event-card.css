@@ -57,9 +57,10 @@
 /* ─── Date block (large day over uppercase short month) ──────────────────── */
 
 /* Date block — fixed-height rounded rectangle, vertically centered next to
-   the content. Background + text color are inline styles set by PHP from
-   either the category color or a deterministic hashed pastel, so each event
-   gets its own coherent shade. */
+   the content. PHP supplies only the per-event hue + saturation as inline
+   --pill-hue / --pill-sat (from the category colour, or a deterministic hash);
+   the lightness comes from the mode tokens so the pill inverts on dark
+   surfaces instead of staying a bright pastel. */
 .lrob-event-card__date-block {
     display: flex;
     flex-direction: column;
@@ -74,9 +75,8 @@
     line-height: 1;
     font-variant-numeric: tabular-nums;
     text-align: center;
-    /* Fallback in case inline style is missing */
-    background: var(--lrob-cal-surface-muted);
-    color: var(--lrob-cal-text);
+    background: hsl(var(--pill-hue, 210), var(--pill-sat, 60%), var(--lrob-cal-pill-bg-l));
+    color:      hsl(var(--pill-hue, 210), var(--pill-sat, 60%), var(--lrob-cal-pill-fg-l));
 }
 
 .lrob-event-card__date-day {
@@ -445,9 +445,8 @@
     line-height: 1;
     font-variant-numeric: tabular-nums;
     text-align: center;
-    /* Fallback colors if the inline style is somehow missing. */
-    background: var(--lrob-cal-primary-soft);
-    color: var(--lrob-cal-primary);
+    background: hsl(var(--pill-hue, 210), var(--pill-sat, 60%), var(--lrob-cal-pill-bg-l));
+    color:      hsl(var(--pill-hue, 210), var(--pill-sat, 60%), var(--lrob-cal-pill-fg-l));
 }
 
 .lrob-event-card.lrob-event-grid .lrob-event-thumbnail--placeholder .lrob-event-card__date-day {
@@ -481,8 +480,8 @@
     justify-content: center;
     min-width: 52px;
     padding: var(--lrob-cal-space-2) var(--lrob-cal-space-2);
-    background: var(--lrob-cal-surface);
-    color: var(--lrob-cal-text);
+    background: hsl(var(--pill-hue, 210), var(--pill-sat, 60%), var(--lrob-cal-pill-bg-l));
+    color:      hsl(var(--pill-hue, 210), var(--pill-sat, 60%), var(--lrob-cal-pill-fg-l));
     border-radius: var(--lrob-cal-radius-md);
     box-shadow: var(--lrob-cal-shadow-card);
     line-height: 1;
@@ -645,8 +644,8 @@
     align-items: center;
     gap: var(--lrob-cal-space-1);
     padding: 2px var(--lrob-cal-space-2);
-    background: var(--lrob-cal-primary-soft);
-    color: var(--lrob-cal-primary);
+    background: hsl(var(--pill-hue, 210), var(--pill-sat, 60%), var(--lrob-cal-pill-bg-l));
+    color:      hsl(var(--pill-hue, 210), var(--pill-sat, 60%), var(--lrob-cal-pill-fg-l));
     font-size: 0.82em;
     font-weight: var(--lrob-cal-font-weight-semibold);
     border-radius: var(--lrob-cal-radius-pill);

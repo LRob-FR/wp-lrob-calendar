@@ -114,24 +114,6 @@
     display: block;
 }
 
-/* Image preview */
-.lrob-image-preview {
-    margin-bottom: 10px;
-}
-
-.lrob-image-preview img {
-    max-width: 150px;
-    height: auto;
-    display: block;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-
-.lrob-select-image,
-.lrob-remove-image {
-    margin-right: 5px;
-}
-
 /* Responsive */
 @media screen and (max-width: 782px) {
     .lrob-import-export-container {

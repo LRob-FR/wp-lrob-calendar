@@ -19,7 +19,7 @@
     },
     "editorScript": "lrob-calendar-block-single-event-edit",
     "editorStyle":  "lrob-calendar-blocks-editor",
-    "viewScript":   ["lrob-calendar-event-card-expand"],
+    "viewScript":   ["lrob-calendar-theme-detect", "lrob-calendar-event-card-expand"],
     "style":        ["lrob-calendar-event-card"],
     "render":       "file:./render.php"
 }

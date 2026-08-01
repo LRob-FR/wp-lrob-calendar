@@ -92,37 +92,10 @@
         $('#lrob_latitude, #lrob_longitude').on('input change', syncMapOptions);
         syncMapOptions();
 
-        // Media library integration
-        $(document).on('click', '.lrob-select-image', function(e) {
-            e.preventDefault();
-            var $button = $(this);
-            var targetInput = $button.data('target');
-            var previewDiv = $button.data('preview');
-
-            var frame = wp.media({
-                title: lrobCalendarAdmin.selectImageTitle || 'Select Image',
-                button: { text: lrobCalendarAdmin.useImageText || 'Use this image' },
-                multiple: false
-            });
-
-            frame.on('select', function() {
-                var attachment = frame.state().get('selection').first().toJSON();
-                $('#' + targetInput).val(attachment.id);
-                var url = attachment.sizes && attachment.sizes.thumbnail ? attachment.sizes.thumbnail.url : attachment.url;
-                $('#' + previewDiv).html('<img src="' + url + '" style="max-width:150px;height:auto;">');
-                $button.siblings('.lrob-remove-image').show();
-            });
-
-            frame.open();
-        });
-
-        $(document).on('click', '.lrob-remove-image', function(e) {
-            e.preventDefault();
-            var $button = $(this);
-            $('#' + $button.data('target')).val('');
-            $('#' + $button.data('preview')).empty();
-            $button.hide();
-        });
+        // The generic .lrob-select-image / .lrob-remove-image media picker that
+        // lived here was only ever wired to the category "Image" field, which
+        // nothing rendered on the frontend and which was removed in 1.2.1. The
+        // event modal has its own wp.media picker (admin/js/event-modal.js).
     });
 
 })(jQuery);

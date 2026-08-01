@@ -5,6 +5,45 @@ This project follows [semantic versioning](https://semver.org/).
 
 ---
 
+## 1.2.1 — Dark themes, properly 🌙
+
+**🐛 Fixes**
+- **Unreadable text on dark themes.** The event details injected above a single
+  event's content (date, place, price, contact) ignored the colour mode setting
+  entirely and always used the light palette — so on a dark theme the date read
+  as near-black on near-black. It now follows the same setting as every block.
+- **Popups no longer come out white on a dark site.** In *Auto*, the popup used
+  your operating system's light/dark preference rather than the page's, so a
+  dark site viewed from a light-mode computer got a white card. It now takes its
+  colours from the page it opens over.
+- **Date pills adapt.** The coloured day/month blocks kept a pastel background
+  and dark text whatever the mode. They now invert on dark surfaces, keeping
+  each event's own hue.
+
+**✨ New**
+- **Auto mode reworked.** It used to try to disappear into your theme — borrow
+  its text colour, keep its own backgrounds transparent. That failed twice
+  over: a calendar with the page's own background has no edge and dissolves
+  into the page, and on themes that don't pass a colour down to plugin content
+  the borrowed colour came out black, on a black page.
+
+  Auto now **measures the background behind the block and picks the light or
+  dark palette to match**. The calendar reads as a proper panel again, and it's
+  readable by construction rather than by luck. Themes with their own
+  light/dark switch are followed live, without a page reload.
+- **Light and dark colours are configurable** in Settings → Appearance: pick a
+  background and a text colour for each palette. Borders, muted text and hover
+  shades are mixed from those two, so a custom palette stays consistent — and
+  they apply to Auto too, so you can tune the dark background to sit closer to
+  your theme's if you'd rather it stayed quiet.
+
+**🧹 Housekeeping**
+- Removed the category **Image** field. Nothing in the plugin ever displayed it,
+  and it was only reachable from a screen the menu no longer links to. Existing
+  values are untouched and still import/export, so nothing is lost.
+
+---
+
 ## 1.2.0 — A brand-new event editor 🎉
 
 The biggest update yet: managing events no longer means wrestling with the
