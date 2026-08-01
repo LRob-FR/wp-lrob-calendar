@@ -20,6 +20,29 @@ There are none. Changes ship by copying the directory into a WP install's `wp-co
 
 **JS translations require both**: (a) `wp_set_script_translations($handle, 'lrob-calendar', LROB_CALENDAR_PATH . 'languages')` called after the script is enqueued — already done in `LRob_Calendar::enqueue_block_editor_assets()`; (b) the matching JSON file shipped in `languages/`. The JSON filename is `lrob-calendar-<locale>-<md5-of-source-path>.json` — `wp i18n make-json` handles the hashing automatically.
 
+## Publishing a release
+
+`./publish.sh` is the publish entry point — **`release.sh` builds, this ships.**
+It tags, creates the Forgejo release at `git.lrob.net/WP/calendar` and uploads
+the zip as a release asset. Installed sites auto-update from that asset (see
+`LRob_Calendar_Updater`), so publishing pushes to real users — **only run it
+when the user explicitly asks.**
+
+```sh
+./publish.sh --dry-run -n notes.md     # print every API call, touch nothing
+./publish.sh -n notes.md               # tag + release + upload
+./publish.sh -n notes.md --clobber     # replace the zip on an existing tag
+```
+
+Token comes from `~/.config/forgejo/token` (or `$FORGEJO_TOKEN`). The repo URL
+is read from `LROB_CALENDAR_REPO_URL` in `lrob-calendar.php`, so the publish
+target can't drift from where installed sites look for updates.
+
+It refuses to publish if any `.po` has fuzzy or untranslated strings, and warns
+if the zip is older than the working tree or `HEAD` differs from `forgejo/main`
+— push before publishing. `prerelease` is always false: the updater only offers
+the latest non-prerelease, so a prerelease would silently stall every install.
+
 Translation workflow when strings change:
 - Add/modify strings using `__('...', 'lrob-calendar')` (PHP) or `wp.i18n.__('...', 'lrob-calendar')` (blocks JS) — text domain is always `lrob-calendar`.
 - Run `./release.sh` to refresh the `.pot`.
